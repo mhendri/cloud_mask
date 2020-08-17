@@ -7,7 +7,7 @@ the vertical feature mask (VFM) and Number of Layers Found.
 
 Usage:  save this script and run
 
-    python VFM_full_NumLayers.py
+    python VFM_333m_NumLayers.py
 
 The HDF file must be in your current working directory.
 
