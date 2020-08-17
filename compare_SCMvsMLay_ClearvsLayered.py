@@ -135,6 +135,8 @@ ax1.scatter(lat, SCM, color='orange', s=0.3, label='SCM')
 leg = ax1.legend(loc='upper center', fontsize=10, frameon=False, ncol=2)
 for handle, text in zip(leg.legendHandles, leg.get_texts()):
     text.set_color(handle.get_facecolor()[0])
+for item in leg.legendHandles:
+    item.set_visible(False)
 ax1.set_xlabel('Lat', fontsize=9)
 ax1.xaxis.set_label_coords(-0.01, -0.06)
 ax1.margins(x=0, y=0.1)
