@@ -63,7 +63,7 @@ for calipso_path in data_path:
 		# Determine orbit path over Greenland
 		latlon = zip(lat, lon)
 		for index, lalo in enumerate(latlon):
-			if (75<=lalo[0]<=83 and -73<=lalo[1]<=-10) or (65<=lalo[0]<=75 and -60<=lalo[1]<=-17) or (58<=lalo[0]<=65 and -55<=lalo[1]<=-40): 
+			if (75<=lalo[0]<=83 and -73<=lalo[1]<=-15) or (65<=lalo[0]<=75 and -60<=lalo[1]<=-17) or (58<=lalo[0]<=65 and -55<=lalo[1]<=-40): 
 				if calipso_path not in file_lst:
 					file_lst.append(calipso_path)
 
