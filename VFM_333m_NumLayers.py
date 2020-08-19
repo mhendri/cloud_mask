@@ -504,7 +504,7 @@ ax4.legend(loc='upper left', fontsize=9)
 fig = plt.gcf()
 
 # Create a second axes for the discrete colorbar.
-ax5 = fig.add_axes([0.83, 0.3, 0.02, 0.6])
+ax5 = fig.add_axes([0.83, 0.5, 0.02, 0.4])
 cb = mpl.colorbar.ColorbarBase(ax5, cmap=cmap, boundaries=bounds)
 cb.ax.tick_params(size=0)
 cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
