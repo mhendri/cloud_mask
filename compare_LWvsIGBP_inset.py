@@ -12,7 +12,7 @@ Usage:  save this script and run
 The HDF file must be in your current working directory.
 
 Tested under: Python 3.7.6  Anaconda 4.8.3
-Last updated: 2020-08-14
+Last updated: 2020-08-19
 """
 
 import os
@@ -99,7 +99,7 @@ cmap = colors.ListedColormap(['blue', 'green'])
 
 # The data is global, so render in a global projection
 m = Basemap(projection='cyl', resolution='l',
-            llcrnrlat=55, urcrnrlat=85,
+            llcrnrlat=55, urcrnrlat=90,
             llcrnrlon=-80, urcrnrlon=-10)
 m.drawcoastlines(linewidth=0.5)
 m.drawparallels(np.arange(55,85,10), labels=[True,False,False,True])
@@ -122,7 +122,36 @@ for m2_feature in IGBP:
 # Draw line along original orbit path on top of points
 m.plot(lon, lat, color='grey', linewidth=0.75)
 
-
+# Draw geographical box
+for i in lat:
+    if 75 <= i <= 83: 
+        m.scatter(-73, i, color='red', s=2)
+    elif 65 <= i <= 75: 
+        m.scatter(-60, i, color='red', s=2)
+    elif 58 <= i <= 65: 
+        m.scatter(-55, i, color='red', s=2)
+for j in lat:
+    if 75 <= j <= 83: 
+        m.scatter(-15, j, color='red', s=2)
+    elif 65 <= j <= 75: 
+        m.scatter(-17, j, color='red', s=2)
+    elif 58 <= j <= 65: 
+        m.scatter(-40, j, color='red', s=2)
+for i in lon:
+    if -73 <= i <= -15: 
+        m.scatter(i, 83, color='red', s=2)
+for j in lon:
+    if -73 <= j <= -60:
+        m.scatter(j, 75, color='red', s=2)
+    elif -60 <= j <=-55:
+        m.scatter(j, 65, color='red', s=2)
+    elif -55 <= j <= -40: 
+        m.scatter(j, 58, color='red', s=2)
+    elif -40 <= j <= -17:
+        m.scatter(j, 65, color='red', s=2)
+    elif -17 <= j <= -15:
+        m.scatter(j, 75, color='red', s=2)
+        
 #-----------------------------------------------------------------------------#
 # Create lower left inset
 axins = zoomed_inset_axes(ax1, 5, loc='lower left') #, bbox_to_anchor=(-0.1, 1.8),  bbox_transform=ax1.transAxes,  borderpad=3)
