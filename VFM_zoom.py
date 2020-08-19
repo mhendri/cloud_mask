@@ -328,19 +328,19 @@ ax7.set_xticks([])
 ax7.legend(['Surface Elevation'], fontsize=9)
 
 # Create colorbar legend
-plt.gcf().text(0.05,0.03, '1 = "clear air"    2 = cloud    3 = tropospheric aerosol    4 = stratospheric aerosol    5 = surface   6 = subsurface   7 = no signal', 
-	fontsize=9, fontweight='bold')
+#plt.gcf().text(0.05,0.03, '1 = "clear air"    2 = cloud    3 = tropospheric aerosol    4 = stratospheric aerosol    5 = surface   6 = subsurface   7 = no signal', 
+#	fontsize=9, fontweight='bold')
 
 fig = plt.gcf()
 
 # Create a second axes for the discrete colorbar.
-ax4 = fig.add_axes([0.89, 0.2, 0.02, 0.6])
+ax4 = fig.add_axes([0.83, 0.5, 0.02, 0.4])
 cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, boundaries=bounds)
 cb.ax.tick_params(size=0)
-
 cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
-cb.ax.set_yticklabels(['1', '2', '3', '4', '5', '6', '7'], 
-	fontsize=6, fontweight='bold')
+cb.ax.set_yticklabels(['"clear air"', 'cloud', 'tropospheric aerosol',
+ 'stratospheric aerosol', 'surface', 'subsurface', 'no signal'],
+  fontsize=8, fontweight='bold')
 
 plt.show()
 pngfile = 'VFM_zoom'
