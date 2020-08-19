@@ -127,7 +127,7 @@ for f in file_name_list:
 		lat_lon_lst = []
 		latlon = zip(lat, lon)
 		for index, lalo in enumerate(latlon):
-			if 75<=lalo[0]<=83 and -73<=lalo[1]<=-10 or 67<=lalo[0]<=75 and -60<=lalo[1]<=-10 or 58<=lalo[0]<=67 and -60<=lalo[1]<=-40:  
+			if (75<=lalo[0]<=83 and -73<=lalo[1]<=-15) or (65<=lalo[0]<=75 and -60<=lalo[1]<=-17) or (58<=lalo[0]<=65 and -55<=lalo[1]<=-40):  
 				if index not in lat_lon_lst:
 						lat_lon_lst.append(index)
 
