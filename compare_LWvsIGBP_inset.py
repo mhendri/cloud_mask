@@ -154,7 +154,7 @@ for j in lon:
         
 #-----------------------------------------------------------------------------#
 # Create lower left inset
-axins = zoomed_inset_axes(ax1, 5, loc='lower left') #, bbox_to_anchor=(-0.1, 1.8),  bbox_transform=ax1.transAxes,  borderpad=3)
+axins = zoomed_inset_axes(ax1, 6.5, loc='lower left') #, bbox_to_anchor=(-0.1, 1.8),  bbox_transform=ax1.transAxes,  borderpad=3)
 mark_inset(ax1, axins, loc1=2, loc2=1, fc="none", ec="0.5")
 axins.set_xlim(-66.5, -64.5)
 axins.set_ylim(80, 82)
@@ -184,8 +184,8 @@ for m2_feature in IGBP:
 
 #-----------------------------------------------------------------------------#
 # Create upper right inset
-axins2 = zoomed_inset_axes(ax1, 4.5, loc='upper right') #, bbox_to_anchor=(0.6, -1.0),  bbox_transform=ax1.transAxes,  borderpad=3)
-mark_inset(ax1, axins2, loc1=3, loc2=4, fc="none", ec="0.5")
+axins2 = zoomed_inset_axes(ax1, 6, loc='lower right') #, bbox_to_anchor=(0.6, -1.0),  bbox_transform=ax1.transAxes,  borderpad=3)
+mark_inset(ax1, axins2, loc1=2, loc2=1, fc="none", ec="0.5")
 axins2.set_xlim(-23.5, -21.5)
 axins2.set_ylim(69.5, 72)
 
