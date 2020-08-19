@@ -99,10 +99,16 @@ ax1.scatter(MLay_date, MLay_lat, s=8, color='orange', label='333mMLay')
 ax1.scatter(MYD03_date, MYD03_lat, s=8, color='blue', label='333m-MYD03')
 ax1.scatter(MYD021_date, MYD021_lat, s=8, color='green', label='333m-MYD021KM')
 plt.xticks(rotation=90, fontsize=8)
+start, end = ax1.get_xlim()
+ax1.xaxis.set_ticks(np.arange(start, end, 10))
 ax1.margins(x=0.001)
 ax1.set_ylim(ymin=63000)
 
-ax1.legend()
+leg = ax1.legend(loc='upper center', fontsize=15, frameon=False, ncol=3)
+for handle, text in zip(leg.legendHandles, leg.get_texts()):
+    text.set_color(handle.get_facecolor()[0])
+for item in leg.legendHandles:
+    item.set_visible(False)
 
 # Set title
 long_name = 'Orbit Length (number of pixels)'
