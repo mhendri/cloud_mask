@@ -126,17 +126,17 @@ m.plot(lon, lat, color='grey', linewidth=0.75)
 for i in lat:
     if 75 <= i <= 83: 
         m.scatter(-73, i, color='red', s=2)
-    elif 65 <= i <= 75: 
+    elif 67 <= i <= 75: 
         m.scatter(-60, i, color='red', s=2)
-    elif 58 <= i <= 65: 
+    elif 58 <= i <= 67: 
         m.scatter(-55, i, color='red', s=2)
 for j in lat:
     if 75 <= j <= 83: 
         m.scatter(-15, j, color='red', s=2)
-    elif 65 <= j <= 75: 
+    elif 67 <= j <= 75: 
         m.scatter(-17, j, color='red', s=2)
-    elif 58 <= j <= 65: 
-        m.scatter(-40, j, color='red', s=2)
+    elif 58 <= j <= 67: 
+        m.scatter(-30, j, color='red', s=2)
 for i in lon:
     if -73 <= i <= -15: 
         m.scatter(i, 83, color='red', s=2)
@@ -144,11 +144,11 @@ for j in lon:
     if -73 <= j <= -60:
         m.scatter(j, 75, color='red', s=2)
     elif -60 <= j <=-55:
-        m.scatter(j, 65, color='red', s=2)
-    elif -55 <= j <= -40: 
+        m.scatter(j, 67, color='red', s=2)
+    elif -55 <= j <= -30: 
         m.scatter(j, 58, color='red', s=2)
-    elif -40 <= j <= -17:
-        m.scatter(j, 65, color='red', s=2)
+    elif -30 <= j <= -17:
+        m.scatter(j, 67, color='red', s=2)
     elif -17 <= j <= -15:
         m.scatter(j, 75, color='red', s=2)
         
