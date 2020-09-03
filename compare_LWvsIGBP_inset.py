@@ -103,7 +103,7 @@ m = Basemap(projection='cyl', resolution='l',
             llcrnrlat=55, urcrnrlat=90,
             llcrnrlon=-80, urcrnrlon=0)
 m.drawcoastlines(linewidth=0.5)
-m.drawparallels(np.arange(55,85,10), labels=[True,False,False,True])
+m.drawparallels(np.arange(50,90,10), labels=[True,False,False,True])
 m.drawmeridians(np.arange(-80,-10,10), labels=[True,False,False,True])
 
 # Draw points from Land/Water Mask
@@ -124,14 +124,14 @@ for m2_feature in IGBP:
 m.plot(lon, lat, color='grey', linewidth=0.75)
 
 # Draw geographical box
-x1, y1 = [-60, -60], [82, 85]
-x2, y2 = [-62, -60], [82, 82]
-x3, y3 = [-64, -64], [81, 81.5]
-x4, y4 = [-68, -64], [81, 81]
-x5, y5 = [-68, -68], [80, 81]
+x1, y1 = [-60.25, -60.25], [82, 85]
+x2, y2 = [-62, -60.25], [82, 82]
+x3, y3 = [-64, -64], [81.25, 81.5]
+x4, y4 = [-67.5, -65], [81, 81]
+x5, y5 = [-68, -68], [80, 80.5]
 x6, y6 = [-70, -68], [80, 80]
 x7, y7 = [-70, -70], [79, 80]
-x8, y8 = [-73, -70], [79, 79]
+x8, y8 = [-73.25, -70], [79, 79]
 x9, y9 = [-60, -60], [67, 75]
 x10, y10 = [-55, -55], [58, 67]
 x11, y11 = [-10, -10], [75, 85]
@@ -143,10 +143,14 @@ x16, y16 = [-60, -55], [67, 67]
 x17, y17 = [-55, -30], [58, 58]
 x18, y18 = [-30, -17], [67, 67]
 x19, y19 = [-17, -10], [75, 75]
-x20, y20 = [-73, -73], [75, 79]
+x20, y20 = [-73.25, -73.25], [75, 79]
 x21, y21 = [-64, -62], [81.5, 81.5]
 x22, y22 = [-62, -62], [81.5, 82]
-plt.plot(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, x7, y7, x8, y8, x9, y9, x10, y10, x11, y11, x12, y12, x13, y13, x14, y14, x15, y15, x16, y16, x17, y17, x18, y18, x19, y19, x20, y20, x21, y21, x22, y22, marker = 'o', color='red', markersize=1)
+x23, y23 = [-67.5, -68 ], [80.5, 80.5]
+x24, y24 = [-67.5, -67.5], [80.5, 81]
+x25, y25 = [-65, -65], [81, 81.25]
+x26, y26 = [-65, -64], [81.25, 81.25]
+plt.plot(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, x7, y7, x8, y8, x9, y9, x10, y10, x11, y11, x12, y12, x13, y13, x14, y14, x15, y15, x16, y16, x17, y17, x18, y18, x19, y19, x20, y20, x21, y21, x22, y22, x23, y23, x24, y24, x25, y25, x26, y26, marker = 'o', color='red', markersize=1)
         
 #-----------------------------------------------------------------------------#
 # Create lower left inset
