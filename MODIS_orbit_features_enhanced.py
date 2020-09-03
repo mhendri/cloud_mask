@@ -1,5 +1,25 @@
 #!/usr/bin/env python
 
+'''
+Edited by Hannah Skobe
+Edited by Megan Ward-Baranyay
+This code illustrates how to access and visulaize both a LaRC CALIPSO file and 
+a MODIS file in Python. Specifically, this code plots the orbit path of CALIPSO 
+over the MODIS enhanced RGB image with layer indication from the instrument CALIOP.
+MODIS code reference:
+https://science-emergence.com/Codes/Plot-MODIS-granule-RGB-image-orthographic-projection-using-python-and-basemap/
+https://moonbooks.org/Codes/Plot-MODIS-granule-RGB-image-orthographic-projection--color-enhancement-using-python-and-basemap/
+CALIOP code reference:
+http://hdfeos.org/zoo/LaRC/CAL_LID_L2_VFM-ValStage1-V3-02.2011-12-31T23-18-11ZD.hdf.py
+Usage:  save this script and run
+    python MODIS_orbit_features_enhanced.py
+The HDF files must either be in your current working directory.
+Tested under: Python 3.7.6  Anaconda 4.8.3
+Last updated: 2020-09-03
+'''
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+
 from pyhdf.SD import SD, SDC 
 from skimage.util import img_as_ubyte
 from mpl_toolkits.basemap import Basemap, cm 
