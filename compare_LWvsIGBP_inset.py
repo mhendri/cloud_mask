@@ -1,17 +1,17 @@
 """
 Edited by Hannah Skobe
 Edited by Megan Ward-Baranyay
-
+Edited by Iraz Tejani
 This example code illustrates how to access and visualize a LaRC CALIPSO file 
 in Python on land above Greenland. Specifically, this code plots a comparison
 between two datasets: Land_Water_Mask and IGBP_Surface_Type.
-
 Usage:  save this script and run
-
     python compare_LWvsIGBP_inset.py
 
-The HDF file must be in your current working directory.
+To generate zoomed in image, comment out bottom insert section then simply zoom 
+using the plot tool shown after running the script. 
 
+The HDF file must be in your current working directory in a folder named 'Data'.
 Tested under: Python 3.7.6  Anaconda 4.8.3
 Last updated: 2020-08-19
 """
@@ -26,6 +26,9 @@ from mpl_toolkits.basemap import Basemap
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
+#-----------------------------------------------------------------------------#
+#Change Directory to Data
+os.chdir('./Data')
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 #CALIPSO VFM file input
@@ -126,34 +129,29 @@ m.plot(lon, lat, color='grey', linewidth=0.75)
 # Draw geographical box
 x1, y1 = [-60.25, -60.25], [82, 85]
 x2, y2 = [-62, -60.25], [82, 82]
-x3, y3 = [-64, -64], [81.25, 81.5]
-x4, y4 = [-67.5, -65], [81, 81]
-x5, y5 = [-68, -68], [80, 80.5]
-x6, y6 = [-70, -68], [80, 80]
-x7, y7 = [-70, -70], [79, 80]
-x8, y8 = [-73.25, -70], [79, 79]
+x3, y3 = [-62, -62], [82, 81.23]
+x4, y4 = [-62, -65.5], [81.23, 81.23]
+x5, y5 = [-65.5, -65.5], [81.23, 80.77]
+x6, y6 = [-67.5, -65.5], [80.77, 80.77]
+x7, y7 = [-67.5, -67.5], [80.77, 79.15]
+x8, y8 = [-73.25, -67.5], [79.15, 79.15]
 x9, y9 = [-60, -60], [67, 75]
 x10, y10 = [-55, -55], [58, 67]
 x11, y11 = [-10, -10], [75, 85]
 x12, y12 = [-17, -17], [67, 75]
 x13, y13 = [-30, -30], [58, 67]
-x14, y14 = [-60, -10], [85, 85]
-x15, y15 = [-73, -60], [75, 75]
+x14, y14 = [-60.25, -10], [85, 85]
+x15, y15 = [-73.25, -60], [75, 75]
 x16, y16 = [-60, -55], [67, 67]
 x17, y17 = [-55, -30], [58, 58]
 x18, y18 = [-30, -17], [67, 67]
 x19, y19 = [-17, -10], [75, 75]
-x20, y20 = [-73.25, -73.25], [75, 79]
-x21, y21 = [-64, -62], [81.5, 81.5]
-x22, y22 = [-62, -62], [81.5, 82]
-x23, y23 = [-67.5, -68 ], [80.5, 80.5]
-x24, y24 = [-67.5, -67.5], [80.5, 81]
-x25, y25 = [-65, -65], [81, 81.25]
-x26, y26 = [-65, -64], [81.25, 81.25]
-plt.plot(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, x7, y7, x8, y8, x9, y9, x10, y10, x11, y11, x12, y12, x13, y13, x14, y14, x15, y15, x16, y16, x17, y17, x18, y18, x19, y19, x20, y20, x21, y21, x22, y22, x23, y23, x24, y24, x25, y25, x26, y26, marker = 'o', color='red', markersize=1)
+x20, y20 = [-73.25, -73.25], [75, 79.15]
+
+plt.plot(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, x7, y7, x8, y8, x9, y9, x10, y10, x11, y11, x12, y12, x13, y13, x14, y14, x15, y15, x16, y16, x17, y17, x18, y18, x19, y19, x20, y20, marker = 'o', color='red', markersize=1)
         
 #-----------------------------------------------------------------------------#
-# Create lower left inset
+# # Create lower left inset
 axins = zoomed_inset_axes(ax1, 6.5, loc='lower left') #, bbox_to_anchor=(-0.1, 1.8),  bbox_transform=ax1.transAxes,  borderpad=3)
 mark_inset(ax1, axins, loc1=2, loc2=1, fc="none", ec="0.5")
 axins.set_xlim(-66.5, -64.5)
@@ -237,4 +235,3 @@ cb.ax.set_yticklabels(['water', 'land'], fontsize=6)
 plt.show()
 pngfile = "compare_LWvsIGBP_inset.png"
 fig.savefig(pngfile)
-
