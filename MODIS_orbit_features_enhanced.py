@@ -40,6 +40,11 @@ import os
 # http://www.idlcoyote.com/ip_tips/brightmodis.html
 #https://moonbooks.org/Codes/Plot-MODIS-granule-RGB-image-orthographic-projection--color-enhancement-using-python-and-basemap/
 
+#-----------------------------------------------------------------------------#
+#Change Directory to Data
+os.chdir('./Data')
+
+#-----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
 # inputs
 
@@ -52,10 +57,11 @@ file_myd021km = SD(file_name_myd021km, SDC.READ)
 
 selected_sds = file_myd021km.select('EV_250_Aggr1km_RefSB')
 
+
 selected_sds_attributes = selected_sds.attributes()
 
 for key, value in selected_sds_attributes.items():
-	#print key, value
+	#print(key, value)
 	if key == 'reflectance_scales':
 		reflectance_scales_250_Aggr1km_RefSB = np.asarray(value)		
 	if key == 'reflectance_offsets':
@@ -73,12 +79,12 @@ cross_trak = data_shape[2]
 selected_sds = file_myd021km.select('EV_500_Aggr1km_RefSB')
 
 selected_sds_attributes = selected_sds.attributes()
-
+#print(selected_sds_attributes)
 for key, value in selected_sds_attributes.items():
 	if key == 'reflectance_scales':
 		reflectance_scales_500_Aggr1km_RefSB = np.asarray(value)	
 	if key == 'reflectance_offsets':
-		reflectance_offsets_500_Aggr1km_RefSB = np.asarray(value)	
+		reflectance_offsets_500_Aggr1km_RefSB = np.asarray(value)
 
 sds_data_500_Aggr1km_RefSB = selected_sds.get()
 
@@ -153,8 +159,6 @@ z_color_enh[:,:,2] = scale_image(img_as_ubyte(z[:,:,2]), x, y)
 #print z_color_enh
 
 z = z_color_enh / 256.0
-
-#print z
 
 #----------------------------------------------------------------------------------------#
 # Rough estimation of latitude and longitude at granule center (long_0, lat_0)

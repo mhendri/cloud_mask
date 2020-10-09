@@ -26,6 +26,10 @@ from mpl_toolkits.basemap import Basemap
 #np.set_printoptions(threshold=np.inf)
 
 #-----------------------------------------------------------------------------#
+#Change Directory to Data
+os.chdir('./Data')
+
+#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 #CALIPSO file input
 
@@ -65,7 +69,7 @@ land_water[land_water == 2] = 1;
 lat_lon_lst = []
 latlon = zip(lat, lon)
 for index, lalo in enumerate(latlon):
-	if (75<=lalo[0]<=83 and -73<=lalo[1]<=-15) or (67<=lalo[0]<=75 and -60<=lalo[1]<=-17) or (58<=lalo[0]<=67 and -55<=lalo[1]<=-30):
+	if 75<=lalo[0]<=83 and -73<=lalo[1]<=-10 or 67<=lalo[0]<=75 and -60<=lalo[1]<=-10 or 58<=lalo[0]<=67 and -60<=lalo[1]<=-40:
 		if index not in lat_lon_lst:
 					lat_lon_lst.append(index)
 
@@ -116,7 +120,7 @@ upper_data22d = data13[land_lst[0]:land_lst[-1]+1, 165:1165]  # 8.2km to 20.2km
 upper_data23d = np.reshape(upper_data22d, (upper_size, 5, 200))
 upper_data2 = upper_data23d[:,0,:]
 
-lower_data2d = total_data13[land_lst2[0]:land_lst2[-1]+1, 1165:]  # -0.5km to  8.2km
+lower_data2d = data13[land_lst2[0]:land_lst2[-1]+1, 1165:]  # -0.5km to  8.2km
 lower_data3d = np.reshape(lower_data2d, (lower_size, 15, 290))
 lower_data = lower_data3d[:,0,:]
 
@@ -228,7 +232,7 @@ cmap = colors.ListedColormap(['blue', 'lightskyblue', 'orange', 'yellow',
  'lime', 'grey', 'black'])
 
 fig = plt.figure(figsize = (10, 8))
-plt.subplots_adjust(bottom=0.13, top=0.9, left=0.1, right=0.85)
+plt.subplots_adjust(bottom=0.07, top=0.9, left=0.1, right=0.8)
 
 # Define the bins and normalize.
 bounds = np.linspace(0,7,8)
@@ -276,17 +280,17 @@ ax3.set_xticks([])
 label_added = False
 for i in range(len(top[1, :])):
 	if not label_added:
-		ax3.scatter(lat, top[:, i], color='deeppink', s = 1, label='Layer Top Altitude')
+		ax3.scatter(upper_lat, top[:, i], color='deeppink', s = 1, label='Layer Top Altitude')
 		label_added = True
 	else:
-		ax3.scatter(lat, top[:, i], color='deeppink', s = 1)
+		ax3.scatter(upper_lat, top[:, i], color='deeppink', s = 1)
 label_added2 = False
 for i in range(len(bottom[1, :])):
 	if not label_added2:
-		ax3.scatter(lat, bottom[:, i], color = 'indigo', s = 1, label='Layer Bottom Altitude')
+		ax3.scatter(upper_lat, bottom[:, i], color = 'indigo', s = 1, label='Layer Bottom Altitude')
 		label_added2 = True
 	else:
-		ax3.scatter(lat, bottom[:, i], color = 'indigo', s = 1)
+		ax3.scatter(upper_lat, bottom[:, i], color = 'indigo', s = 1)
 ax3.margins(x=0, y=0)
 ax3.set_ylim(ymin=-0.5)
 ax3.legend(fontsize=9)

@@ -25,6 +25,9 @@ from matplotlib import colors
 from mpl_toolkits.basemap import Basemap
 
 #np.set_printoptions(threshold=np.inf)
+#-----------------------------------------------------------------------------#
+#Change Directory to Data
+os.chdir('./Data')
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
