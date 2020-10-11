@@ -88,7 +88,7 @@ def genImage(bands):
             reflectance_offsets_500_Aggr1km_RefSB = np.asarray(value)
 
     sds_data_500_Aggr1km_RefSB = selected_sds.get()
-    print(reflectance_scales_500_Aggr1km_RefSB)
+    
     #----------------------------------------------------------------------------------------#
 
     file_myd03 = SD(file_name_myd03, SDC.READ)
@@ -336,4 +336,4 @@ def genImage(bands):
     plt.savefig('RGBenhance010CALIPSO2.png', dpi=200)
 
 if __name__ == "__main__":
-    genImage([1,4,3])
+    genImage([7,2,1])
