@@ -313,6 +313,7 @@ cb2.ax.tick_params(size=0)
 cb2.ax.set_yticklabels(['invalid/night', 'land', 'water', 'snow covered land', 'sea ice', 'snow covered sea ice', 'cloud', 'mixed pixels'], fontsize=6)
 
 plt.show()
+os.chdir('..')
 pngfile = 'compare_SCMvsCALIPSO_MODIS'
 fig.savefig(pngfile)
 

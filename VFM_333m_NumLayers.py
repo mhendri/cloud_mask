@@ -517,6 +517,7 @@ cb.ax.set_yticklabels(['"clear air"', 'cloud', 'tropospheric aerosol',
 
 plt.show()
 pngfile = 'VFM_full_NumLayers'
+os.chdir('..')
 fig.savefig(pngfile)
     
 
