@@ -3,6 +3,7 @@
 '''
 Edited by Hannah Skobe
 Edited by Megan Ward-Baranyay
+Edited by Iraz Tejani
 This code illustrates how to access and visulaize both a LaRC CALIPSO file and 
 a MODIS file in Python. Specifically, this code plots the orbit path of CALIPSO 
 over the MODIS enhanced RGB image with layer indication from the instrument CALIOP.
@@ -13,6 +14,7 @@ CALIOP code reference:
 http://hdfeos.org/zoo/LaRC/CAL_LID_L2_VFM-ValStage1-V3-02.2011-12-31T23-18-11ZD.hdf.py
 Usage:  save this script and run
     python MODIS_orbit_features_enhanced.py
+    For different band combinations, simply change the list bands_used right underneath the imports. 
 The HDF files must either be in your current working directory.
 Tested under: Python 3.7.6  Anaconda 4.8.3
 Last updated: 2020-09-03
@@ -34,13 +36,19 @@ import matplotlib.cm as cm
 import pprint
 import os
 
-
+#First list is the bands you want, second integer is whether you want it enhanced or not
+bands_used = [[[1,4,3], 0], 
+            [[1,4,3], 1], 
+            [[3,6,7], 1], 
+            [[7,2,1], 1]]
+            
 # References:
 # https://earthdata.nasa.gov/sites/default/files/field/document/MODIS_True_Color.pdf
 # http://www.idlcoyote.com/ip_tips/brightmodis.html
 #https://moonbooks.org/Codes/Plot-MODIS-granule-RGB-image-orthographic-projection--color-enhancement-using-python-and-basemap/
 
-def genImage(bands):
+def genImage(bands, enhanced, indy, fig):
+    fig = fig
     #-----------------------------------------------------------------------------#
     #Change Directory to Data
     os.chdir('./Data')
@@ -130,35 +138,35 @@ def genImage(bands):
 
     #----------------------------------------------------------------------------------------#
     # Color enhancement
+    if enhanced == 1:
+        x = np.array([0,  30,  60, 120, 190, 255], dtype=np.uint8)
+        y = np.array([0, 110, 160, 210, 240, 255], dtype=np.uint8)
 
-    x = np.array([0,  30,  60, 120, 190, 255], dtype=np.uint8)
-    y = np.array([0, 110, 160, 210, 240, 255], dtype=np.uint8)
+        def scale_image(image, x, y):
+            scaled = np.zeros((along_track, cross_trak), dtype=np.uint8)
+            for i in range(len(x)-1):
+                x1 = x[i]
+                x2 = x[i+1]
+                y1 = y[i]
+                y2 = y[i+1]
+                m = (y2 - y1) / float(x2 - x1)
+                b = y2 - (m *x2)
+                mask = ((image >= x1) & (image < x2))
+                scaled = scaled + mask * np.asarray(m * image + b, dtype=np.uint8)
 
-    def scale_image(image, x, y):
-        scaled = np.zeros((along_track, cross_trak), dtype=np.uint8)
-        for i in range(len(x)-1):
-            x1 = x[i]
-            x2 = x[i+1]
-            y1 = y[i]
-            y2 = y[i+1]
-            m = (y2 - y1) / float(x2 - x1)
-            b = y2 - (m *x2)
-            mask = ((image >= x1) & (image < x2))
-            scaled = scaled + mask * np.asarray(m * image + b, dtype=np.uint8)
+            mask = image >= x2
+            scaled = scaled + (mask * 255)
 
-        mask = image >= x2
-        scaled = scaled + (mask * 255)
+            return scaled
 
-        return scaled
+        z_color_enh = np.zeros((along_track, cross_trak,3), dtype=np.uint8)
+        z_color_enh[:,:,0] = scale_image(img_as_ubyte(z[:,:,0]), x, y)
+        z_color_enh[:,:,1] = scale_image(img_as_ubyte(z[:,:,1]), x, y)
+        z_color_enh[:,:,2] = scale_image(img_as_ubyte(z[:,:,2]), x, y)
 
-    z_color_enh = np.zeros((along_track, cross_trak,3), dtype=np.uint8)
-    z_color_enh[:,:,0] = scale_image(img_as_ubyte(z[:,:,0]), x, y)
-    z_color_enh[:,:,1] = scale_image(img_as_ubyte(z[:,:,1]), x, y)
-    z_color_enh[:,:,2] = scale_image(img_as_ubyte(z[:,:,2]), x, y)
+        #print z_color_enh
 
-    #print z_color_enh
-
-    z = z_color_enh / 256.0
+        z = z_color_enh / 256.0
 
     #----------------------------------------------------------------------------------------#
     # Rough estimation of latitude and longitude at granule center (long_0, lat_0)
@@ -223,10 +231,12 @@ def genImage(bands):
     #----------------------------------------------------------------------------------------#
     # Orthographic Map Projection
 
-    fig = plt.figure()
+    #fig = plt.figure()
 
-    ax = fig.add_subplot(111)
-
+    #Creates subplots
+    subplot_num = 220+indy
+    ax = fig.add_subplot(subplot_num)
+    
     ax.patch.set_facecolor((0.75,0.75,0.75))
 
     m1 = Basemap(projection='ortho',lon_0=lon_0,lat_0=lat_0,resolution=None)
@@ -247,7 +257,7 @@ def genImage(bands):
 
     m = Basemap(projection='ortho',lon_0=lon_0,lat_0=lat_0,resolution='l',\
         llcrnrx=llx,llcrnry=lly,urcrnrx=urx,urcrnry=ury)
-
+    
     x_igrid, y_igrid = m(myd03_long,myd03_lat)
 
     x_igrid = x_igrid - xpt0
@@ -289,7 +299,7 @@ def genImage(bands):
     rgb_projected[whereAreNaNs] = 0.75;
 
     #print rgb_projected
-
+    
     #----------------------------------------------------------------------------------------#
 
     img = m.imshow(np.rot90((np.fliplr(rgb_projected))* 255).astype(np.uint8), origin='lower')
@@ -297,26 +307,36 @@ def genImage(bands):
     img.set_clim(0.0, 1.0)
 
     m.drawcoastlines()
-
-    m.drawparallels(np.arange(-90.,120.,10.), color='k', 
+    
+    m.drawparallels(np.arange(-90.,120.,10.), color='k', fontsize=6, 
         labels=[True,False,False,False])
-    m.drawmeridians(np.arange(0.,420.,10.), color='k', 
+    m.drawmeridians(np.arange(0.,420.,10.), color='k', fontsize=6, 
         labels=[False,False,False,True])
-
+    
     # Map data along orbit path in plot
     x,y = m(lon, lat)
     i = 0
     for feature in data:
         m.plot(x[i], y[i], 'o', color=cmap(feature),  markersize=1)
         i = i+1
+    
+    ax.set_xlabel("", fontsize=5)
+    ax.set_ylabel("", fontsize=5) 
+    
+    #convert bands to string
+    slist = ''.join(map(str,bands))
 
-    ax.set_xlabel("", fontsize=10)
-    ax.set_ylabel("", fontsize=10) 
+    enhanced_word = ''
+    if enhanced == 1:
+        enhanced_word = ' Enhanced'
+    
+    #Change font size of title
+    plt.rcParams["axes.titlesize"] = 5   
 
     # Set title
-    long_name = 'MODIS Enhanced RGB Orthographic Projection'
-    basename = os.path.basename(FILE_NAME)
-    plt.title('{0}\n{1}'.format(basename, long_name))
+    long_name = f'MODIS RGB = {slist}{enhanced_word} Orthographic Projection'
+    #basename = os.path.basename(FILE_NAME)
+    plt.title(long_name)
 
     fig = plt.gcf()
 
@@ -325,15 +345,31 @@ def genImage(bands):
     norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
     # create a second axes for the colorbar
-    ax2 = fig.add_axes([0.92, 0.4, 0.01, 0.2])
+    ax2 = fig.add_axes([0.88, 0.7, 0.01, 0.2])
     cb = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, 
         spacing='proportional', ticks=bounds, boundaries=bounds, format='%1i')
     cb.set_ticks([0.5, 1.5])
     cb.ax.tick_params(size=0)
-    cb.ax.set_yticklabels(['clear', 'layered'], fontsize=6)
+    cb.ax.set_yticklabels(['clear', 'layered'], fontsize=4)
     
     os.chdir('..')
-    plt.savefig('RGBenhance010CALIPSO2.png', dpi=200)
+    fig.tight_layout()
+
+    #--------------------------# 
+    #This is only for individual outputs rather than table.
+
+    #Set Name of File
+    #name = f'RGBenhance010CALIPSO2_bands-{slist}-{enhanced}.png'
+
+    #plt.savefig(name, dpi=200) #Do this if you want to output each specific projection, make sure to comment out subplot code as well.
+    return fig
+    
 
 if __name__ == "__main__":
-    genImage([7,2,1])
+    fig = plt.figure()
+    for indy, item in enumerate(bands_used):
+        fig = genImage(item[0], item[1], indy+1, fig)
+    plt.savefig('MODIS_orbit_features_enhanced_output', dpi=200)
+    
+
+
