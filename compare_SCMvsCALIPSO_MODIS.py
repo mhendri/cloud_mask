@@ -9,7 +9,7 @@ Usage:  save this script and run
 
     python compare_SCMvsCALIPSO_MODIS.py
 
-The HDF files must either be in your current working directory.
+The HDF file must be in your current working directory in a folder named 'Data'.
 
 Tested under: Python 3.7.6  Anaconda 4.8.3
 Last updated: 2020-08-14
@@ -27,6 +27,11 @@ from pyhdf.SD import SD, SDC
 from scipy import interpolate
 from scipy.interpolate import griddata
 import pprint
+
+
+#-----------------------------------------------------------------------------#
+#Change Directory to Data
+os.chdir('./Data')
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
@@ -308,6 +313,7 @@ cb2.ax.tick_params(size=0)
 cb2.ax.set_yticklabels(['invalid/night', 'land', 'water', 'snow covered land', 'sea ice', 'snow covered sea ice', 'cloud', 'mixed pixels'], fontsize=6)
 
 plt.show()
+os.chdir('..')
 pngfile = 'compare_SCMvsCALIPSO_MODIS'
 fig.savefig(pngfile)
 

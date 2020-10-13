@@ -25,6 +25,9 @@ from matplotlib import colors
 from mpl_toolkits.basemap import Basemap
 
 #np.set_printoptions(threshold=np.inf)
+#-----------------------------------------------------------------------------#
+#Change Directory to Data
+os.chdir('./Data')
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
@@ -514,6 +517,7 @@ cb.ax.set_yticklabels(['"clear air"', 'cloud', 'tropospheric aerosol',
 
 plt.show()
 pngfile = 'VFM_full_NumLayers'
+os.chdir('..')
 fig.savefig(pngfile)
     
 

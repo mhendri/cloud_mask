@@ -42,6 +42,11 @@ import os
 
 #file_name_myd021km = 'MYD021KM.A2015190.1340.061.2018051014602.hdf'
 #file_name_myd03 = 'MYD03.A2015190.1340.061.2018048194846.hdf'
+#-----------------------------------------------------------------------------#
+    #Change Directory to Data
+    os.chdir('./Data')
+
+#-----------------------------------------------------------------------------#
 
 file_name_myd021km = 'CALTRACK-333m_MYD021KM_V1-21_2007-12-05T17-25-10ZD.hdf'
 file_name_myd03 = 'CALTRACK-333m_MYD03_V1-21_2007-12-05T17-25-10ZD.hdf'
@@ -296,6 +301,7 @@ cb.ax.tick_params(size=0)
 cb.ax.set_yticklabels(['clear', 'layered'], fontsize=6)
    
 plt.show()
+os.chdir('..')
 plt.savefig(('MODIS_orbit_features'), dpi=100)
 
 #----------------------------------------------------------------------------------------#
