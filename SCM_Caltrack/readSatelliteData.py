@@ -36,8 +36,9 @@ class GetSatelliteData:
         cls.nametimestamp = nametimestamp        
         
         cls.channel_list = channel_list
-
-        full_name = calipso_path        
+        
+        full_name = calipso_path    
+           
         hf = SD(full_name,SDC.READ)  
         
         data = hf.select('Latitude')     

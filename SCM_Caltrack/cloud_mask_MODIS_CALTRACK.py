@@ -8,15 +8,22 @@ Created on Thu Feb 13 08:44:59 2020
 import time
 import numpy as np
 
-from readSatelliteData import GetSatelliteData 
-from classifySatelliteImage import ClassifyImage
+from scm_caltrack.readSatelliteData import GetSatelliteData 
+from scm_caltrack.classifySatelliteImage import ClassifyImage
+import os
 from os import listdir
 from os.path import isfile, join
 
 start_time = time.time()            
 
 
-data_path = '/Users/chennan/Downloads/maps/CALTRACK/'
+#data_path = '/Users/chennan/Downloads/maps/CALTRACK/'
+#Change data path to the \Data Folder
+data_path = os.getcwd()+'\Data\\'
+
+#Change working directory to scm_caltrack
+os.chdir('./scm_caltrack')
+
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
     
 

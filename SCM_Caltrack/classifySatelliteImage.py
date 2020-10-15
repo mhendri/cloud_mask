@@ -20,7 +20,7 @@ import joblib
 import sys
 # import os
 
-from readSatelliteData import GetSatelliteData 
+from scm_caltrack.readSatelliteData import GetSatelliteData 
 
     
 class ClassifyImage():
