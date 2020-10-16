@@ -26,7 +26,7 @@ from mpl_toolkits.basemap import Basemap
 from matplotlib import colors
 
 # Data path to location of file storage
-rootdir = '/Volumes/untitled/Greenland_Tracks/test/'
+rootdir = os.getcwd() + '\Data\\'
 
 data_path = []
 for subdir, dirs, files in os.walk(rootdir):
@@ -48,7 +48,6 @@ m.drawparallels(np.arange(60,85,10), labels=[True,False,False,True], linewidth=0
 m.drawmeridians(np.arange(-80,-10,10), labels=[True,False,False,True], linewidth=0.2)
 
 for calipso_path in data_path:
-	
 	if calipso_path[-49:-41] == '333mMLay': # Only want 333mMLay HDF files f[11:19] == '333mMLay' 
 		# Reads HDF file
 		hdf = SD(calipso_path, SDC.READ)
@@ -85,18 +84,21 @@ for file in file_lst:
 
 	# Plot lat/lon points on graph
 	x,y = m(lon, lat)
+	
 	m.scatter(x, y, color=colors[ncolor], s=1, label=file[-14:-6])
 	plt.legend(fontsize=7)
 
 	# iterate through colors
-	ncolor+=1
+	if ncolor == 6: ncolor = 0
+	else: ncolor+=1
+	
 		
 # Copy files of interest into new folder
-for file in file_lst:
-	src = file
-	dst = '/Volumes/untitled/Greenland_Tracks/save_later/'
-	#dst = '/Users/hskobe/Desktop/NASA Internship 2020/test'
-	shutil.move(src, dst)
+# for file in file_lst:
+# 	src = file
+# 	dst = '/Volumes/untitled/Greenland_Tracks/save_later/'
+# 	#dst = '/Users/hskobe/Desktop/NASA Internship 2020/test'
+# 	shutil.move(src, dst)
 
 # Prints list of files that pass over Greenland
 print('File list:', file_lst)
