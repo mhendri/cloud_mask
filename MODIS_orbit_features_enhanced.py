@@ -39,8 +39,8 @@ import os
 #First list is the bands you want, second integer is whether you want it enhanced or not
 bands_used = [[[1,4,3], 0], 
             [[1,4,3], 1], 
-            [[3,6,7], 1], 
-            [[7,2,1], 1]]
+            [[3,6,7], 0], 
+            [[7,2,1], 0]]
             
 # References:
 # https://earthdata.nasa.gov/sites/default/files/field/document/MODIS_True_Color.pdf
@@ -305,7 +305,7 @@ def genImage(bands, enhanced, indy, fig):
     img = m.imshow(np.rot90((np.fliplr(rgb_projected))* 255).astype(np.uint8), origin='lower')
     
     img.set_clim(0.0, 1.0)
-    plt.show()
+    #plt.show()
     m.drawcoastlines()
     
     m.drawparallels(np.arange(-90.,120.,10.), color='k', fontsize=6, 

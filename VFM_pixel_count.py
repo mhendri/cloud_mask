@@ -21,7 +21,7 @@ import shutil
 import os
 
 # Select which data path to iterate through files
-data_path = '/Users/hskobe/Desktop/NASA Internship 2020/Python/'
+data_path = os.getcwd() + '\Data\\'
 
 file_name_list = [f for f in listdir(data_path) if isfile(join(data_path, f))]
 
@@ -30,7 +30,7 @@ file_lst = []
 
 for f in file_name_list:
 	if f[11:14] == 'VFM' and f[-1] == 'f': # Only want VFM / HDF files
-
+		
 		calipso_path = data_path + f
 
 		# Read scientific data (SD) from file
@@ -53,32 +53,47 @@ for f in file_name_list:
 		cloud_aerosol = 0
 		invalid = 0
 
+		# 2 - cloud
+		# 3 - topospheric aerosol
+		# 4 - stratospheric aerosol/feature?	
+
 		# Assign new pixel value to column in VFM 'Feature_Classification_Flags'
 		for column in feature_flag:
 			if 2 in column:
-				if 3 in column:
-					VFM_lst.append(3)
-					cloud_aerosol += 1
-				elif 4 in column:
-					VFM_lst.append(3)
-					cloud_aerosol += 1
-				else:
-					VFM_lst.append(1)
-					cloudy += 1
-			elif 3 in column:
-				if 2 not in column:
-					VFM_lst.append(2)
-					aerosol += 1
-			elif 4 in column:
-				if 2 not in column:
-					VFM_lst.append(2)
-					aerosol += 1
+				VFM_lst.append(1)
+				cloudy += 1
+			elif 3 in column or 4 in column:
+				VFM_lst.append(2)
+				aerosol += 1
 			elif 0 in column:
 				VFM_lst.append(4)
 				invalid += 1
 			else:
 				VFM_lst.append(0)
 				clear += 1
+
+		# for column in feature_flag:
+		# 	if 2 in column:
+		# 		if 3 in column or 4 in column:
+		# 			VFM_lst.append(3)
+		# 			cloud_aerosol += 1
+		# 		else:
+		# 			VFM_lst.append(1)
+		# 			cloudy += 1
+		# 	elif 3 in column:
+		# 		if 2 not in column:
+		# 			VFM_lst.append(2)
+		# 			aerosol += 1
+		# 	elif 4 in column:
+		# 		if 2 not in column:
+		# 			VFM_lst.append(2)
+		# 			aerosol += 1
+		# 	elif 0 in column:
+		# 		VFM_lst.append(4)
+		# 		invalid += 1
+		# 	else:
+		# 		VFM_lst.append(0)
+		# 		clear += 1
 
 		# Calculate layered pixels
 		layered = cloudy + aerosol + cloud_aerosol

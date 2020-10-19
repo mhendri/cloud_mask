@@ -22,6 +22,7 @@ start_time = time.time()
 data_path = os.getcwd()+'\Data\\'
 
 #Change working directory to scm_caltrack
+print(os.getcwd())
 os.chdir('./scm_caltrack')
 
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']

@@ -21,7 +21,7 @@ import shutil
 import os
 
 # Select which data path to iterate through files
-data_path = '/Users/hskobe/Desktop/NASA Internship 2020/Python/'
+data_path = os.getcwd() + '\Data\\'
 
 file_name_list = [f for f in listdir(data_path) if isfile(join(data_path, f))]
 
@@ -53,26 +53,21 @@ for f in file_name_list:
 		cloud_aerosol = 0
 		invalid = 0
 
+		#2 - Cloud
+		#3 - Aerosol
+		#4 - Stratospheric Feature
+
 		# Assign new pixel value to column in MLay 'Feature_Classification_Flags'
 		for column in feature_flag:
 			if 2 in column:
-				if 3 in column:
-					VFM_lst.append(3)
-					cloud_aerosol += 1
-				elif 4 in column:
-					VFM_lst.append(3)
-					cloud_aerosol += 1
-				else:
-					VFM_lst.append(1)
-					cloudy += 1
+				VFM_lst.append(1)
+				cloudy += 1
 			elif 3 in column:
-				if 2 not in column:
-					VFM_lst.append(2)
-					aerosol += 1
+				VFM_lst.append(2)
+				aerosol += 1
 			elif 4 in column:
-				if 2 not in column:
-					VFM_lst.append(2)
-					aerosol += 1
+				VFM_lst.append(3)
+				cloud_aerosol += 1
 			elif 0 in column:
 				VFM_lst.append(4)
 				invalid += 1
@@ -99,7 +94,8 @@ for f in file_name_list:
 		print('––––––')
 		print('Total aerosol pixels (percentage):', aerosol, '(', (aerosol/len(VFM_lst))*100, ')')
 		print('––––––')
-		print('Total cloud+aerosol pixels (percentage):', cloud_aerosol, '(', (cloud_aerosol/len(VFM_lst))*100, ')')
+		#print('Total cloud+aerosol pixels (percentage):', cloud_aerosol, '(', (cloud_aerosol/len(VFM_lst))*100, ')')
+		print('Strat Feat pixels over Greenland (percentage):', cloud_aerosol, '(', (cloud_aerosol/len(VFM_lst))*100, ')')
 		print('––––––')
 		print('Total layered pixels (percentage):', layered, '(', (layered/len(VFM_lst))*100, ')')
 		print('––––––')
@@ -115,18 +111,19 @@ for f in file_name_list:
 		lon = longitude[:, 1]
 
 
-		# To read in Land/Water Mask
-		#hdf = SD('CAL_LID_L2_VFM-Standard-V4-20.2015-07-09T13-02-00ZD.hdf', SDC.READ)
+		#To read in Land/Water Mask
+		# data_loc = data_path + 'CAL_LID_L2_VFM-Standard-V4-20.2015-07-09T13-02-00ZD.hdf'
+		# hdf = SD(data_loc, SDC.READ)
 
-		# Read 'Land_Water_Mask' for land water mask
-		#data1D = hdf.select('Land_Water_Mask')
-		#Land_Water = data1D[:]
+		# #Read 'Land_Water_Mask' for land water mask
+		# data1D = hdf.select('Land_Water_Mask')
+		# Land_Water = data1D[:]
 
-		# Focus on land (= 1 and 2) data only
-		#Land_Water[Land_Water < 1] = 0;
-		#Land_Water[Land_Water > 2] = 0;
-		#Land_Water[Land_Water == 1] = 1;
-		#Land_Water[Land_Water == 2] = 1;
+		# #Focus on land (= 1 and 2) data only
+		# Land_Water[Land_Water < 1] = 0;
+		# Land_Water[Land_Water > 2] = 0;
+		# Land_Water[Land_Water == 1] = 1;
+		# Land_Water[Land_Water == 2] = 1;
 
 		# Read 'IGBP_Surface_Type' for land/water mask
 		data1D = hdf.select('IGBP_Surface_Type')
@@ -187,7 +184,8 @@ for f in file_name_list:
 		print('––––––')
 		print('Aerosol pixels over Greenland (percentage):', aerosol2, '(', (aerosol2/len(VFM_lst2))*100, ')')
 		print('––––––')
-		print('Cloud+aerosol pixels over Greenland (percentage):', cloud_aerosol2, '(', (cloud_aerosol2/len(VFM_lst2))*100, ')')
+		#print('Cloud+aerosol pixels over Greenland (percentage):', cloud_aerosol2, '(', (cloud_aerosol2/len(VFM_lst2))*100, ')')
+		print('Strat Feat pixels over Greenland (percentage):', cloud_aerosol2, '(', (cloud_aerosol2/len(VFM_lst2))*100, ')')
 		print('––––––')
 		print('Layered pixels over Greenland (percentage):', layered2, '(', (layered2/len(VFM_lst2))*100, ')')
 		print('––––––')

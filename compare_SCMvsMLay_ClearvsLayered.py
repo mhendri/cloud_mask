@@ -93,7 +93,7 @@ CALIPSO = CALIPSO[::15]
 # cloud_mask_MODIS_CALTRACK.py created by Nan Chen
 
 # Extract SCM
-from cloud_mask_MODIS_CALTRACK import sflag
+from scm_caltrack.cloud_mask_MODIS_CALTRACK import sflag
 
 # Slice array to obtain indicies over Greenland
 sflag = sflag[land_lst[0]:land_lst[-1]+1]
