@@ -113,14 +113,14 @@ m.drawmeridians(np.arange(-80,-10,10), labels=[True,False,False,True])
 x,y = m(lon, lat)
 i = 0
 for m_feature in land_water:
-    m.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=6)
+    m.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=2)
     i = i+1
 
 # Draw points from IGBP with a downward shift in lat/lon 
 a,b = m(lon2, lat2)
 j = 0
 for m2_feature in IGBP:
-    m.plot(a[j]-0.5, b[j]-0.5, 'o', color=cmap(m2_feature),  markersize=6)
+    m.plot(a[j]-0.5, b[j]-0.5, 'o', color=cmap(m2_feature),  markersize=2)
     j = j+1
 
 # Draw line along original orbit path on top of points
