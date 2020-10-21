@@ -39,10 +39,10 @@ for f in file_name_list:
 		# Read 'Feature_Classification_Flags' for feature type
 		data2D = hdf.select('Feature_Classification_Flags')
 		feature_flag = data2D[:,:]
-
+		
 		# Extract feature type (bit 1-3) through bitmask
 		feature_flag = feature_flag & 7
-
+		
 		# Create empty list for pixel classification mask
 		VFM_lst = []
 
@@ -52,26 +52,35 @@ for f in file_name_list:
 		aerosol = 0
 		cloud_aerosol = 0
 		invalid = 0
+		strat_feat = 0
 
 		# 2 - cloud
 		# 3 - topospheric aerosol
 		# 4 - stratospheric aerosol/feature?	
-
+		
 		# Assign new pixel value to column in VFM 'Feature_Classification_Flags'
 		for column in feature_flag:
 			if 2 in column:
-				VFM_lst.append(1)
-				cloudy += 1
-			elif 3 in column or 4 in column:
-				VFM_lst.append(2)
-				aerosol += 1
+				if 3 in column:
+					VFM_lst.append(5)
+					cloud_aerosol +=1
+				else:
+					VFM_lst.append(1)
+					cloudy += 1
+			elif 3 in column:# or 4 in column:
+				if 2 not in column:
+		 			VFM_lst.append(2)
+		 			aerosol += 1
+			elif 4 in column:
+				VFM_lst.append(3)
+				strat_feat += 1
 			elif 0 in column:
 				VFM_lst.append(4)
 				invalid += 1
 			else:
 				VFM_lst.append(0)
 				clear += 1
-
+		
 		# for column in feature_flag:
 		# 	if 2 in column:
 		# 		if 3 in column or 4 in column:
@@ -96,30 +105,32 @@ for f in file_name_list:
 		# 		clear += 1
 
 		# Calculate layered pixels
-		layered = cloudy + aerosol + cloud_aerosol
+		layered = cloudy + aerosol + cloud_aerosol + strat_feat
 
 		# Convert list to array to extract
 		VFM_lst_mask = np.array(VFM_lst)
 
-		print('')
-		print(f) # Print name of observed file
-		print('––––––')
-		print('VFM_lst legend:\n0 = clear\n1 = cloud\n2 = aerosol\n3 = cloud+aerosol\n4 = invalid')
-		print('––––––')
-		print('Total number of pixels:', len(VFM_lst))
-		print('––––––')
-		print('Total clear pixels (percentage):', clear, '(', (clear/len(VFM_lst))*100, ')')
-		print('––––––')
-		print('Total cloudy pixels (percentage):', cloudy, '(', (cloudy/len(VFM_lst))*100, ')')
-		print('––––––')
-		print('Total aerosol pixels (percentage):', aerosol, '(', (aerosol/len(VFM_lst))*100, ')')
-		print('––––––')
-		print('Total cloud+aerosol pixels (percentage):', cloud_aerosol, '(', (cloud_aerosol/len(VFM_lst))*100, ')')
-		print('––––––')
-		print('Total layered pixels (percentage):', layered, '(', (layered/len(VFM_lst))*100, ')')
-		print('––––––')
-		print('Total invalid pixels (percentage):', invalid, '(', (invalid/len(VFM_lst))*100, ')')
-		print('***********************************************************')
+		# print('')
+		# print(f) # Print name of observed file
+		# print('––––––')
+		# print('VFM_lst legend:\n0 = clear\n1 = cloud\n2 = aerosol\n3 = cloud+aerosol\n4 = invalid')
+		# print('––––––')
+		# print('Total number of pixels:', len(VFM_lst))
+		# print('––––––')
+		# print('Total clear pixels (percentage):', clear, '(', (clear/len(VFM_lst))*100, ')')
+		# print('––––––')
+		# print('Total cloudy pixels (percentage):', cloudy, '(', (cloudy/len(VFM_lst))*100, ')')
+		# print('––––––')
+		# print('Total aerosol pixels (percentage):', aerosol, '(', (aerosol/len(VFM_lst))*100, ')')
+		# print('––––––')
+		# print('Total strat_feat pixels (percentage):', strat_feat, '(', (strat_feat/len(VFM_lst))*100, ')')
+		# print('––––––')
+		# print('Total cloud+aerosol pixels (percentage):', cloud_aerosol, '(', (cloud_aerosol/len(VFM_lst))*100, ')')
+		# print('––––––')
+		# print('Total layered pixels (percentage):', layered, '(', (layered/len(VFM_lst))*100, ')')
+		# print('––––––')
+		# print('Total invalid pixels (percentage):', invalid, '(', (invalid/len(VFM_lst))*100, ')')
+		# print('***********************************************************')
 
 		# Extract geolocation data
 		latitude = hdf.select('Latitude')
@@ -154,16 +165,17 @@ for f in file_name_list:
 
 		# Slice original list to indicies over Greenland
 		VFM_lst2 = VFM_lst[land_lst[0]:land_lst[-1]+1]
-
+		
 		# Convert list over Greenland to array to extract
 		VFM_lst2_mask = np.array(VFM_lst2)
-
+		
 		# Create scalars for counts over Greenland
 		clear2 = 0
 		cloudy2 = 0
 		aerosol2 = 0
 		cloud_aerosol2 = 0
 		invalid2 = 0
+		strat_feat2 = 0
 
 		for value in VFM_lst2:
 			if value == 0:
@@ -173,12 +185,14 @@ for f in file_name_list:
 			elif value == 2:
 				aerosol2 += 1
 			elif value == 3:
-				cloud_aerosol2 += 1
+				strat_feat2 += 1
 			elif value == 4:
 				invalid += 1
+			elif value == 5:
+				cloud_aerosol2 += 1
 
 		# Calculate layered pixels over Greenland
-		layered2 = cloudy2 + aerosol2 + cloud_aerosol2
+		layered2 = cloudy2 + aerosol2 + cloud_aerosol2 + strat_feat2
 
 		print('Number of pixels over Greenland (percentage):', len(VFM_lst2), '(', (len(VFM_lst2)/len(VFM_lst))*100, ')')
 		print('––––––')
@@ -188,9 +202,12 @@ for f in file_name_list:
 		print('––––––')
 		print('Aerosol pixels over Greenland (percentage):', aerosol2, '(', (aerosol2/len(VFM_lst2))*100, ')')
 		print('––––––')
+		print('strat_feat pixels over Greenland (percentage):', strat_feat2, '(', (strat_feat2/len(VFM_lst2))*100, ')')
+		print('––––––')
 		print('Cloud+aerosol pixels over Greenland (percentage):', cloud_aerosol2, '(', (cloud_aerosol2/len(VFM_lst2))*100, ')')
 		print('––––––')
 		print('Layered pixels over Greenland (percentage):', layered2, '(', (layered2/len(VFM_lst2))*100, ')')
 		print('––––––')
 		print('Invalid pixels over Greenland (percentage):', invalid2, '(', (invalid2/len(VFM_lst2))*100, ')')
 		print('')
+		

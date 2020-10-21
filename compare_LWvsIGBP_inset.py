@@ -113,14 +113,14 @@ m.drawmeridians(np.arange(-80,-10,10), labels=[True,False,False,True])
 x,y = m(lon, lat)
 i = 0
 for m_feature in land_water:
-    m.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=2)
+    m.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=6)
     i = i+1
 
 # Draw points from IGBP with a downward shift in lat/lon 
 a,b = m(lon2, lat2)
 j = 0
 for m2_feature in IGBP:
-    m.plot(a[j]-0.5, b[j]-0.5, 'o', color=cmap(m2_feature),  markersize=2)
+    m.plot(a[j]-0.5, b[j]-0.5, 'o', color=cmap(m2_feature),  markersize=6)
     j = j+1
 
 # Draw line along original orbit path on top of points
@@ -150,65 +150,65 @@ x20, y20 = [-73.25, -73.25], [75, 79.2]
 
 plt.plot(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, x7, y7, x8, y8, x9, y9, x10, y10, x11, y11, x12, y12, x13, y13, x14, y14, x15, y15, x16, y16, x17, y17, x18, y18, x19, y19, x20, y20, marker = 'o', color='red', markersize=1)
         
-#-----------------------------------------------------------------------------#
-# # Create lower left inset
-axins = zoomed_inset_axes(ax1, 6.5, loc='lower left') #, bbox_to_anchor=(-0.1, 1.8),  bbox_transform=ax1.transAxes,  borderpad=3)
-mark_inset(ax1, axins, loc1=2, loc2=1, fc="none", ec="0.5")
-axins.set_xlim(-66.5, -64.5)
-axins.set_ylim(80, 82)
+# #-----------------------------------------------------------------------------#
+# # # Create lower left inset
+# axins = zoomed_inset_axes(ax1, 6.5, loc='lower left') #, bbox_to_anchor=(-0.1, 1.8),  bbox_transform=ax1.transAxes,  borderpad=3)
+# mark_inset(ax1, axins, loc1=2, loc2=1, fc="none", ec="0.5")
+# axins.set_xlim(-66.5, -64.5)
+# axins.set_ylim(80, 82)
 
-map2 = Basemap(projection='cyl', resolution='l', llcrnrlon=-66.5, llcrnrlat=80, 
-    urcrnrlon=-64.5, urcrnrlat=82, ax=axins)
-map2.drawcoastlines()
-map2.drawcountries()
+# map2 = Basemap(projection='cyl', resolution='l', llcrnrlon=-66.5, llcrnrlat=80, 
+#     urcrnrlon=-64.5, urcrnrlat=82, ax=axins)
+# map2.drawcoastlines()
+# map2.drawcountries()
 
-# Draw line along original orbit path behind points
-map2.plot(lon, lat, color='red', linewidth=0.75)
+# # Draw line along original orbit path behind points
+# map2.plot(lon, lat, color='red', linewidth=0.75)
 
-# Draw points from Land/Water Mask at a smaller size to see individual points
-x,y = map2(lon, lat)
-i = 0
-for m_feature in land_water:
-    map2.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=2)
-    i = i+1
+# # Draw points from Land/Water Mask at a smaller size to see individual points
+# x,y = map2(lon, lat)
+# i = 0
+# for m_feature in land_water:
+#     map2.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=2)
+#     i = i+1
 
-# Draw points from IGBP with a downward shift in lat/lon and at a smaller size 
-# to see indidivdual points
-a,b = map2(lon2, lat2)
-j = 0
-for m2_feature in IGBP:
-    map2.plot(a[j]-0.25, b[j]-0.25, 'o', color=cmap(m2_feature),  markersize=2)
-    j = j+1
+# # Draw points from IGBP with a downward shift in lat/lon and at a smaller size 
+# # to see indidivdual points
+# a,b = map2(lon2, lat2)
+# j = 0
+# for m2_feature in IGBP:
+#     map2.plot(a[j]-0.25, b[j]-0.25, 'o', color=cmap(m2_feature),  markersize=2)
+#     j = j+1
 
-#-----------------------------------------------------------------------------#
-# Create upper right inset
-axins2 = zoomed_inset_axes(ax1, 6, loc='lower right') #, bbox_to_anchor=(0.6, -1.0),  bbox_transform=ax1.transAxes,  borderpad=3)
-mark_inset(ax1, axins2, loc1=2, loc2=1, fc="none", ec="0.5")
-axins2.set_xlim(-23.5, -21.5)
-axins2.set_ylim(69.5, 72)
+# #-----------------------------------------------------------------------------#
+# # Create upper right inset
+# axins2 = zoomed_inset_axes(ax1, 6, loc='lower right') #, bbox_to_anchor=(0.6, -1.0),  bbox_transform=ax1.transAxes,  borderpad=3)
+# mark_inset(ax1, axins2, loc1=2, loc2=1, fc="none", ec="0.5")
+# axins2.set_xlim(-23.5, -21.5)
+# axins2.set_ylim(69.5, 72)
 
-map3 = Basemap(projection='cyl', resolution='l', llcrnrlon=-24, 
-    llcrnrlat=69.5, urcrnrlon=-21.5, urcrnrlat=71.5, ax=axins2)
-map3.drawcoastlines()
-map3.drawcountries()
+# map3 = Basemap(projection='cyl', resolution='l', llcrnrlon=-24, 
+#     llcrnrlat=69.5, urcrnrlon=-21.5, urcrnrlat=71.5, ax=axins2)
+# map3.drawcoastlines()
+# map3.drawcountries()
 
-# Draw line along original orbit path behind points
-map3.plot(lon, lat, color='red', linewidth=0.75)
+# # Draw line along original orbit path behind points
+# map3.plot(lon, lat, color='red', linewidth=0.75)
 
-# Draw points from Land/Water Mask at a smaller size to see individual points
-x,y = map3(lon, lat)
-i = 0
-for m_feature in land_water:
-    map3.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=2)
-    i = i+1
+# # Draw points from Land/Water Mask at a smaller size to see individual points
+# x,y = map3(lon, lat)
+# i = 0
+# for m_feature in land_water:
+#     map3.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=2)
+#     i = i+1
 
-# Draw points from IGBP with a downward shift in lat/lon and at a smaller size 
-# to see indidivdual points
-a,b = map3(lon2, lat2)
-j = 0
-for m2_feature in IGBP:
-    map3.plot(a[j]-0.2, b[j]-0.2, 'o', color=cmap(m2_feature),  markersize=2)
-    j = j+1
+# # Draw points from IGBP with a downward shift in lat/lon and at a smaller size 
+# # to see indidivdual points
+# a,b = map3(lon2, lat2)
+# j = 0
+# for m2_feature in IGBP:
+#     map3.plot(a[j]-0.2, b[j]-0.2, 'o', color=cmap(m2_feature),  markersize=2)
+#     j = j+1
 
 #-----------------------------------------------------------------------------#
 # Adjust overall plot scaling

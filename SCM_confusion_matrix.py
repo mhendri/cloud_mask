@@ -22,8 +22,8 @@ Last updated: 2020-08-14
 import time
 import numpy as np
 
-from readSatelliteData import GetSatelliteData 
-from classifySatelliteImage import ClassifyImage
+from scm_caltrack.readSatelliteData import GetSatelliteData 
+from scm_caltrack.classifySatelliteImage import ClassifyImage
 from os import listdir
 from os.path import isfile, join
 # import fnmatch
