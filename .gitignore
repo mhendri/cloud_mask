@@ -2,3 +2,5 @@ Data/
 .vscode/
 
 *.png
+*.csv
+*.xlsx
