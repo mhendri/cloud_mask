@@ -19,7 +19,10 @@ from ftplib import FTP
 from shapely.geometry import Point, Polygon
 from multiprocessing import Pool
 import numpy as np
+from itertools import zip_longest
+import csv
 
+from urllib.request import urlretrieve
 import pickle
 import time
 
@@ -36,6 +39,7 @@ poly = Polygon(coords)
 file_data = pd.DataFrame(columns=['year', 'month', 'MYD03','MYD021km', 'MLay'])
 
 monthdata = [0 for i in range(12)]
+namedata = []
 #___________________________________________________________________________________________
 
 def ftpLogin():
@@ -52,13 +56,16 @@ def ftpWalk(ftp, dir):
                 pass
                 dirs.append(item[0])
             else:
-                nondirs.append(item[0])
+                if len(item[0]) > 2:
+                    nondirs.append(item[0])
+                    namedata.append(dir+'/'+item[0])
         if nondirs:
-            print('\n{}:'.format(dir))
+            print(f'\n{dir} : {len(namedata)}')
             lendir = len(dir)
-            if len(nondirs)-2 > 0:
-                month = int(dir[lendir-5:lendir-3])
-                monthdata[month-1] += len(nondirs)-2
+            #if len(nondirs)-2 > 0:
+            month = int(dir[lendir-5:lendir-3])
+            monthdata[month-1] += len(nondirs)
+            #print(namedata)
                 #year = int(dir[lendir-10:lendir-6])
                 #print(year)
             #print('\n'.join(sorted(nondirs)))
@@ -71,12 +78,39 @@ def ftpWalk(ftp, dir):
     except Exception as e:
         pass
 
+def getFn(s):
+    return s[s.rfind('/')+1:len(s)]
+
+def ftpDownload(url):
+    url = url.strip()
+    try:
+        return urlretrieve(url, 'E:\\CM_data\\'+getFn(url)), None
+    except Exception as e:
+        return None
+                
+
+def batchDownload(file):
+    st = time.time()
+    with open('.\\Task_4\\'+file, newline='') as f:
+        reader = csv.reader(f)
+        paths = list(reader)
+    paths = [j for i in paths for j in i]
+
+    begining = 'ftp://iraz:friedchicken@ftp.icare.univ-lille1.fr/'
+    for index, path in enumerate(paths):
+        paths[index]=begining+path
+    #ftpDownload('ftp://iraz:friedchicken@ftp.icare.univ-lille1.fr/SPACEBORNE/CALIOP/CALTRACK-333m_MYD021KM.v1.21/2007/2007_01_01/CALTRACK-333m_MYD021KM_V1-21_2007-01-01T14-20-16ZD.hdf')
+    pool = Pool(10)
+    pool.map(ftpDownload, paths)
+    et = time.time()
+    print(et-st)
 def getAvailability(ftp_path, fname, hname):
     ftp = ftpLogin()
     global monthdata
     global file_data
- 
-    years_to_check = [str(year) for year in range(2006, 2010)] #06-14
+    global namedata
+
+    years_to_check = [str(year) for year in range(2007, 2008)] #06-14
     
     # print(ftp_path+years_to_check[0])
     for year in years_to_check:
@@ -90,7 +124,11 @@ def getAvailability(ftp_path, fname, hname):
         file_data = pd.concat([file_data,temp])
         #print(file_data)
     print(file_data)
-    file_data.to_pickle('./Task_4/'+fname)
+    #file_data.to_pickle('./Task_4/'+fname)
+    with open('./Task_4/'+fname+'names.csv', 'w') as f:
+        for item in namedata:
+            f.write("%s\n" % item)
+    namedata=[]
 
 def convertAvaToCSV():
     df = pd.read_pickle('./Task_4/mlay_ava')
@@ -115,7 +153,7 @@ def filterMYD03(p_list):
 
     greenland_files = []
     
-    file_name_list = [f for f in listdir(directory ) if isfile(join(directory , f))]
+    file_name_list = [f for f in listdir(directory) if isfile(join(directory, f))]
     file_name_list = file_name_list[s_ind:e_ind]
     #print(len(file_name_list))
     for index, f in enumerate(file_name_list):
@@ -145,7 +183,6 @@ def enumLatlon(lat, lon):
                 return True
     return False
 
-
 def removeSubFolders(directory, destination):
     count=0
     for root, dirs, files in os.walk(directory):  
@@ -155,9 +192,100 @@ def removeSubFolders(directory, destination):
             count+=1
             if count % 10 == 0: print(count)
 
-def getList():
-    pass
+def removeNonGl(directory, destination):
+    with open('.\\Task_4\\myd03_over_greenland.csv', newline='') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+    data = [j for i in data for j in i]
 
+    file_name_list = [f for f in listdir(directory) if isfile(join(directory, f))]
+    file_name_list = file_name_list[:]
+    
+    for name in data:
+        if name in file_name_list and not 'N' in name:
+            shutil.move(directory+name, destination)
+
+def checkAllExist():
+    with open('.\\Task_4\\mlay_avanames.csv', newline='') as f:
+        reader = csv.reader(f)
+        mlay = list(reader)
+    mlay = [j for i in mlay for j in i]
+    with open('.\\Task_4\\myd021km_avanames.csv', newline='') as f:
+        reader = csv.reader(f)
+        m21 = list(reader)
+    m21 = [j for i in m21 for j in i]
+    with open('.\\Task_4\\polder_avanames.csv', newline='') as f:
+        reader = csv.reader(f)
+        pdr = list(reader)
+    pdr = [j for i in pdr for j in i]
+    with open('.\\Task_4\\myd03_over_greenland.csv', newline='') as f:
+        reader = csv.reader(f)
+        md3 = list(reader)
+    md3 = [j for i in md3 for j in i]
+
+    fine_list = []
+    for item in md3:
+        l = len(item)
+        #print(item[l-25:l])
+        date = item[l-25:l]
+        if not any(date in x for x in mlay):
+            #print('ml',date)
+            continue
+        if not any(date in x for x in m21):
+            #print('m21',date)
+            continue
+        if not any(date in x for x in pdr):
+            #print('pdr',date)
+            continue
+        fine_list.append(item)
+
+    with open(f'./Task_4/myd03_over_greenland_final.csv', 'w') as f:
+        for item in fine_list:
+            f.write("%s\n" % item)
+
+    mlay_f, m21_f, pdr_f, md3_f = [],[],[],[]
+    for item in mlay:
+        l=len(item)
+        date = item[l-25:l]
+        if any(date in x for x in fine_list):mlay_f.append(item)
+    for item in m21:
+        l=len(item)
+        date = item[l-25:l]
+        if any(date in x for x in fine_list):m21_f.append(item)
+    for item in pdr:
+        l=len(item)
+        date = item[l-25:l]
+        if any(date in x for x in fine_list):pdr_f.append(item)
+    for item in md3:
+        l=len(item)
+        date = item[l-25:l]
+        if any(date in x for x in fine_list):md3_f.append(item)
+    
+    with open(f'./Task_4/mlay_avanames.csv', 'w') as f:
+        for item in mlay_f:
+            f.write("%s\n" % item)
+    with open(f'./Task_4/myd021km_avanames.csv', 'w') as f:
+        for item in m21_f:
+            f.write("%s\n" % item)
+    with open(f'./Task_4/polder_avanames.csv', 'w') as f:
+        for item in pdr_f:
+            f.write("%s\n" % item)
+    with open(f'./Task_4/md3_avanames.csv', 'w') as f:
+        for item in md3_f:
+            f.write("%s\n" % item)
+
+def removeNonExist(directory):
+    with open('.\\Task_4\\md3_avanames.csv', newline='') as f:
+        reader = csv.reader(f)
+        md3 = list(reader)
+    md3 = [j for i in md3 for j in i] 
+
+    file_name_list = [f for f in listdir(directory) if isfile(join(directory, f))]
+    file_name_list = file_name_list[:]
+    i = 0
+    for f in file_name_list:
+        if not f in md3:
+            os.remove('.\\Task_4\\Data\\MYD03_gl\\'+f)
 
 if __name__ == '__main__':
     #___________________________________________________________________________________________
@@ -169,43 +297,56 @@ if __name__ == '__main__':
     # removeSubFolders(directory,destination)
     #___________________________________________________________________________________________
     # Make availability excel sheet
-    # getAvailability('SPACEBORNE/CALIOP/CALTRACK-333m_MYD03.v1.21/', 'myd03_ava', 'MYD03')
-    # file_data = pd.DataFrame(columns=['year', 'month', 'MYD03','MYD021km', 'MLay'])
+    #file_data = pd.DataFrame(columns=['year', 'month', 'MYD03'])
+    #getAvailability('SPACEBORNE/CALIOP/CALTRACK-333m_MYD03.v1.21/', 'myd03_ava', 'MYD03')
+    # file_data = pd.DataFrame(columns=['year', 'month', 'Polder'])
+    # getAvailability('SPACEBORNE/CALIOP/CALTRACK-5km_PM-L2.v1.01/', 'polder_ava', 'Polder')
+
+    # file_data = pd.DataFrame(columns=['year', 'month', 'MYD021km'])
     # getAvailability('SPACEBORNE/CALIOP/CALTRACK-333m_MYD021KM.v1.21/', 'myd021km_ava', 'MYD021km')
-    # file_data = pd.DataFrame(columns=['year', 'month', 'MYD03','MYD021km', 'MLay'])
+
+    # file_data = pd.DataFrame(columns=['year', 'month', 'MLay'])
     # getAvailability('SPACEBORNE/CALIOP/333mMLay.v4.20/', 'mlay_ava', 'MLay')
     #convertAvaToCSV()
+    
+    # #___________________________________________________________________________________________
+    # #Remove all non Greenland files -- 19366 total
+    # directory = os.getcwd() + '\\Task_4\\Data\\MYD03'
+
+    # threads = 5
+    # s_ind, e_ind = [], []
+    # tlen = 10198
+    # for i in range(threads):
+    #     s_ind.append(i*round((tlen/threads)))
+    #     e_ind.append(s_ind[i]+round((tlen/threads)))
+   
+    # e_ind[-1] = tlen
+
+    # p_list = []
+    # for i in range(len(s_ind)):
+    #     p_list.append([directory, s_ind[i], e_ind[i], i])
+    # with Pool(threads) as p:
+    #     gl_list = p.map(filterMYD03, p_list)
+
+    # gl_list = [j for i in gl_list for j in i]
+
+    # with open(f'./Task_4/myd03_over_greenland.csv', 'w') as f:
+    #     for item in gl_list:
+    #         f.write("%s\n" % item)
+    # print(len(gl_list))
+    
+    # #___________________________________________________________________________________________
+    # # Move all Greenland files to seperate folder
+    # removeNonGl('.\\Task_4\\Data\\MYD03\\', '.\\Task_4\\Data\\MYD03_gl')
+
     #___________________________________________________________________________________________
-    #Remove all non Greenland files -- 19366 total
-    directory = os.getcwd() + '\\Task_4\\Data\\MYD03'
+    # Check if all 4 files exist
+    checkAllExist()
 
-    #filterMYD03([directory, 0, 10000, 1])
+    #Remove non exist files
+    removeNonExist('.\\Task_4\\Data\\MYD03_gl\\')
 
-    threads = 5
-    s_ind, e_ind = [], []
-    tlen = 10198
-    for i in range(threads):
-        s_ind.append(i*round((tlen/threads)))
-        e_ind.append(s_ind[i]+round((tlen/threads)))
-    #print(s_ind)
-    e_ind[-1] = tlen
-    #print(e_ind)
-
-    p_list = []
-    for i in range(len(s_ind)):
-        p_list.append([directory, s_ind[i], e_ind[i], i])
-    #print(p_list)
-
-    with Pool(threads) as p:
-        gl_list = p.map(filterMYD03, p_list)
-
-    gl_list = [j for i in gl_list for j in i]
-
-    with open(f'./Task_4/myd03_over_greenland.csv', 'w') as f:
-        for item in gl_list:
-            f.write("%s\n" % item)
-
-    #gl_list = filterMYD03(directory, 0)
-    print(len(gl_list))
-    # with open ('gl_myd03_list', 'wb') as f:
-    #     pickle.dump(gl_list, f)
+    #___________________________________________________________________________________________
+    # Ftp stuff
+    #batchDownload('mlay_avanames.csv')
+    #batchDownload('myd021km_avanames.csv')
