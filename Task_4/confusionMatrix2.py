@@ -5,7 +5,7 @@ Created on Thu Feb 13 08:44:59 2020
 
 @author: chennan
 
-Edited by Hannah Skobe
+Edited by Iraz Tejani
 
 This code creates a confustion matrix between the SCM and the
 CLM developed from CALIPSO.
@@ -14,10 +14,8 @@ Usage:  save this script and run
 
     python SCM_confusion_matrix.py
 
-The HDF files must either be in your current working directory.
-
 Tested under: Python 3.7.6  Anaconda 4.8.3
-Last updated: 2020-08-14
+Last updated: 2020-10-28
 """
 import time
 import numpy as np
@@ -63,7 +61,7 @@ for f in file_name_list:
     
     # print(f[11:19])
     
-    if not '2007-01' in f:
+    if not '2007-02' in f:
         continue
     
     if ( f[11:19] != '333mMLay' ):
@@ -92,7 +90,7 @@ for f in file_name_list:
 
         classification_type = 'cloud_mask_land'
         classifier_type     = 'random_forest'
-        classifier_path     = 'Task_1_2_3/scm_caltrack/trained_classifiers/'
+        classifier_path     = 'Task_4/scm_caltrack/trained_classifiers/'
         classifier_name     = 'CMl_rf_T11_MODIS_6ch'
         channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ]  
         
@@ -103,7 +101,7 @@ for f in file_name_list:
         
         classification_type = 'cloud_mask_water'
         classifier_type     = 'random_forest'
-        classifier_path     = 'Task_1_2_3/scm_caltrack/trained_classifiers/'
+        classifier_path     = 'Task_4/scm_caltrack/trained_classifiers/'
         classifier_name     = 'CMw_rf_T2_MODIS_6ch'
         channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ] 
 
@@ -111,6 +109,7 @@ for f in file_name_list:
                             classifier_name,channel_conf)
         sflag2 = c4.classify_image(sflag,scaler=False)        
     except Exception as e:
+        print('EXCEPTION:',e)
         continue
 
     # Focus on only layered pixels (= 6 and 7)
@@ -136,15 +135,15 @@ for f in file_name_list:
     # Create confusion maxtrix and print information of interest
     tn, fp, fn, tp = confusion_matrix(data, sflag2).ravel()
     matrix = confusion_matrix(data, sflag2)
-    print('CALIPSO file :', calipso_fname)
-    print('MYD021KM file:', mod021km_fname)
-    print('MYDO3 file   :', mod03_fname)
-    print(matrix)
-    print('TP, percentage:', tp, (tp/len(data))*100)
-    print('FP, percentage:', fp, (fp/len(data))*100)
-    print('TN, percentage:', tn, (tn/len(data))*100)
-    print('FN, ercentage:', fn, (fn/len(data))*100)
-    print('Total pixels :', len(data))
+    # print('CALIPSO file :', calipso_fname)
+    # print('MYD021KM file:', mod021km_fname)
+    # print('MYDO3 file   :', mod03_fname)
+    print('matrix',matrix)
+    # print('TP, percentage:', tp, (tp/len(data))*100)
+    # print('FP, percentage:', fp, (fp/len(data))*100)
+    # print('TN, percentage:', tn, (tn/len(data))*100)
+    # print('FN, ercentage:', fn, (fn/len(data))*100)
+    # print('Total pixels :', len(data))
 
     # Plot confusion matrix elements as a function of time (time stamp)
     plt.scatter(calipso_fname[-14:-6], ((tp/len(data))*100), s=10, color='red')
@@ -160,27 +159,27 @@ for f in file_name_list:
     name_lst.append(calipso_fname[-14:-6])
 
     # Rotate time stamp vertically
-    plt.xticks(rotation=90)
+    # plt.xticks(rotation=90)
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 print("--- %s seconds ---" % (time.time() - start_time))
 
-plt.subplots_adjust(bottom = 0.15)
+# plt.subplots_adjust(bottom = 0.15)
 
-# Connect points on plot
-plt.plot(name_lst, TP_lst, color = 'red', linewidth = 1, label='TP')
-plt.plot(name_lst, FP_lst, color = 'blue', linewidth = 1, label='FP')
-plt.plot(name_lst, TN_lst, color = 'green', linewidth = 1, label = 'TN')
-plt.plot(name_lst, FN_lst, color = 'orange', linewidth = 1, label = 'FN')
+# # Connect points on plot
+# plt.plot(name_lst, TP_lst, color = 'red', linewidth = 1, label='TP')
+# plt.plot(name_lst, FP_lst, color = 'blue', linewidth = 1, label='FP')
+# plt.plot(name_lst, TN_lst, color = 'green', linewidth = 1, label = 'TN')
+# plt.plot(name_lst, FN_lst, color = 'orange', linewidth = 1, label = 'FN')
 
-plt.legend()
+# plt.legend()
 
-# Set title
-long_name = 'Snow-ice Cloud Mask vs Clear/Layered Mask\nConfusion Matrix Elements'
-basename = '2015-05-05'
-plt.title('{0}\n{1}'.format(basename, long_name))
+# # Set title
+# long_name = 'Snow-ice Cloud Mask vs Clear/Layered Mask\nConfusion Matrix Elements'
+# basename = '2015-05-05'
+# plt.title('{0}\n{1}'.format(basename, long_name))
 
-plt.show()
-pngfile = 'SCM_confusion_matrix'
-fig.savefig(pngfile)
+# plt.show()
+# pngfile = 'SCM_confusion_matrix'
+# fig.savefig(pngfile)

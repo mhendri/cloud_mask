@@ -96,7 +96,10 @@ def batchDownload(file):
         paths = list(reader)
     paths = [j for i in paths for j in i]
 
-    begining = 'ftp://iraz:friedchicken@ftp.icare.univ-lille1.fr/'
+    f = open('.\\Task_4\\ftpcreds.txt', 'r')
+    u_p = f.read()
+
+    begining = f'ftp://{u_p}@ftp.icare.univ-lille1.fr/'
     for index, path in enumerate(paths):
         paths[index]=begining+path
     #ftpDownload('ftp://iraz:friedchicken@ftp.icare.univ-lille1.fr/SPACEBORNE/CALIOP/CALTRACK-333m_MYD021KM.v1.21/2007/2007_01_01/CALTRACK-333m_MYD021KM_V1-21_2007-01-01T14-20-16ZD.hdf')

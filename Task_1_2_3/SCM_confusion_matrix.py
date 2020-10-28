@@ -50,8 +50,8 @@ name_lst = []
 # Choose directory path
 # data_path = '/Users/chennan/Downloads/maps/SGLI/SGLI_CM_test_suite/hdf/'
 #data_path = '/Users/hskobe/Desktop/NASA Internship 2020/Python/test/'
-#data_path = os.getcwd() + '\Task_1_2_3\\Data\\'
-data_path = 'E:\\CM_data\\'
+data_path = os.getcwd() + '\Task_1_2_3\\Data\\'
+#data_path = 'E:\\CM_data\\'
 # data_path = '/Users/chennan/Downloads/maps/SGLI/SGLI_CM_test_Feb2020/20200131_SGLI/hdf/'
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
 
@@ -63,8 +63,8 @@ for f in file_name_list:
     
     # print(f[11:19])
     
-    if not '2007-01' in f:
-        continue
+    # if not '2007-01' in f:
+    #     continue
     
     if ( f[11:19] != '333mMLay' ):
             continue
@@ -86,32 +86,31 @@ for f in file_name_list:
     calipso_path  = data_path + calipso_fname   
     mod021km_path = data_path + mod021km_fname
     mod03_path    = data_path + mod03_fname       
-    try:
-        ## read satellite data ##
-        c1 = GetSatelliteData.read_caltrack_data(calipso_path,mod021km_path,mod03_path,channel_list)  
+    
+    ## read satellite data ##
+    c1 = GetSatelliteData.read_caltrack_data(calipso_path,mod021km_path,mod03_path,channel_list)  
 
-        classification_type = 'cloud_mask_land'
-        classifier_type     = 'random_forest'
-        classifier_path     = 'Task_1_2_3/scm_caltrack/trained_classifiers/'
-        classifier_name     = 'CMl_rf_T11_MODIS_6ch'
-        channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ]  
-        
-        c2 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
-                            classifier_name,channel_conf)  
-        sflag = c2.initialize_sflag()
-        sflag = c2.classify_image(sflag,scaler=False)     
-        
-        classification_type = 'cloud_mask_water'
-        classifier_type     = 'random_forest'
-        classifier_path     = 'Task_1_2_3/scm_caltrack/trained_classifiers/'
-        classifier_name     = 'CMw_rf_T2_MODIS_6ch'
-        channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ] 
+    classification_type = 'cloud_mask_land'
+    classifier_type     = 'random_forest'
+    classifier_path     = 'Task_1_2_3/scm_caltrack/trained_classifiers/'
+    classifier_name     = 'CMl_rf_T11_MODIS_6ch'
+    channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ]  
+    
+    c2 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
+                        classifier_name,channel_conf)  
+    sflag = c2.initialize_sflag()
+    sflag = c2.classify_image(sflag,scaler=False)     
+    
+    classification_type = 'cloud_mask_water'
+    classifier_type     = 'random_forest'
+    classifier_path     = 'Task_1_2_3/scm_caltrack/trained_classifiers/'
+    classifier_name     = 'CMw_rf_T2_MODIS_6ch'
+    channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ] 
 
-        c4 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
-                            classifier_name,channel_conf)
-        sflag2 = c4.classify_image(sflag,scaler=False)        
-    except Exception as e:
-        continue
+    c4 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
+                        classifier_name,channel_conf)
+    sflag2 = c4.classify_image(sflag,scaler=False)        
+    
 
     # Focus on only layered pixels (= 6 and 7)
     sflag2[sflag2 < 6] = 0;
