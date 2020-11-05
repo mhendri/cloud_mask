@@ -46,7 +46,7 @@ m = Basemap(projection='cyl', resolution='l',
             llcrnrlon=-80, urcrnrlon=0)
 m.drawcoastlines(linewidth=0.5)
 m.drawparallels(np.arange(50,90,10), labels=[True,False,False,True])
-m.drawmeridians(np.arange(-80,-10,10), labels=[True,False,False,True])
+m.drawmeridians(np.arange(-80,0,10), labels=[True,False,False,True])
 
 # Draw geographical box
 x1, y1 = [-60.25, -60.25], [82, 84]
@@ -171,7 +171,8 @@ for file in file_lst:
 	x,y = m(lon, lat)
 	
 	m.scatter(x, y, color=colors[ncolor], s=1, label=file[-14:-6])
-	plt.legend(fontsize=7)
+	plt.legend(fontsize=10, loc='upper center', ncol=8, shadow=True, markerscale=5, 
+				mode='expand', labelspacing=0.5)
 
 	# iterate through colors
 	if ncolor == 6: ncolor = 0
@@ -197,6 +198,6 @@ plt.title('{0}\n{1} to {2}'.format(long_name, timestamp, timestamp2))
 fig = plt.gcf()
 
 #plt.show()
-pngfile = 'CALIPSO_over_Greenland'
+pngfile = './Task_1_2_3/CALIPSO_over_Greenland'
 fig.savefig(pngfile,bbox_inches='tight', dpi=400)
 

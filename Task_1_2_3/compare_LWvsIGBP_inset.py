@@ -28,7 +28,7 @@ from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
 #-----------------------------------------------------------------------------#
 #Change Directory to Data
-os.chdir('./Data')
+os.chdir('./Task_1_2_3/Data')
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 #CALIPSO VFM file input
@@ -103,24 +103,29 @@ cmap = colors.ListedColormap(['blue', 'green'])
 
 # The data is global, so render in a global projection
 m = Basemap(projection='cyl', resolution='l',
-            llcrnrlat=55, urcrnrlat=90,
-            llcrnrlon=-80, urcrnrlon=0)
+            llcrnrlat=77, urcrnrlat=85,
+            llcrnrlon=-75, urcrnrlon=-59)
+#55, 90, 80, 0 for zoomed out
+#77, 85, -75, -59 zoom in
+
 m.drawcoastlines(linewidth=0.5)
-m.drawparallels(np.arange(50,90,10), labels=[True,False,False,True])
-m.drawmeridians(np.arange(-80,-10,10), labels=[True,False,False,True])
+m.drawparallels(np.arange(50,90,10), labels=[True,False,False,True], fontsize=15)
+m.drawmeridians(np.arange(-80,5,10), labels=[True,False,False,True], fontsize=15)
+#50, 90, 10, -80, 5, 10 zoom out
+#75, 85, 3, -80, 5, 3 zoom in
 
 # Draw points from Land/Water Mask
 x,y = m(lon, lat)
 i = 0
 for m_feature in land_water:
-    m.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=2)
+    m.plot(x[i], y[i], 'o', color=cmap(m_feature),  markersize=6) #change for zoom
     i = i+1
 
 # Draw points from IGBP with a downward shift in lat/lon 
 a,b = m(lon2, lat2)
 j = 0
 for m2_feature in IGBP:
-    m.plot(a[j]-0.5, b[j]-0.5, 'o', color=cmap(m2_feature),  markersize=2)
+    m.plot(a[j]-0.5, b[j]-0.5, 'o', color=cmap(m2_feature),  markersize=6)
     j = j+1
 
 # Draw line along original orbit path on top of points
@@ -228,11 +233,11 @@ cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, norm=norm,
 # Adjust ticks and labels on colorbar
 cb.set_ticks([0.5, 1.5])
 cb.ax.tick_params(size=0)
-cb.ax.set_yticklabels(['water', 'land'], fontsize=10)
+cb.ax.set_yticklabels(['water', 'land'], fontsize=12)
 
 #-----------------------------------------------------------------------------#
 # Show and save plot
-plt.show()
+#plt.show()
 os.chdir('..')
 pngfile = "compare_LWvsIGBP_inset.png"
 fig.savefig(pngfile, bbox_inches='tight')

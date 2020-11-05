@@ -72,11 +72,11 @@ from scm_caltrack.cloud_mask_MODIS_CALTRACK import sflag
 # Subset data. Otherwise, all points look black.
 sflag = sflag[::15]
 
-# bands_used = [[[1,4,3], 0], 
-#             [[1,4,3], 1], 
-#             [[3,6,7], 0], 
-#             [[7,2,1], 0]]
-bands_used = [[[1,4,3], 0]]
+bands_used = [[[1,4,3], 0], 
+             [[1,4,3], 1], 
+             [[3,6,7], 0], 
+             [[7,2,1], 0]]
+#bands_used = [[[7,5,1], 0]]
 
 def genImage(bands, enhanced, indy, fig):
     fig = fig
@@ -290,9 +290,9 @@ def genImage(bands, enhanced, indy, fig):
 
     m.drawcoastlines()
     #plt.show()
-    m.drawparallels(np.arange(-90.,120.,10.), color='k', fontsize=5,
+    m.drawparallels(np.arange(-90.,120.,10.), color='k', fontsize=11,
         labels=[True,False,False,False])
-    m.drawmeridians(np.arange(0.,420.,10.), color='k', fontsize=5,
+    m.drawmeridians(np.arange(0.,420.,20.), color='k', fontsize=11,
         labels=[False,False,False,True])
     
     # Make a color map of fixed colors.
@@ -330,9 +330,9 @@ def genImage(bands, enhanced, indy, fig):
     plt.rcParams["axes.titlesize"] = 7   
 
     # Set title
-    long_name = f'MODIS RGB = {slist}{enhanced_word} Orthographic Projection'
+    long_name = f'MODIS RGB\n{slist}{enhanced_word} Orthographic Projection'
     #basename = os.path.basename(FILE_NAME)
-    plt.title(long_name)
+    plt.title(long_name, fontsize=12)
 
     # # Set old title
     # long_name = 'MODIS RGB Orthographic Projection \n Snow-ice Cloud Mask vs Clear/Layered Mask'
@@ -348,26 +348,29 @@ def genImage(bands, enhanced, indy, fig):
     norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
     # create a second axes for the colorbar
-    ax2 = fig.add_axes([0.76, 0.55, 0.008, 0.11])
+    ax2 = fig.add_axes([0.62, -0.038, 0.2, 0.02])
     cb = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, 
-        spacing='proportional', boundaries=bounds, format='%1i')
+        spacing='proportional', boundaries=bounds, format='%1i', orientation='horizontal')
 
     cb.set_ticks([0.5, 1.5])
     cb.ax.tick_params(size=0)
-    cb.ax.set_yticklabels(['clear', 'layered'], fontsize=4)
+    cb.ax.set_xticklabels(['clear', 'layered'], fontsize=10)
 
     # define the bins and normalize for SCM
     bounds2 = np.linspace(0,8,9)
     norm2 = mpl.colors.BoundaryNorm(bounds2, cmap2.N)
 
-    # create a second axes for the colorbar
-    ax3 = fig.add_axes([0.76, 0.67, 0.008, 0.19])
+    # create a second axes for the colorbar[0.76, 0.67, 0.008, 0.19]
+    ax3 = fig.add_axes([0.08, -0.038, 0.5, 0.02])
     cb2 = mpl.colorbar.ColorbarBase(ax3, cmap=cmap2, norm=norm2, 
-        spacing='proportional', boundaries=bounds2, format='%1i')
+        spacing='proportional', boundaries=bounds2, format='%1i', orientation='horizontal')
 
     cb2.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5])
     cb2.ax.tick_params(size=0)
-    cb2.ax.set_yticklabels(['invalid/night', 'land', 'water', 'snow covered land', 'sea ice', 'snow covered sea ice', 'cloud', 'mixed pixels'], fontsize=4)
+    #cb2.ax.set_xticklabels(['invalid/\nnight', 'land', 'water', 'snow\ncovered land', 'sea ice', 'snow\ncovered sea ice', 'cloud', 'mixed\npixels'], fontsize=10)
+    cb2.ax.set_xticklabels(['invalid/\nnight', 'land', 'water','',
+                             'snow covered land,\nsea ice,\nsnow covered sea ice',
+                             '', '              cloud,\n              mixed pixels', ''], fontsize=10)
 
     #plt.show()
     #os.chdir('..')
@@ -384,5 +387,6 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(9, 8))
     for indy, item in enumerate(bands_used):
         fig = genImage(item[0], item[1], indy+1, fig)
+    fig.tight_layout(pad=3)
     os.chdir('..')
     plt.savefig('compare_SCMvsCALIPSO_MODIS_output',bbox_inches='tight', dpi=200)

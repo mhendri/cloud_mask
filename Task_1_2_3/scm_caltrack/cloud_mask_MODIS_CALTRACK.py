@@ -23,7 +23,7 @@ data_path = os.getcwd()+'\Task_1_2_3\\Data\\'
 
 #Change working directory to scm_caltrack
 print(os.getcwd())
-os.chdir('./scm_caltrack')
+os.chdir('./Task_1_2_3/scm_caltrack')
 
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
     

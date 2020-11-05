@@ -27,8 +27,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Select file directory
-rootdir = '/Volumes/untitled/Greenland_Tracks/2014_Tracks'
-
+#rootdir = './Task_1_2_3/Data/'
+rootdir = 'E:/CM_data/'
 data_path = []
 for subdir, dirs, files in os.walk(rootdir):
 	for file in files:
@@ -47,8 +47,9 @@ MYD021_lat = []
 MYD021_date = []
 
 for calipso_path in data_path:
+	if not '2007-05' in calipso_path: continue
 	if calipso_path[-1] == 'f' and calipso_path[-49:-41] == '333mMLay': # Only want 333mMLay HDF files 
-
+		
 		# Reads HDF file
 		hdf = SD(calipso_path, SDC.READ)
 
@@ -60,7 +61,7 @@ for calipso_path in data_path:
 		lon = longitude[:]
 
 		MLay_lat.append(len(lat))
-		MLay_date.append(calipso_path[-25:-6])
+		MLay_date.append(calipso_path[-14:-6])
 
 	elif calipso_path[-1] == 'f' and calipso_path[-37:-32] == 'MYD03': # Only want 333m-MYD03 HDF files 
 
@@ -75,7 +76,7 @@ for calipso_path in data_path:
 		lon = longitude[:]
 
 		MYD03_lat.append(len(lat))
-		MYD03_date.append(calipso_path[-25:-6])
+		MYD03_date.append(calipso_path[-14:-6])
 
 	elif calipso_path[-1] == 'f' and calipso_path[-40:-32] == 'MYD021KM': # Only want 333m-MYD021KM HDF files 
 
@@ -90,21 +91,22 @@ for calipso_path in data_path:
 		lon = longitude[:]
 
 		MYD021_lat.append(len(lat))
-		MYD021_date.append(calipso_path[-25:-6])
+		MYD021_date.append(calipso_path[-14:-6])
 
 plt.subplots_adjust(top=0.85, bottom = 0.2, left = 0.05, right = 0.98)
 
 # Plot each orbit length as a function of time (time stamp)
-ax1.scatter(MLay_date, MLay_lat, s=8, color='orange', label='333mMLay')
-ax1.scatter(MYD03_date, MYD03_lat, s=8, color='blue', label='333m-MYD03')
-ax1.scatter(MYD021_date, MYD021_lat, s=8, color='green', label='333m-MYD021KM')
-plt.xticks(rotation=90, fontsize=8)
+ax1.scatter(MLay_date, MLay_lat, s=20, color='orange', label='333mMLay')
+ax1.scatter(MYD03_date, MYD03_lat, s=20, color='blue', label='333m-MYD03')
+ax1.scatter(MYD021_date, MYD021_lat, s=20, color='green', label='333m-MYD021KM')
+plt.xticks(rotation=90, fontsize=22)
 start, end = ax1.get_xlim()
 ax1.xaxis.set_ticks(np.arange(start, end, 10))
 ax1.margins(x=0.001)
 ax1.set_ylim(ymin=63000)
+plt.yticks(fontsize=22)
 
-leg = ax1.legend(loc='upper center', fontsize=15, frameon=False, ncol=3)
+leg = ax1.legend(loc='upper center', fontsize=23, frameon=False, ncol=3)
 for handle, text in zip(leg.legendHandles, leg.get_texts()):
     text.set_color(handle.get_facecolor()[0])
 for item in leg.legendHandles:
@@ -112,10 +114,10 @@ for item in leg.legendHandles:
 
 # Set title
 long_name = 'Orbit Length (number of pixels)'
-basename = '2015-05'
-plt.title('{0}\n{1}'.format(basename, long_name))
+basename = '2007-05'
+plt.title('{0}\n{1}'.format(basename, long_name), size=26)
 
-plt.show()
+#plt.show()
 pngfile = 'compare_orbit_length'
-fig.savefig(pngfile)
+fig.savefig('./Task_1_2_3/'+pngfile,  bbox_inches='tight')
 

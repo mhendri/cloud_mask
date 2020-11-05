@@ -1,5 +1,6 @@
 """
 Edited by Hannah Skobe
+and iraz too but just a little on this one
 
 This example code illustrates how to access and visualize a LaRC CALIPSO file 
 in Python on land above Greenland. Specifically, this code plots a segment of
@@ -27,7 +28,7 @@ from mpl_toolkits.basemap import Basemap
 #np.set_printoptions(threshold=np.inf)
 #-----------------------------------------------------------------------------#
 #Change Directory to Data
-os.chdir('./Data')
+os.chdir('./Task_1_2_3/Data')
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
@@ -403,8 +404,8 @@ longitude, altitude2 = np.meshgrid(lon, total_alt)
 cmap = colors.ListedColormap(['blue', 'lightskyblue', 'orange', 'yellow', 
 	'lime', 'grey', 'black'])
 
-fig = plt.figure(figsize = (10, 8))
-plt.subplots_adjust(bottom=0.07, top=0.9, left=0.1, right=0.8)
+fig = plt.figure(figsize = (13, 12))
+#plt.subplots_adjust(bottom=0.07, top=0.9, left=0.1, right=0.8)
 
 # Define the bins and normalize.
 bounds = np.linspace(0,7,8)
@@ -412,15 +413,15 @@ norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
 # Create lower plot for Number of Layers Found
 ax1 = fig.add_subplot(212)
-
-ax1.scatter(lat, total_layers[::15], color='red', s=0.5, label='VFM')
-ax1.scatter(lat, num_layers+0.1, color='blue', s=1, label='MLay')
-ax1.legend(loc='upper right', fontsize=8)
-ax1.set_xlabel('Lat', fontsize=9)
+fig.tight_layout(pad = 10)
+ax1.scatter(lat, total_layers[::15], color='red', s=3, label='VFM')
+ax1.scatter(lat, num_layers+0.1, color='blue', s=3, label='MLay')
+ax1.legend(loc='upper right', fontsize=15)
+ax1.set_xlabel('Lat', fontsize=15)
 ax1.set_xticks(np.linspace(lat[0], lat[-1], 5))
-ax1.set_ylabel('Number of Layers', fontsize=9)
+ax1.set_ylabel('Number of Layers', fontsize=20)
 ax1.xaxis.set_label_coords(-0.06, -0.04)
-ax1.xaxis.set_tick_params(labelsize=9)
+ax1.xaxis.set_tick_params(labelsize=15)
 ax1.margins(x=0)
 
 # Create second axis with longitute as x-axis
@@ -434,9 +435,9 @@ ax12.spines['bottom'].set_visible(False)
 ax12.invert_xaxis()
 ax12.tick_params(size=0)
 ax12.set_xticks(np.linspace(lon[0], lon[-1], 5))
-ax12.set_xlabel('Lon', fontsize=9)
+ax12.set_xlabel('Lon', fontsize=15)
 ax12.xaxis.set_label_coords(-0.06, -0.13)
-ax12.xaxis.set_tick_params(labelsize=9)
+ax12.xaxis.set_tick_params(labelsize=15)
 ax12.set_ylim(ax1.get_ylim())
 ax12.margins(x = 0)
 
@@ -453,16 +454,16 @@ ax2.plot(lat, y_coordiantes, color='magenta', linewidth=0.75, label = '8.2km')
 long_name = 'Feature Type (Bits 1-3) in Feature Classification Flag'
 basename = os.path.basename(FILE_NAME)
 basename2 = os.path.basename(filename)
-ax2.set_title('{0}\n{1}\n{2}'.format(basename, basename2, long_name))
+ax2.set_title('{0}\n{1}\n{2}'.format(basename, basename2, long_name), fontsize=21)
 
 ax2.contourf(latitude, altitude, np.rot90(total_data,1), cmap=cmap)
-ax2.set_xlabel('Lat', fontsize=9)
-ax2.set_ylabel('Altitude (km)', fontsize=9)
+ax2.set_xlabel('Lat', fontsize=15)
+ax2.set_ylabel('Altitude (km)', fontsize=20)
 ax2.minorticks_on()
 ax2.set_xticks(np.linspace(lat[0], lat[-1], 5))
 ax2.xaxis.set_label_coords(-0.06, -0.04)
-ax2.yaxis.set_tick_params(labelsize=9)
-ax2.xaxis.set_tick_params(labelsize=9)
+ax2.yaxis.set_tick_params(labelsize=15)
+ax2.xaxis.set_tick_params(labelsize=15)
 
 # Create second plot with longitude as x-axis
 ax3 = ax2.twiny()
@@ -475,50 +476,60 @@ ax3.spines['bottom'].set_visible(False)
 ax3.invert_xaxis()
 ax3.tick_params(size=0)
 ax3.set_xticks(np.linspace(lon[0], lon[-1], 5))
-ax3.set_xlabel('Lon', fontsize=9)
+ax3.set_xlabel('Lon', fontsize=15)
 ax3.xaxis.set_label_coords(-0.06, -0.13)
-ax3.xaxis.set_tick_params(labelsize=9)
+ax3.xaxis.set_tick_params(labelsize=15)
 ax3.set_ylim(ax2.get_ylim())
 
 # Create third plot with elevation, layer top altitude, layer base altitude as y-axis
 ax4 = ax2.twiny()
 
-ax4.plot(lat, elevation, color='red', label='Suface Elevation')
+ax4.plot(lat, elevation, color='darkgreen', label='Suface Elevation', linewidth=3)
 ax4.set_xlim(ax2.get_xlim())
 ax4.set_xticks([])
 label_added = False
 for i in range(len(top[1, :])):
 	if not label_added:
-		ax4.scatter(lat, top[:, i], color='deeppink', s = 1, label='Layer Top Altitude')
+		ax4.scatter(lat, top[:, i], color='red', s = 4, label='Layer Top Altitude')
 		label_added = True
 	else:
-		ax4.scatter(lat, top[:, i], color='deeppink', s = 1)
+		ax4.scatter(lat, top[:, i], color='red', s = 4)
 label_added2 = False
 for i in range(len(bottom[1, :])):
 	if not label_added2:
-		ax4.scatter(lat, bottom[:, i], color = 'indigo', s = 1, label='Layer Bottom Altitude')
+		ax4.scatter(lat, bottom[:, i], color = 'darkred', s = 4, label='Layer Bottom Altitude')
 		label_added2 = True
 	else:
-		ax4.scatter(lat, bottom[:, i], color = 'indigo', s = 1)
+		ax4.scatter(lat, bottom[:, i], color = 'darkred', s = 4)
 ax4.margins(x=0, y=0)
 ax4.set_ylim(ymin=-0.5)
-ax4.legend(loc='upper left', fontsize=9)
+ax4.legend(loc='upper left', fontsize=15)
 
 fig = plt.gcf()
 
-# Create a second axes for the discrete colorbar.
-ax5 = fig.add_axes([0.83, 0.5, 0.02, 0.4])
-cb = mpl.colorbar.ColorbarBase(ax5, cmap=cmap, boundaries=bounds)
+# # Create a second axes for the discrete colorbar.
+# ax5 = fig.add_axes([0.83, 0.5, 0.02, 0.4])
+# cb = mpl.colorbar.ColorbarBase(ax5, cmap=cmap, boundaries=bounds)
+# cb.ax.tick_params(size=0)
+# cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
+# cb.ax.set_yticklabels(['"clear air"', 'cloud', 'tropospheric aerosol',
+#  'stratospheric aerosol', 'surface', 'subsurface', 'no signal'],
+#   fontsize=11, fontweight='bold')
+
+#Create a second axes for the discrete colorbar.
+
+ax4 = fig.add_axes([0.1, .49, 0.8, 0.02])
+cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, boundaries=bounds, orientation='horizontal')
 cb.ax.tick_params(size=0)
 cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
-cb.ax.set_yticklabels(['"clear air"', 'cloud', 'tropospheric aerosol',
- 'stratospheric aerosol', 'surface', 'subsurface', 'no signal'],
-  fontsize=8, fontweight='bold')
+cb.ax.set_xticklabels(['"clear air"', 'cloud', 'tropospheric\naerosol',
+ 'stratospheric\naerosol', 'surface', 'subsurface', 'no signal'],
+  fontsize=13, fontweight='bold')
 
-plt.show()
+#plt.show()
 pngfile = 'VFM_full_NumLayers'
 os.chdir('..')
-fig.savefig(pngfile)
+fig.savefig(pngfile, bbox_inches='tight')
     
 
  

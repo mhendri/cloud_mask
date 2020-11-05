@@ -27,7 +27,7 @@ from mpl_toolkits.basemap import Basemap
 
 #-----------------------------------------------------------------------------#
 #Change Directory to Data
-os.chdir('./Data')
+os.chdir('./Task_1_2_3/Data')
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
@@ -231,7 +231,7 @@ lower_longitude, lower_altitude2 = np.meshgrid(lower_lon, alt1)
 cmap = colors.ListedColormap(['blue', 'lightskyblue', 'orange', 'yellow',
  'lime', 'grey', 'black'])
 
-fig = plt.figure(figsize = (10, 8))
+fig = plt.figure(figsize = (18, 10))
 plt.subplots_adjust(bottom=0.07, top=0.9, left=0.1, right=0.8)
 
 # Define the bins and normalize.
@@ -245,14 +245,14 @@ long_name = 'Feature Type (Bits 1-3) in Feature Classification Flag'
 basename = os.path.basename(FILE_NAME)
 basename2 = os.path.basename(filename)
 ax1.contourf(upper_latitude, upper_altitude, np.rot90(total_upper,1), cmap=cmap)
-ax1.set_title('{0}\n{1}\n{2}'.format(basename, basename2, long_name))
-ax1.set_xlabel('Lat', fontsize=9)
-ax1.set_ylabel('Altitude (km)', fontsize=9)
+ax1.set_title('{0}\n{1}\n{2}'.format(basename, basename2, long_name), fontsize=21)
+ax1.set_xlabel('Lat', fontsize=17)
+ax1.set_ylabel('Altitude (km)', fontsize=20)
 ax1.minorticks_on()
 ax1.set_xticks(np.linspace(upper_lat[0], upper_lat[-1], 5))
-ax1.xaxis.set_label_coords(-0.05, -0.03)
-ax1.yaxis.set_tick_params(labelsize=9)
-ax1.xaxis.set_tick_params(labelsize=9)
+ax1.xaxis.set_label_coords(-0.06, -0.03)
+ax1.yaxis.set_tick_params(labelsize=17)
+ax1.xaxis.set_tick_params(labelsize=17)
 ax1.set_ylim(ymax=12) # only want altitude from -0.5 to 12km
 
 # Create second axis with longitude as x-axis
@@ -266,46 +266,46 @@ ax2.spines['bottom'].set_visible(False)
 ax2.invert_xaxis()
 ax2.tick_params(size=0)
 ax2.set_xticks(np.linspace(upper_lon[0], upper_lon[-1], 5))
-ax2.set_xlabel('Lon', fontsize=9)
-ax2.xaxis.set_label_coords(-0.05, -0.13)
-ax2.xaxis.set_tick_params(labelsize=9)
+ax2.set_xlabel('Lon', fontsize=17)
+ax2.xaxis.set_label_coords(-0.06, -0.13)
+ax2.xaxis.set_tick_params(labelsize=17)
 ax2.set_ylim(ax1.get_ylim())
  
 # Create third axis with elevation, layer top altitude, layer base altitude as y-axis
 ax3 = ax1.twiny()
 
-ax3.plot(upper_lat, upper_elevation, color='red', label='Surface Elevation')
+ax3.plot(upper_lat, upper_elevation, color='darkgreen', label='Surface Elevation', linewidth=4)
 ax3.set_xlim(ax1.get_xlim())
 ax3.set_xticks([])
 label_added = False
 for i in range(len(top[1, :])):
 	if not label_added:
-		ax3.scatter(upper_lat, top[:, i], color='deeppink', s = 1, label='Layer Top Altitude')
+		ax3.scatter(upper_lat, top[:, i], color='red', s = 10, label='Layer Top Altitude')
 		label_added = True
 	else:
-		ax3.scatter(upper_lat, top[:, i], color='deeppink', s = 1)
+		ax3.scatter(upper_lat, top[:, i], color='red', s = 10)
 label_added2 = False
 for i in range(len(bottom[1, :])):
 	if not label_added2:
-		ax3.scatter(upper_lat, bottom[:, i], color = 'indigo', s = 1, label='Layer Bottom Altitude')
+		ax3.scatter(upper_lat, bottom[:, i], color = 'darkred', s = 10, label='Layer Bottom Altitude')
 		label_added2 = True
 	else:
-		ax3.scatter(upper_lat, bottom[:, i], color = 'indigo', s = 1)
+		ax3.scatter(upper_lat, bottom[:, i], color = 'darkred', s = 10)
 ax3.margins(x=0, y=0)
 ax3.set_ylim(ymin=-0.5)
-ax3.legend(fontsize=9)
+ax3.legend(fontsize=17)
 
 # Create lower plot
 ax5 = fig.add_subplot(212)
 
 ax5.contourf(lower_latitude, lower_altitude, np.rot90(lower_data,1), cmap=cmap)
-ax5.set_xlabel('Lat', fontsize=9)
-ax5.set_ylabel('Altitude (km)', fontsize=9)
+ax5.set_xlabel('Lat', fontsize=17)
+ax5.set_ylabel('Altitude (km)', fontsize=20)
 ax5.minorticks_on()
 ax5.set_xticks(np.linspace(lower_lat[0], lower_lat[-1], 5))
-ax5.xaxis.set_label_coords(-0.05, -0.03)
-ax5.yaxis.set_tick_params(labelsize=9)#, labelweight='bold')
-ax5.xaxis.set_tick_params(labelsize=9)#, labelweight='bold')
+ax5.xaxis.set_label_coords(-0.07, -0.03)
+ax5.yaxis.set_tick_params(labelsize=17)#, labelweight='bold')
+ax5.xaxis.set_tick_params(labelsize=17)#, labelweight='bold')
 ax5.set_ylim(ymax=1.25)
 
 # Create second axis with longitude as x-axis
@@ -319,17 +319,17 @@ ax6.spines['bottom'].set_visible(False)
 ax6.invert_xaxis()
 ax6.tick_params(size=0)
 ax6.set_xticks(np.linspace(lower_lon[0], lower_lon[-1], 5))
-ax6.set_xlabel('Lon', fontsize=9)
-ax6.xaxis.set_label_coords(-0.05, -0.13)
-ax6.xaxis.set_tick_params(labelsize=9)#, labelweight='bold')
+ax6.set_xlabel('Lon', fontsize=17)
+ax6.xaxis.set_label_coords(-0.07, -0.13)
+ax6.xaxis.set_tick_params(labelsize=17)#, labelweight='bold')
 
 # Create third axis with elevation as y-axis
 ax7 = ax6.twiny()
 
-ax7.plot(lower_lat, lower_elevation, color='red')
+ax7.plot(lower_lat, lower_elevation, color='darkgreen', linewidth=6)
 ax7.set_xlim(ax5.get_xlim())
 ax7.set_xticks([])
-ax7.legend(['Surface Elevation'], fontsize=9)
+ax7.legend(['Surface Elevation'], fontsize=17)
 
 # Create colorbar legend
 #plt.gcf().text(0.05,0.03, '1 = "clear air"    2 = cloud    3 = tropospheric aerosol    4 = stratospheric aerosol    5 = surface   6 = subsurface   7 = no signal', 
@@ -337,19 +337,28 @@ ax7.legend(['Surface Elevation'], fontsize=9)
 
 fig = plt.gcf()
 
+# # Create a second axes for the discrete colorbar.
+# ax4 = fig.add_axes([0.83, 0.5, 0.02, 0.4])
+# cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, boundaries=bounds, orientation='horizontal')
+# cb.ax.tick_params(size=0)
+# cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
+# cb.ax.set_yticklabels(['"clear air"', 'cloud', 'tropospheric aerosol',
+#  'stratospheric aerosol', 'surface', 'subsurface', 'no signal'],
+#   fontsize=20, fontweight='bold')
+
 # Create a second axes for the discrete colorbar.
-ax4 = fig.add_axes([0.83, 0.5, 0.02, 0.4])
-cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, boundaries=bounds)
+ax4 = fig.add_axes([0.1, -.05, 0.7, 0.05])
+cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, boundaries=bounds, orientation='horizontal')
 cb.ax.tick_params(size=0)
 cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
-cb.ax.set_yticklabels(['"clear air"', 'cloud', 'tropospheric aerosol',
- 'stratospheric aerosol', 'surface', 'subsurface', 'no signal'],
-  fontsize=8, fontweight='bold')
+cb.ax.set_xticklabels(['"clear air"', 'cloud', 'tropospheric\naerosol',
+ 'stratospheric\naerosol', 'surface', 'subsurface', 'no signal'],
+  fontsize=16, fontweight='bold')
 
-plt.show()
+#plt.show()
 os.chdir('..')
 pngfile = 'VFM_zoom'
-fig.savefig(pngfile)
+fig.savefig(pngfile, bbox_inches='tight')
     
 
  

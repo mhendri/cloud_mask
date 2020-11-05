@@ -17,169 +17,200 @@ Usage:  save this script and run
 Tested under: Python 3.7.6  Anaconda 4.8.3
 Last updated: 2020-10-28
 """
-import time
-import numpy as np
 
-from scm_caltrack.readSatelliteData import GetSatelliteData 
-from scm_caltrack.classifySatelliteImage import ClassifyImage
-from os import listdir
-from os.path import isfile, join
-# import fnmatch
 
-from sklearn.metrics import confusion_matrix
-from pyhdf.SD import SD, SDC
-import numpy as np
+
 import os
 from os import listdir
 from os.path import isfile, join
+import time
 
+import numpy as np
+import pandas as pd
+from sklearn.metrics import confusion_matrix
+from pyhdf.SD import SD, SDC
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
+from shapely.geometry import Point, Polygon
+
+from scm_caltrack.readSatelliteData import GetSatelliteData 
+from scm_caltrack.classifySatelliteImage import ClassifyImage
+
 
 start_time = time.time()            
 
-TP_lst = []
-FP_lst = []
-TN_lst = []
-FN_lst = []
-name_lst = []
-
 # Choose directory path
-# data_path = '/Users/chennan/Downloads/maps/SGLI/SGLI_CM_test_suite/hdf/'
-#data_path = '/Users/hskobe/Desktop/NASA Internship 2020/Python/test/'
-#data_path = os.getcwd() + '\Task_1_2_3\\Data\\'
 data_path = 'E:\\CM_data\\'
-# data_path = '/Users/chennan/Downloads/maps/SGLI/SGLI_CM_test_Feb2020/20200131_SGLI/hdf/'
+
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
 
-fig = plt.figure(figsize=(10, 6))
+full_data = []
+full_df = pd.DataFrame(columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix'])
+map_data=[]
 
-file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
+coords = [(-55, 59.5), (-55,67.5), (-60,67.5), (-60,75), (-73.25,75), (-73.25,79.2),
+		(-67.5,79.2), (-67.5,80.82), (-65.34,80.82), (-65.34,81.23), (-62,81.23),
+		(-62,82), (-60.25,82), (-60.25,84), (-10,84), (-10,75), (-17,75), (-17,67.5),
+		(-30,67.5), (-30,59.5)]
+poly = Polygon(coords)
 
-for f in file_name_list:
-    
-    # print(f[11:19])
-    
-    if not '2007-02' in f:
-        continue
-    
-    if ( f[11:19] != '333mMLay' ):
+
+def confuse():
+    file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
+    for f in file_name_list:
+        st = time.time()
+
+        # if not '2007-05-20' in f: continue
+        
+        if ( f[11:19] != '333mMLay' ):
+                continue
+
+        calipso_fname = f    
+
+        nametimestamp  =  calipso_fname[-25:-4] 
+        print('nametimesnamp=',nametimestamp)
+        for file in listdir(data_path):
+            if file[-25:-4] == nametimestamp and file[14:19] == 'MYD03':
+                mod03_fname = file 
+                #print('myd03=',file[-25:-4])
+            if file[-25:-4] == nametimestamp and file[14:22] == 'MYD021KM':
+                mod021km_fname = file  
+                #print('myd021km=',file[-25:-4])
+
+        calipso_path  = data_path + calipso_fname   
+        mod021km_path = data_path + mod021km_fname
+        mod03_path    = data_path + mod03_fname       
+        try:
+            ## read satellite data ##
+            c1 = GetSatelliteData.read_caltrack_data(calipso_path,mod021km_path,mod03_path,channel_list)  
+
+            classification_type = 'cloud_mask_land'
+            classifier_type     = 'random_forest'
+            classifier_path     = 'Task_4/scm_caltrack/trained_classifiers/'
+            classifier_name     = 'CMl_rf_T11_MODIS_6ch'
+            channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ]  
+            
+            c2 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
+                                classifier_name,channel_conf)  
+            sflag = c2.initialize_sflag()
+            sflag = c2.classify_image(sflag,scaler=False)     
+            
+            classification_type = 'cloud_mask_water'
+            classifier_type     = 'random_forest'
+            classifier_path     = 'Task_4/scm_caltrack/trained_classifiers/'
+            classifier_name     = 'CMw_rf_T2_MODIS_6ch'
+            channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ] 
+
+            c4 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
+                                classifier_name,channel_conf)
+            sflag2 = c4.classify_image(sflag,scaler=False)        
+        except Exception as e:
+            print('EXCEPTION:',e)
+            print('DATE:', nametimestamp)
             continue
 
-    calipso_fname = f    
-    # print(f)
-    nametimestamp  =  calipso_fname[-25:-4] 
-    print('nametimesnamp=',nametimestamp)
-    for file in listdir(data_path):
-        #print(file[14:22])
+        # Focus on only layered pixels (= 6 and 7)
+        sflag2[sflag2 < 6] = 0;
+        sflag2[sflag2 == 6] = 1;
+        sflag2[sflag2 == 7] = 1;    
+    #-----------------------------------------------------------------------------#
+    #-----------------------------------------------------------------------------#
+        # Read into CALIPSO file
+        hdf = SD(calipso_path, SDC.READ)
+        lat = hdf.select('Latitude')
+        lon = hdf.select('Longitude')
+        lat = lat[:, 0]
+        lon = lon[:, 0]
+        lat = lat.tolist()
+        lon = lon.tolist()
+        #print(lat.info()[2][0])
+        # Read 'Number_Layers_Found' dataset.
+        data1D = hdf.select('Number_Layers_Found')
+        data = data1D[:, 0]
         
-        if file[-25:-4] == nametimestamp and file[14:19] == 'MYD03':
-           mod03_fname = file 
-           print('myd03=',file[-25:-4])
-        if file[-25:-4] == nametimestamp and file[14:22] == 'MYD021KM':
-           mod021km_fname = file  
-           print('myd021km=',file[-25:-4])
+        # Read Land_Water_Mask dataset.
+        IGBP_Type = hdf.select('IGBP_Surface_Type')     
+        IGBP = IGBP_Type[:, 0]
 
-    calipso_path  = data_path + calipso_fname   
-    mod021km_path = data_path + mod021km_fname
-    mod03_path    = data_path + mod03_fname       
-    try:
-        ## read satellite data ##
-        c1 = GetSatelliteData.read_caltrack_data(calipso_path,mod021km_path,mod03_path,channel_list)  
+        # Focus on land (≠ 17) data only.
+        IGBP[IGBP < 17] = 1;
+        IGBP[IGBP > 17] = 1;
+        IGBP[IGBP == 17] = 0;
 
-        classification_type = 'cloud_mask_land'
-        classifier_type     = 'random_forest'
-        classifier_path     = 'Task_4/scm_caltrack/trained_classifiers/'
-        classifier_name     = 'CMl_rf_T11_MODIS_6ch'
-        channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ]  
+        IGBP = IGBP.tolist()
+
+        # Focus only on layered pixels (> 0)
+        data[data > 0] = 1;
+        data[data == 0] = 0;
         
-        c2 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
-                            classifier_name,channel_conf)  
-        sflag = c2.initialize_sflag()
-        sflag = c2.classify_image(sflag,scaler=False)     
         
-        classification_type = 'cloud_mask_water'
-        classifier_type     = 'random_forest'
-        classifier_path     = 'Task_4/scm_caltrack/trained_classifiers/'
-        classifier_name     = 'CMw_rf_T2_MODIS_6ch'
-        channel_conf = np.s_[ 0, 1, 2, 3, 4, 5 ] 
 
-        c4 = ClassifyImage(c1, classification_type,classifier_type,classifier_path,\
-                            classifier_name,channel_conf)
-        sflag2 = c4.classify_image(sflag,scaler=False)        
-    except Exception as e:
-        print('EXCEPTION:',e)
-        continue
+        try: 
+            bott = ([float(f'{num:.1f}') for num in lat].index(59.5))
+            if(lat[bott+100]<lat[bott]): bott = 0
+        except Exception as e: 
+            bott = 0
+        cor_inds = []
+        for index in range(bott, len(lat)):
+            if (poly.contains(Point(lon[index], lat[index]))):
+                cor_inds.append(index)
+                if not index == (len(lat)-1) and not (poly.contains(Point(lon[index+1], lat[index+1]))):
+                    break
+        if len(cor_inds) < 10:
+            continue
+        # Print out coordinates to file
+        # tempdf = pd.DataFrame({'Latitude': lat, 'Longitude': lon})
+        # tempdf.to_csv('test.csv', index=False)
+    #-----------------------------------------------------------------------------#
+    #-----------------------------------------------------------------------------#
+        # Create confusion maxtrix and print information of interest
+        data = data[(cor_inds[0]):(cor_inds[-1])]
+        sflag2 = sflag2[(cor_inds[0]):(cor_inds[-1])]
+        lat = lat[(cor_inds[0]):(cor_inds[-1])]
+        lon = lon[(cor_inds[0]):(cor_inds[-1])]
+        IGBP = IGBP[(cor_inds[0]):(cor_inds[-1])]
 
-    # Focus on only layered pixels (= 6 and 7)
-    sflag2[sflag2 < 6] = 0;
-    sflag2[sflag2 == 6] = 1;
-    sflag2[sflag2 == 7] = 1;    
+        
+        vd = ''
+        print("DATA LENGTH=",len(data), len(sflag2))
+        for ll in range(len(data)):
+            if data[ll] == 1 and sflag2[ll] == 1:
+                vd=('tl')
+            elif data[ll] == 1 and sflag2[ll] == 0:
+                vd=('fc')
+            elif data[ll] == 0 and sflag2[ll] == 0:
+                vd=('tc')
+            elif data[ll] == 0 and sflag2[ll] == 1:
+                vd=('fl')
+            if IGBP[ll] == 0:
+                lat[ll], lon[ll], = None, None
+            map_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
+                            lat[ll], lon[ll], vd])
+
+        tl, fc, fl, tc = confusion_matrix(data, sflag2, labels=[0,1]).ravel()
+        #matrix = confusion_matrix(data, sflag2)
+        
+        print(nametimestamp, nametimestamp[11:19])
+        full_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
+                            round((tc/len(data))*100, 3), round((fc/len(data))*100, 3), round((tl/len(data))*100, 3), 
+                            round((fl/len(data))*100, 3), len(data)])
+        et = time.time()
+        print('LOOP TIME:', (et-st))
+
+def fdToDf():
+    full_df = pd.DataFrame(full_data[:], columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix'])
+    return full_df
+
+def mdToDf():
+    map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd',])
+    return map_df
+
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
+if __name__ == "__main__":
+    confuse()
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    fdToDf().to_csv('./Task_4/cf_matrix_full_data.csv', index=False)
     
-    # Read into CALIPSO file
-    hdf = SD(calipso_path, SDC.READ)
-
-    # Read 'Number_Layers_Found' dataset.
-    data1D = hdf.select('Number_Layers_Found')
-    data = data1D[:, 0]
-
-    # Focus only on layered pixels (> 0)
-    data[data > 0] = 1;
-    data[data == 0] = 0;
-
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------#
-    # Create confusion maxtrix and print information of interest
-    tn, fp, fn, tp = confusion_matrix(data, sflag2).ravel()
-    matrix = confusion_matrix(data, sflag2)
-    # print('CALIPSO file :', calipso_fname)
-    # print('MYD021KM file:', mod021km_fname)
-    # print('MYDO3 file   :', mod03_fname)
-    print('matrix',matrix)
-    # print('TP, percentage:', tp, (tp/len(data))*100)
-    # print('FP, percentage:', fp, (fp/len(data))*100)
-    # print('TN, percentage:', tn, (tn/len(data))*100)
-    # print('FN, ercentage:', fn, (fn/len(data))*100)
-    # print('Total pixels :', len(data))
-
-    # Plot confusion matrix elements as a function of time (time stamp)
-    plt.scatter(calipso_fname[-14:-6], ((tp/len(data))*100), s=10, color='red')
-    plt.scatter(calipso_fname[-14:-6], ((fp/len(data))*100), s=10, color='blue')
-    plt.scatter(calipso_fname[-14:-6], ((tn/len(data))*100), s=10, color='green')
-    plt.scatter(calipso_fname[-14:-6], ((fn/len(data))*100), s=10, color='orange')
-
-    TP_lst.append(((tp/len(data))*100))
-    FP_lst.append(((fp/len(data))*100))
-    TN_lst.append(((tn/len(data))*100))
-    FN_lst.append(((fn/len(data))*100))
-
-    name_lst.append(calipso_fname[-14:-6])
-
-    # Rotate time stamp vertically
-    # plt.xticks(rotation=90)
-
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------#
-print("--- %s seconds ---" % (time.time() - start_time))
-
-# plt.subplots_adjust(bottom = 0.15)
-
-# # Connect points on plot
-# plt.plot(name_lst, TP_lst, color = 'red', linewidth = 1, label='TP')
-# plt.plot(name_lst, FP_lst, color = 'blue', linewidth = 1, label='FP')
-# plt.plot(name_lst, TN_lst, color = 'green', linewidth = 1, label = 'TN')
-# plt.plot(name_lst, FN_lst, color = 'orange', linewidth = 1, label = 'FN')
-
-# plt.legend()
-
-# # Set title
-# long_name = 'Snow-ice Cloud Mask vs Clear/Layered Mask\nConfusion Matrix Elements'
-# basename = '2015-05-05'
-# plt.title('{0}\n{1}'.format(basename, long_name))
-
-# plt.show()
-# pngfile = 'SCM_confusion_matrix'
-# fig.savefig(pngfile)
+    mdToDf().to_csv('./Task_4/cf_matrix_map_data.csv', index=False)

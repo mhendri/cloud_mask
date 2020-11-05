@@ -41,6 +41,7 @@ bands_used = [[[1,4,3], 0],
             [[1,4,3], 1], 
             [[3,6,7], 0], 
             [[7,2,1], 0]]
+# bands_used = [[[1,4,3], 0]]
             
 # References:
 # https://earthdata.nasa.gov/sites/default/files/field/document/MODIS_True_Color.pdf
@@ -51,14 +52,14 @@ def genImage(bands, enhanced, indy, fig):
     fig = fig
     #-----------------------------------------------------------------------------#
     #Change Directory to Data
-    os.chdir('./Data')
-
+    #os.chdir('./Task_1_2_3/Data')
+    path = '.\\Task_1_2_3\\Data\\'
     #-----------------------------------------------------------------------------#
     #----------------------------------------------------------------------------------------#
     # inputs
 
-    file_name_myd021km = 'MYD021KM.A2015190.1340.061.2018051014602.hdf'
-    file_name_myd03 = 'MYD03.A2015190.1340.061.2018048194846.hdf'
+    file_name_myd021km = path+'MYD021KM.A2015190.1340.061.2018051014602.hdf'
+    file_name_myd03 = path+'MYD03.A2015190.1340.061.2018048194846.hdf'
 
     file_myd021km = SD(file_name_myd021km, SDC.READ)
 
@@ -192,7 +193,7 @@ def genImage(bands, enhanced, indy, fig):
     #FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2015-07-09T14-40-55ZD.hdf'
     #FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2015-07-09T11-23-10ZD.hdf'
     #FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2015-07-09T13-02-00ZD.hdf'
-    FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2015-07-09T13-02-00ZD.hdf'
+    FILE_NAME = path+'CAL_LID_L2_333mMLay-Standard-V4-20.2015-07-09T13-02-00ZD.hdf'
     DATAFIELD_NAME = 'Number_Layers_Found'
 
     #-----------------------------------------------------------------------------#
@@ -308,9 +309,9 @@ def genImage(bands, enhanced, indy, fig):
     #plt.show()
     m.drawcoastlines()
     
-    m.drawparallels(np.arange(-90.,120.,10.), color='k', fontsize=6, 
+    m.drawparallels(np.arange(-90.,120.,10.), color='k', fontsize=12, 
         labels=[True,False,False,False])
-    m.drawmeridians(np.arange(0.,420.,10.), color='k', fontsize=6, 
+    m.drawmeridians(np.arange(0.,420.,20.), color='k', fontsize=12, 
         labels=[False,False,False,True])
     
     # Map data along orbit path in plot
@@ -334,9 +335,9 @@ def genImage(bands, enhanced, indy, fig):
     plt.rcParams["axes.titlesize"] = 5   
 
     # Set title
-    long_name = f'MODIS RGB = {slist}{enhanced_word} Orthographic Projection'
+    long_name = f'MODIS RGB\n{slist}{enhanced_word} Orthographic Projection'
     #basename = os.path.basename(FILE_NAME)
-    plt.title(long_name)
+    plt.title(long_name, fontsize=15)
 
     fig = plt.gcf()
 
@@ -345,15 +346,15 @@ def genImage(bands, enhanced, indy, fig):
     norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
     # create a second axes for the colorbar
-    ax2 = fig.add_axes([0.88, 0.7, 0.01, 0.2])
+    ax2 = fig.add_axes([0.25, -0.038, 0.5, 0.02])
     cb = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, 
-        spacing='proportional', ticks=bounds, boundaries=bounds, format='%1i')
+        spacing='proportional', ticks=bounds, boundaries=bounds, format='%1i', orientation='horizontal')
     cb.set_ticks([0.5, 1.5])
     cb.ax.tick_params(size=0)
-    cb.ax.set_yticklabels(['clear', 'layered'], fontsize=4)
+    cb.ax.set_xticklabels(['clear', 'layered'], fontsize=12)
     
-    os.chdir('..')
-    fig.tight_layout()
+    #os.chdir('..')
+    #fig.tight_layout(pad=2)
 
     #--------------------------# 
     #This is only for individual outputs rather than table.
@@ -367,9 +368,11 @@ def genImage(bands, enhanced, indy, fig):
 
 if __name__ == "__main__":
     fig = plt.figure()
+    fig = plt.figure(figsize=(9, 8))
     for indy, item in enumerate(bands_used):
         fig = genImage(item[0], item[1], indy+1, fig)
-    plt.savefig('MODIS_orbit_features_enhanced_output', dpi=200)
+        fig.tight_layout()
+    plt.savefig('./Task_1_2_3/'+'MODIS_orbit_features_enhanced_output', bbox_inches='tight', dpi=200)
     
 
 

@@ -86,8 +86,7 @@ def ftpDownload(url):
     try:
         return urlretrieve(url, 'E:\\CM_data\\'+getFn(url)), None
     except Exception as e:
-        return None
-                
+        return None           
 
 def batchDownload(file):
     st = time.time()
@@ -107,6 +106,7 @@ def batchDownload(file):
     pool.map(ftpDownload, paths)
     et = time.time()
     print(et-st)
+
 def getAvailability(ftp_path, fname, hname):
     ftp = ftpLogin()
     global monthdata
