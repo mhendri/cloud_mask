@@ -343,13 +343,13 @@ if __name__ == '__main__':
     # removeNonGl('.\\Task_4\\Data\\MYD03\\', '.\\Task_4\\Data\\MYD03_gl')
 
     #___________________________________________________________________________________________
-    # Check if all 4 files exist
-    checkAllExist()
+    # # Check if all 4 files exist
+    # checkAllExist()
 
-    #Remove non exist files
-    removeNonExist('.\\Task_4\\Data\\MYD03_gl\\')
+    # #Remove non exist files
+    # removeNonExist('.\\Task_4\\Data\\MYD03_gl\\')
 
     #___________________________________________________________________________________________
-    # Ftp stuff
+    # Ftp download
     #batchDownload('mlay_avanames.csv')
     #batchDownload('myd021km_avanames.csv')

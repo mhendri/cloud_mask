@@ -159,7 +159,9 @@ for f in file_name_list:
     name_lst.append(calipso_fname[-14:-6])
 
     # Rotate time stamp vertically
-    plt.xticks(rotation=90)
+    plt.xticks(rotation=90, fontsize=15)
+    plt.yticks(fontsize=15)
+  
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
@@ -167,19 +169,23 @@ print("--- %s seconds ---" % (time.time() - start_time))
 
 plt.subplots_adjust(bottom = 0.15)
 
+plt.xlabel('time',fontsize=16)
+plt.ylabel('pixels', fontsize=16)
+
 # Connect points on plot
 plt.plot(name_lst, TP_lst, color = 'red', linewidth = 1, label='TP')
 plt.plot(name_lst, FP_lst, color = 'blue', linewidth = 1, label='FP')
 plt.plot(name_lst, TN_lst, color = 'green', linewidth = 1, label = 'TN')
 plt.plot(name_lst, FN_lst, color = 'orange', linewidth = 1, label = 'FN')
 
-plt.legend()
+plt.legend(loc='upper center', fontsize=13, ncol=4, markerscale=5, 
+				labelspacing=0.8, handletextpad=0, shadow=True)
 
 # Set title
 long_name = 'Snow-ice Cloud Mask vs Clear/Layered Mask\nConfusion Matrix Elements'
-basename = '2015-05-05'
-plt.title('{0}\n{1}'.format(basename, long_name))
+basename = '2014-05-05'
+plt.title('{0}\n{1}'.format(basename, long_name), fontsize=18)
 
-plt.show()
-pngfile = 'SCM_confusion_matrix'
-fig.savefig(pngfile)
+#plt.show()
+pngfile = './Task_1_2_3/SCM_confusion_matrix'
+fig.savefig(pngfile, bbox_inches='tight')

@@ -33,7 +33,7 @@ def openCSV():
 
     return tc, fc, tl, fl, totalpix, monday
 
-def showAva():
+def showAvaMonth():
     fig = plt.figure(figsize=(13, 6))
     
     tp, mon = openCSV()[4], openCSV()[5]
@@ -51,7 +51,33 @@ def showAva():
     plt.ylabel('Pixels', fontsize=20)
     plt.title('Pixels Per Month 2007',fontsize=20)
     
-    fig.savefig('./Task_4/confusionMatrix2plot_ava', bbox_inches='tight')
+    fig.savefig('./Task_4/confusionMatrix2plot_ava_month', bbox_inches='tight')
+
+def showAvaDay():
+    fig = plt.figure(figsize=(13, 6))
+    tp, mon = openCSV()[4], openCSV()[5]
+
+    mon = [x[x.rfind('-')+1:] for x in mon]
+    day = [0 for x in range(len(tp))]
+
+    tmp = 0
+    count = 0
+    for index in range(len(tp)):
+        if mon[index] == tmp:
+            day[count] += tp[index]
+            continue
+        tmp = mon[index]
+        count += 1
+        day[count] += tp[index]
+
+    day = np.trim_zeros(day)
+    
+    plt.plot(range(len(day)), day, linewidth = 2, color='blue')
+    plt.xlabel('Day', fontsize=20)
+    plt.ylabel('Pixels', fontsize=20)
+    plt.title('Pixels Per Day 2007',fontsize=20)
+    
+    fig.savefig('./Task_4/confusionMatrix2plot_ava_day', bbox_inches='tight')
 
 def weeklyAvgSTD(avglen):
     tc, fc, tl, fl, totalpix, monday = openCSV()
@@ -133,8 +159,9 @@ def weeklyAvgSTD(avglen):
 
     plt.legend(prop={'size':13})
     #plt.show()
-    fig.savefig('./Task_4/confusionMatrix2plot', bbox_inches='tight')
+    fig.savefig('./Task_4/confusionMatrix2plot_avg_std', bbox_inches='tight')
 
 if __name__ == '__main__':
     #weeklyAvgSTD(15)
-    showAva()
+    #showAvaMonth()
+    showAvaDay()

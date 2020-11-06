@@ -144,17 +144,11 @@ for file in file_lst:
 				lat_lon_lst.append(index)
 	for i in range(len(lat)):
 		if i in lat_lon_lst:
-			# if i+1 in lat_lon_lst:
-			# 	for x in range(len(lat[i:])):
-			# 		lat[x+i] = -999
-			# # else:
-			# # 	for x in range(len(lat[:i])):
-			# # 		lat[x+i] = -999
-			# break
+
 			lat[i] = -999
 	print(len(lat)-len(lat_lon_lst))
-	# print(len(lat_lon_lst))
-	# print(len(Land_Water))
+
+	#--------------------------------------------Old Code
 	# land_lst = []
 	# for index in lat_lon_lst:
 	# 	if Land_Water[index] == 1: # Change IGBP to Land_Water if changing mask
@@ -166,28 +160,19 @@ for file in file_lst:
 	# lat = lat[land_lst[0]:land_lst[-1]+1]
 	# #lat, lon = latlon
 	# print(len(lat))
+	#--------------------------------------------Old Code
 
 	# Plot lat/lon points on graph
 	x,y = m(lon, lat)
 	
 	m.scatter(x, y, color=colors[ncolor], s=1, label=file[-14:-6])
 	plt.legend(fontsize=10, loc='upper center', ncol=8, shadow=True, markerscale=5, 
-				mode='expand', labelspacing=0.5)
+				mode='expand', labelspacing=0.5, handletextpad=0)
 
 	# iterate through colors
 	if ncolor == 6: ncolor = 0
 	else: ncolor+=1
 	
-		
-# Copy files of interest into new folder
-# for file in file_lst:
-# 	src = file
-# 	dst = '/Volumes/untitled/Greenland_Tracks/save_later/'
-# 	#dst = '/Users/hskobe/Desktop/NASA Internship 2020/test'
-# 	shutil.move(src, dst)
-
-# Prints list of files that pass over Greenland
-#print('File list:', file_lst)
 
 # Set title
 timestamp = file_lst[0][-25:-4]

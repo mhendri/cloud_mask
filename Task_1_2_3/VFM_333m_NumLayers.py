@@ -413,7 +413,7 @@ norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
 # Create lower plot for Number of Layers Found
 ax1 = fig.add_subplot(212)
-fig.tight_layout(pad = 10)
+fig.tight_layout(pad = 5)
 ax1.scatter(lat, total_layers[::15], color='red', s=3, label='VFM')
 ax1.scatter(lat, num_layers+0.1, color='blue', s=3, label='MLay')
 ax1.legend(loc='upper right', fontsize=15)
@@ -454,7 +454,7 @@ ax2.plot(lat, y_coordiantes, color='magenta', linewidth=0.75, label = '8.2km')
 long_name = 'Feature Type (Bits 1-3) in Feature Classification Flag'
 basename = os.path.basename(FILE_NAME)
 basename2 = os.path.basename(filename)
-ax2.set_title('{0}\n{1}\n{2}'.format(basename, basename2, long_name), fontsize=21)
+ax2.set_title('{0}\n{1}\n{2}'.format(basename, basename2, long_name), fontsize=21, pad=60)
 
 ax2.contourf(latitude, altitude, np.rot90(total_data,1), cmap=cmap)
 ax2.set_xlabel('Lat', fontsize=15)
@@ -518,7 +518,7 @@ fig = plt.gcf()
 
 #Create a second axes for the discrete colorbar.
 
-ax4 = fig.add_axes([0.1, .49, 0.8, 0.02])
+ax4 = fig.add_axes([0.1, .98, 0.8, 0.02])
 cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, boundaries=bounds, orientation='horizontal')
 cb.ax.tick_params(size=0)
 cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
