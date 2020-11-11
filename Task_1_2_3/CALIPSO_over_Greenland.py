@@ -100,7 +100,7 @@ for calipso_path in data_path:
 			# 		file_lst.append(calipso_path)
 			# 		break
 			if(poly.contains(Point(lalo[1], lalo[0]))):
-				if calipso_path not in file_lst:
+				if calipso_path not in file_lst and not '2015' in calipso_path:
 					file_lst.append(calipso_path)
 					break
 			

@@ -127,22 +127,24 @@ def getAvailability(ftp_path, fname, hname):
         file_data = pd.concat([file_data,temp])
         #print(file_data)
     print(file_data)
-    #file_data.to_pickle('./Task_4/'+fname)
-    with open('./Task_4/'+fname+'names.csv', 'w') as f:
-        for item in namedata:
-            f.write("%s\n" % item)
+    file_data.to_pickle('./Task_4/'+fname)
+    # with open('./Task_4/'+fname+'names.csv', 'w') as f:
+    #     for item in namedata:
+    #         f.write("%s\n" % item)
     namedata=[]
 
 def convertAvaToCSV():
     df = pd.read_pickle('./Task_4/mlay_ava')
     df2 = pd.read_pickle('./Task_4/myd03_ava')
     df3 = pd.read_pickle('./Task_4/myd021km_ava')
+    df4 = pd.read_pickle('./Task_4/polder_ava')
 
-    df = df.drop(columns=['MYD03', 'MYD021km'])
-    df2 = df2.drop(columns=['MLay', 'MYD021km'])
-    df3 = df3.drop(columns=['MLay', 'MYD03'])
+    # df = df.drop(columns=['MYD03', 'MYD021km'])
+    # df2 = df2.drop(columns=['MLay', 'MYD021km'])
+    # df3 = df3.drop(columns=['MLay', 'MYD03'])
     new_df = pd.merge(df, df2,  how='left', left_on=['year','month'], right_on = ['year','month'])
     new_df = pd.merge(new_df, df3,  how='left', left_on=['year','month'], right_on = ['year','month'])
+    new_df = pd.merge(new_df, df4,  how='left', left_on=['year','month'], right_on = ['year','month'])
     print(new_df)
 
     new_df.to_csv('./Task_4/full_data_availability.csv', index=False)
@@ -300,8 +302,9 @@ if __name__ == '__main__':
     # removeSubFolders(directory,destination)
     #___________________________________________________________________________________________
     # Make availability excel sheet
-    #file_data = pd.DataFrame(columns=['year', 'month', 'MYD03'])
-    #getAvailability('SPACEBORNE/CALIOP/CALTRACK-333m_MYD03.v1.21/', 'myd03_ava', 'MYD03')
+    # file_data = pd.DataFrame(columns=['year', 'month', 'MYD03'])
+    # getAvailability('SPACEBORNE/CALIOP/CALTRACK-333m_MYD03.v1.21/', 'myd03_ava', 'MYD03')
+
     # file_data = pd.DataFrame(columns=['year', 'month', 'Polder'])
     # getAvailability('SPACEBORNE/CALIOP/CALTRACK-5km_PM-L2.v1.01/', 'polder_ava', 'Polder')
 
@@ -310,7 +313,7 @@ if __name__ == '__main__':
 
     # file_data = pd.DataFrame(columns=['year', 'month', 'MLay'])
     # getAvailability('SPACEBORNE/CALIOP/333mMLay.v4.20/', 'mlay_ava', 'MLay')
-    #convertAvaToCSV()
+    convertAvaToCSV()
     
     # #___________________________________________________________________________________________
     # #Remove all non Greenland files -- 19366 total

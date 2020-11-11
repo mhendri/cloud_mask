@@ -76,7 +76,7 @@ bands_used = [[[1,4,3], 0],
              [[1,4,3], 1], 
              [[3,6,7], 0], 
              [[7,2,1], 0]]
-#bands_used = [[[7,5,1], 0]]
+# bands_used = [[[7,5,3], 0]]
 
 def genImage(bands, enhanced, indy, fig):
     fig = fig
@@ -326,11 +326,17 @@ def genImage(bands, enhanced, indy, fig):
     if enhanced == 1:
         enhanced_word = ' Enhanced'
     
+    truefalse = ''
+    if slist == '143':
+        truefalse=' True'
+    else:
+        truefalse=' False'
+
     #Change font size of title
     plt.rcParams["axes.titlesize"] = 7   
 
     # Set title
-    long_name = f'MODIS RGB\n{slist}{enhanced_word} Orthographic Projection'
+    long_name = f'MODIS{truefalse} Color{enhanced_word} ({slist})'
     #basename = os.path.basename(FILE_NAME)
     plt.title(long_name, fontsize=12)
 
@@ -360,6 +366,8 @@ def genImage(bands, enhanced, indy, fig):
     bounds2 = np.linspace(0,8,9)
     norm2 = mpl.colors.BoundaryNorm(bounds2, cmap2.N)
 
+    fig.text(0.33, -0.012, 'SCM', fontsize=18)
+    fig.text(0.69, -0.012, 'CLM', fontsize=18)
     # create a second axes for the colorbar[0.76, 0.67, 0.008, 0.19]
     ax3 = fig.add_axes([0.08, -0.038, 0.5, 0.02])
     cb2 = mpl.colorbar.ColorbarBase(ax3, cmap=cmap2, norm=norm2, 
@@ -387,6 +395,6 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(9, 8))
     for indy, item in enumerate(bands_used):
         fig = genImage(item[0], item[1], indy+1, fig)
-    fig.tight_layout(pad=3)
+    fig.tight_layout(pad=2.4)
     os.chdir('..')
     plt.savefig('compare_SCMvsCALIPSO_MODIS_output',bbox_inches='tight', dpi=200)

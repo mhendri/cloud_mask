@@ -231,7 +231,7 @@ lower_longitude, lower_altitude2 = np.meshgrid(lower_lon, alt1)
 cmap = colors.ListedColormap(['blue', 'lightskyblue', 'orange', 'yellow',
  'lime', 'grey', 'black'])
 
-fig = plt.figure(figsize = (18, 10))
+fig = plt.figure(figsize = (18, 13))
 plt.subplots_adjust(bottom=0.07, top=0.9, left=0.1, right=0.8)
 
 # Define the bins and normalize.
@@ -293,7 +293,7 @@ for i in range(len(bottom[1, :])):
 		ax3.scatter(upper_lat, bottom[:, i], color = 'darkred', s = 10)
 ax3.margins(x=0, y=0)
 ax3.set_ylim(ymin=-0.5)
-ax3.legend(fontsize=17)
+ax3.legend(fontsize=17, markerscale=5)
 
 # Create lower plot
 ax5 = fig.add_subplot(212)
@@ -347,7 +347,7 @@ fig = plt.gcf()
 #   fontsize=20, fontweight='bold')
 
 # Create a second axes for the discrete colorbar.
-ax4 = fig.add_axes([0.1, -.05, 0.7, 0.05])
+ax4 = fig.add_axes([0.1, -.03, 0.7, 0.03])
 cb = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, boundaries=bounds, orientation='horizontal')
 cb.ax.tick_params(size=0)
 cb.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5])

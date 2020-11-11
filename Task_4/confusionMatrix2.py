@@ -144,7 +144,7 @@ def confuse():
         data[data == 0] = 0;
         
         
-
+        st = time.time()
         try: 
             bott = ([float(f'{num:.1f}') for num in lat].index(59.5))
             if(lat[bott+100]<lat[bott]): bott = 0
@@ -158,6 +158,8 @@ def confuse():
                     break
         if len(cor_inds) < 10:
             continue
+        ed = time.time()
+        print(ed-st)
         # Print out coordinates to file
         # tempdf = pd.DataFrame({'Latitude': lat, 'Longitude': lon})
         # tempdf.to_csv('test.csv', index=False)

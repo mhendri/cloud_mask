@@ -103,7 +103,7 @@ plt.xticks(rotation=90, fontsize=22)
 start, end = ax1.get_xlim()
 ax1.xaxis.set_ticks(np.arange(start, end, 10))
 ax1.margins(x=0.001)
-ax1.set_ylim(ymin=63000)
+ax1.set_ylim(ymin=63000, ymax=63500)
 plt.yticks(fontsize=22)
 
 leg = ax1.legend(loc='upper center', fontsize=23, frameon=False, ncol=3)

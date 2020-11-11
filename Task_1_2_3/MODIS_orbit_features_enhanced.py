@@ -37,11 +37,11 @@ import pprint
 import os
 
 #First list is the bands you want, second integer is whether you want it enhanced or not
-bands_used = [[[1,4,3], 0], 
-            [[1,4,3], 1], 
-            [[3,6,7], 0], 
-            [[7,2,1], 0]]
-# bands_used = [[[1,4,3], 0]]
+# bands_used = [[[1,4,3], 0], 
+#             [[1,4,3], 1], 
+#             [[3,6,7], 0], 
+#             [[7,2,1], 0]]
+bands_used = [[[1,2], 0]]
             
 # References:
 # https://earthdata.nasa.gov/sites/default/files/field/document/MODIS_True_Color.pdf

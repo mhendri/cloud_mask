@@ -146,9 +146,9 @@ for f in file_name_list:
     print('Total pixels :', len(data))
 
     # Plot confusion matrix elements as a function of time (time stamp)
-    plt.scatter(calipso_fname[-14:-6], ((tp/len(data))*100), s=10, color='red')
-    plt.scatter(calipso_fname[-14:-6], ((fp/len(data))*100), s=10, color='blue')
-    plt.scatter(calipso_fname[-14:-6], ((tn/len(data))*100), s=10, color='green')
+    plt.scatter(calipso_fname[-14:-6], ((tp/len(data))*100), s=10, color='teal')
+    plt.scatter(calipso_fname[-14:-6], ((fp/len(data))*100), s=10, color='red')
+    plt.scatter(calipso_fname[-14:-6], ((tn/len(data))*100), s=10, color='darkblue')
     plt.scatter(calipso_fname[-14:-6], ((fn/len(data))*100), s=10, color='orange')
 
     TP_lst.append(((tp/len(data))*100))
@@ -170,13 +170,13 @@ print("--- %s seconds ---" % (time.time() - start_time))
 plt.subplots_adjust(bottom = 0.15)
 
 plt.xlabel('time',fontsize=16)
-plt.ylabel('pixels', fontsize=16)
+plt.ylabel('percent', fontsize=16)
 
 # Connect points on plot
-plt.plot(name_lst, TP_lst, color = 'red', linewidth = 1, label='TP')
-plt.plot(name_lst, FP_lst, color = 'blue', linewidth = 1, label='FP')
-plt.plot(name_lst, TN_lst, color = 'green', linewidth = 1, label = 'TN')
-plt.plot(name_lst, FN_lst, color = 'orange', linewidth = 1, label = 'FN')
+plt.plot(name_lst, TP_lst, color = 'teal', linewidth = 1, label='TL')
+plt.plot(name_lst, FP_lst, color = 'red', linewidth = 1, label='FC')
+plt.plot(name_lst, TN_lst, color = 'darkblue', linewidth = 1, label = 'TC')
+plt.plot(name_lst, FN_lst, color = 'orange', linewidth = 1, label = 'FL')
 
 plt.legend(loc='upper center', fontsize=13, ncol=4, markerscale=5, 
 				labelspacing=0.8, handletextpad=0, shadow=True)
