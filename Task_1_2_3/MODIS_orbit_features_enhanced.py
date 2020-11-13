@@ -41,7 +41,7 @@ import os
 #             [[1,4,3], 1], 
 #             [[3,6,7], 0], 
 #             [[7,2,1], 0]]
-bands_used = [[[1,2], 0]]
+bands_used = [[[7,5], 0]]
             
 # References:
 # https://earthdata.nasa.gov/sites/default/files/field/document/MODIS_True_Color.pdf

@@ -142,9 +142,8 @@ def confuse():
         # Focus only on layered pixels (> 0)
         data[data > 0] = 1;
         data[data == 0] = 0;
+
         
-        
-        st = time.time()
         try: 
             bott = ([float(f'{num:.1f}') for num in lat].index(59.5))
             if(lat[bott+100]<lat[bott]): bott = 0
@@ -158,8 +157,7 @@ def confuse():
                     break
         if len(cor_inds) < 10:
             continue
-        ed = time.time()
-        print(ed-st)
+ 
         # Print out coordinates to file
         # tempdf = pd.DataFrame({'Latitude': lat, 'Longitude': lon})
         # tempdf.to_csv('test.csv', index=False)
@@ -189,7 +187,7 @@ def confuse():
             map_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
                             lat[ll], lon[ll], vd])
 
-        tl, fc, fl, tc = confusion_matrix(data, sflag2, labels=[0,1]).ravel()
+        tc, fl, fc, tl = confusion_matrix(data, sflag2, labels=[0,1]).ravel()
         #matrix = confusion_matrix(data, sflag2)
         
         print(nametimestamp, nametimestamp[11:19])
@@ -213,6 +211,6 @@ if __name__ == "__main__":
     confuse()
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    fdToDf().to_csv('./Task_4/cf_matrix_full_data.csv', index=False)
+    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data.csv', index=False)
     
-    mdToDf().to_csv('./Task_4/cf_matrix_map_data.csv', index=False)
+    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data.csv', index=False)

@@ -26,13 +26,13 @@ from pyhdf.SD import SD, SDC
 #np.set_printoptions(threshold=np.inf)
 #-----------------------------------------------------------------------------#
 #Change Directory to Data
-os.chdir('./Task_1_2_3/Data')
-
+#os.chdir('./Task_1_2_3/Data')
+data_dir = os.getcwd()+'\\Task_1_2_3\\Data\\'
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # CALPISO file input
 
-FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2014-05-05T14-27-13ZD.hdf'
+FILE_NAME = data_dir+'CAL_LID_L2_333mMLay-Standard-V4-20.2014-05-05T14-27-13ZD.hdf'
 
 hdf = SD(FILE_NAME, SDC.READ)
 

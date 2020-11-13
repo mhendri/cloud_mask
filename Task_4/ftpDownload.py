@@ -90,7 +90,7 @@ def ftpDownload(url):
 
 def batchDownload(file):
     st = time.time()
-    with open('.\\Task_4\\'+file, newline='') as f:
+    with open('.\\Task_4\\csvs\\'+file, newline='') as f:
         reader = csv.reader(f)
         paths = list(reader)
     paths = [j for i in paths for j in i]
@@ -147,7 +147,7 @@ def convertAvaToCSV():
     new_df = pd.merge(new_df, df4,  how='left', left_on=['year','month'], right_on = ['year','month'])
     print(new_df)
 
-    new_df.to_csv('./Task_4/full_data_availability.csv', index=False)
+    new_df.to_csv('./Task_4/csvs/full_data_availability.csv', index=False)
 
 def filterMYD03(p_list):
     directory = p_list[0]
@@ -198,7 +198,7 @@ def removeSubFolders(directory, destination):
             if count % 10 == 0: print(count)
 
 def removeNonGl(directory, destination):
-    with open('.\\Task_4\\myd03_over_greenland.csv', newline='') as f:
+    with open('.\\Task_4\\csvs\\myd03_over_greenland.csv', newline='') as f:
         reader = csv.reader(f)
         data = list(reader)
     data = [j for i in data for j in i]
@@ -211,19 +211,19 @@ def removeNonGl(directory, destination):
             shutil.move(directory+name, destination)
 
 def checkAllExist():
-    with open('.\\Task_4\\mlay_avanames.csv', newline='') as f:
+    with open('.\\Task_4\\csvs\\mlay_avanames.csv', newline='') as f:
         reader = csv.reader(f)
         mlay = list(reader)
     mlay = [j for i in mlay for j in i]
-    with open('.\\Task_4\\myd021km_avanames.csv', newline='') as f:
+    with open('.\\Task_4\\csvs\\myd021km_avanames.csv', newline='') as f:
         reader = csv.reader(f)
         m21 = list(reader)
     m21 = [j for i in m21 for j in i]
-    with open('.\\Task_4\\polder_avanames.csv', newline='') as f:
+    with open('.\\Task_4\\csvs\\polder_avanames.csv', newline='') as f:
         reader = csv.reader(f)
         pdr = list(reader)
     pdr = [j for i in pdr for j in i]
-    with open('.\\Task_4\\myd03_over_greenland.csv', newline='') as f:
+    with open('.\\Task_4\\csvs\\myd03_over_greenland.csv', newline='') as f:
         reader = csv.reader(f)
         md3 = list(reader)
     md3 = [j for i in md3 for j in i]
@@ -244,7 +244,7 @@ def checkAllExist():
             continue
         fine_list.append(item)
 
-    with open(f'./Task_4/myd03_over_greenland_final.csv', 'w') as f:
+    with open(f'./Task_4/csvs/myd03_over_greenland_final.csv', 'w') as f:
         for item in fine_list:
             f.write("%s\n" % item)
 
@@ -266,21 +266,21 @@ def checkAllExist():
         date = item[l-25:l]
         if any(date in x for x in fine_list):md3_f.append(item)
     
-    with open(f'./Task_4/mlay_avanames.csv', 'w') as f:
+    with open(f'./Task_4/csvs/mlay_avanames.csv', 'w') as f:
         for item in mlay_f:
             f.write("%s\n" % item)
-    with open(f'./Task_4/myd021km_avanames.csv', 'w') as f:
+    with open(f'./Task_4/csvs/myd021km_avanames.csv', 'w') as f:
         for item in m21_f:
             f.write("%s\n" % item)
-    with open(f'./Task_4/polder_avanames.csv', 'w') as f:
+    with open(f'./Task_4/csvs/polder_avanames.csv', 'w') as f:
         for item in pdr_f:
             f.write("%s\n" % item)
-    with open(f'./Task_4/md3_avanames.csv', 'w') as f:
+    with open(f'./Task_4/csvs/md3_avanames.csv', 'w') as f:
         for item in md3_f:
             f.write("%s\n" % item)
 
 def removeNonExist(directory):
-    with open('.\\Task_4\\md3_avanames.csv', newline='') as f:
+    with open('.\\Task_4\\csvs\\md3_avanames.csv', newline='') as f:
         reader = csv.reader(f)
         md3 = list(reader)
     md3 = [j for i in md3 for j in i] 

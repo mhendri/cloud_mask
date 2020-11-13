@@ -22,7 +22,7 @@ data_path = '.\\Task_4\\'
 
 
 def openCSV():
-    df = pd.read_csv(data_path+'cf_matrix_full_data.csv')
+    df = pd.read_csv(data_path+'\\csvs\\'+'cf_matrix_full_data.csv')
     
     tc = df['TC'].tolist()
     fc = df['FC'].tolist()
@@ -114,15 +114,15 @@ def showAvaExact():
     #             '#cfb1ff','#e8d8ff','#ffe4da','#ffc8b6',
     #             '#ffac93','#ff8f70','#ff704f','#ff4b2d',
     #             '#ff0000']
-    colors = ['#ff0000','#ff4900','#ff9e00','#f9ff00',
-                '#a4ff00','#52ff00','#00ffb8','#00acff',
-                '#004aff','#2600ff','#a600ff','#f400ff',
-                '#fc96ff']
+    colors = ['#ff9e00','#f9ff00',
+                '#a4ff00','#36a700','#00ffb8','#00acff',
+                '#2564ff','#1c00c3','#a600ff','#f400ff',
+                '#fc96ff', '#8c8c8c','#000000']
 
     total = 0
     for i in range(3,16):
         total+= len(bins[i])
-        plt.plot(bins[i][0], bins[i][1], label=i, color=colors[-i+2])
+        plt.plot(bins[i][0], bins[i][1], label=i, color=colors[i-3])
 
     leg = plt.legend(handletextpad=.2, handlelength=1.1, fontsize=15, bbox_to_anchor=(.5,-.13),
                 loc='upper center', ncol=13, title='Hour', title_fontsize=18,
@@ -257,10 +257,10 @@ def weeklyAvgSTD(avglen):
     fig.savefig('./Task_4/confusionMatrix2plot_avg_std', bbox_inches='tight')
 
 if __name__ == '__main__':
-    #weeklyAvgSTD(15)
+    weeklyAvgSTD(15)
 
     #showAvaMonth()
 
     #showAvaDay()
 
-    showAvaExact()
+    #showAvaExact()

@@ -33,7 +33,8 @@ import pprint
 #-----------------------------------------------------------------------------#
 #CALIPSO file
 
-FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2014-05-05T14-27-13ZD.hdf'
+# FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2014-05-05T14-27-13ZD.hdf'
+FILE_NAME = 'CAL_LID_L2_333mMLay-Standard-V4-20.2014-05-05T06-12-42ZD.hdf'
 
 data_path = os.getcwd() + '\Task_1_2_3\\Data\\'
 FULL_NAME = data_path + FILE_NAME
@@ -59,9 +60,14 @@ lon = lon[::15]
 data = data[::15]
 
 # Shift SCM orbit 
-lat2 = lat - 1
-lon2 = lon - 1
-
+#lat2 = lat -1
+lat2 = []
+lon2 = lon 
+for index, l in enumerate(lon):
+    if l < 60 or l > 40:
+        lat2.append(lat[index][0]-.5)
+    else:
+        lat2.append(lat[index][0]-0)
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 # cloud_mask_MODIS_CALTRACK.py created by Nan Chen
@@ -72,11 +78,11 @@ from scm_caltrack.cloud_mask_MODIS_CALTRACK import sflag
 # Subset data. Otherwise, all points look black.
 sflag = sflag[::15]
 
-bands_used = [[[1,4,3], 0], 
-             [[1,4,3], 1], 
-             [[3,6,7], 0], 
-             [[7,2,1], 0]]
-# bands_used = [[[7,5,3], 0]]
+# bands_used = [[[1,4,3], 0], 
+#              [[1,4,3], 1], 
+#              [[3,6,7], 0], 
+#              [[7,2,1], 0]]
+bands_used = [[[7,5,3], 0]]
 
 def genImage(bands, enhanced, indy, fig):
     fig = fig
@@ -86,8 +92,10 @@ def genImage(bands, enhanced, indy, fig):
     # MYD021KM file for RBG data
     # MYD03 file for geolocation data
 
-    file_name_myd021km = data_path + 'MYD021KM.A2014125.0835.061.2018053035621.hdf'
-    file_name_myd03 = data_path + 'MYD03.A2014125.0835.061.2018052043132.hdf'
+    # file_name_myd021km = data_path + 'MYD021KM.A2014125.0835.061.2018053035621.hdf'
+    # file_name_myd03 = data_path + 'MYD03.A2014125.0835.061.2018052043132.hdf'
+    file_name_myd021km = data_path + 'MYD021KM.A2014125.0655.061.2018053035428.hdf'
+    file_name_myd03 = data_path + 'MYD03.A2014125.0655.061.2018052043530.hdf'
     #MYD03.A2015190.1340.061.2018048194846.hdf 
 
     #-----------------------------------------------------------------------------#
@@ -208,12 +216,12 @@ def genImage(bands, enhanced, indy, fig):
     lat_min = myd03_lat[0,0]
     lat_max = myd03_lat[along_track-1,cross_trak-1]
 
-    lat_0 = lat_min + (lat_max - lat_min) / 2.
+    lat_0 = lat_min + (lat_max - lat_min) / 2
 
     long_min = min(myd03_long[0,0],myd03_long[along_track-1,cross_trak-1])
     long_max = max(myd03_long[0,0],myd03_long[along_track-1,cross_trak-1])
 
-    lon_0 = long_min + (long_max - long_min) / 2.
+    lon_0 = long_min + (long_max - long_min) / 2
 
     #-----------------------------------------------------------------------------#
     #-----------------------------------------------------------------------------#
@@ -237,15 +245,36 @@ def genImage(bands, enhanced, indy, fig):
                     myd03_lat[along_track-1,cross_trak-1])
     xpt4, ypt4 = m1(myd03_long[along_track-1,0],myd03_lat[along_track-1,0])
 
-    llx = min(xpt1,xpt2,xpt3,xpt4) - xpt0  # lower left
+    llx = min(xpt1,xpt2,xpt3,xpt4) - xpt0 # lower left
     lly = min(ypt1,ypt2,ypt3,ypt4) - ypt0
 
-    urx = max(xpt1,xpt2,xpt3,xpt4) - xpt0  # upper right
-    ury = max(ypt1,ypt2,ypt3,ypt4) - ypt0 
+    urx = max(xpt1,xpt2,xpt3,xpt4) - xpt0 # upper right
+    ury = max(ypt1,ypt2,ypt3,ypt4) - ypt0
 
     m = Basemap(projection='ortho',lon_0=lon_0,lat_0=lat_0,resolution='l',\
         llcrnrx=llx,llcrnry=lly,urcrnrx=urx,urcrnry=ury)
-    
+    # print(lon_0, lat_0)
+    # print(llx, lly, urx, ury)
+    # Map data along orbit path in plot
+    cmap = colors.ListedColormap(['blue', 'red']) 
+    cmap2 = colors.ListedColormap(['black', 'blue', 'grey', 'blue', 'blue', 'blue', 'red', 'red'])
+
+    x,y = m(lon, lat)
+    i = 0
+    for feature in data:
+        m.plot(x[i], y[i], 'o', color=cmap(feature),  markersize=.5)
+        i = i+1
+
+    # Map SCM along orbit path in plot
+    a,b = m(lon2, lat2)
+    j = 0
+    for flag in sflag:
+        m.plot(a[j], b[j], 'o', color=cmap2(flag),  markersize=.5)
+        j = j+1
+
+    return fig
+
+
     x_igrid, y_igrid = m(myd03_long,myd03_lat)
 
     x_igrid = x_igrid - xpt0
@@ -358,27 +387,27 @@ def genImage(bands, enhanced, indy, fig):
     cb = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, 
         spacing='proportional', boundaries=bounds, format='%1i', orientation='horizontal')
 
-    cb.set_ticks([0.5, 1.5])
-    cb.ax.tick_params(size=0)
-    cb.ax.set_xticklabels(['clear', 'layered'], fontsize=10)
+    # cb.set_ticks([0.5, 1.5])
+    # cb.ax.tick_params(size=0)
+    # cb.ax.set_xticklabels(['clear', 'layered'], fontsize=10)
 
     # define the bins and normalize for SCM
     bounds2 = np.linspace(0,8,9)
     norm2 = mpl.colors.BoundaryNorm(bounds2, cmap2.N)
 
-    fig.text(0.33, -0.012, 'SCM', fontsize=18)
-    fig.text(0.69, -0.012, 'CLM', fontsize=18)
-    # create a second axes for the colorbar[0.76, 0.67, 0.008, 0.19]
-    ax3 = fig.add_axes([0.08, -0.038, 0.5, 0.02])
-    cb2 = mpl.colorbar.ColorbarBase(ax3, cmap=cmap2, norm=norm2, 
-        spacing='proportional', boundaries=bounds2, format='%1i', orientation='horizontal')
+    # fig.text(0.33, -0.012, 'SCM', fontsize=18)
+    # fig.text(0.69, -0.012, 'CLM', fontsize=18)
+    # # create a second axes for the colorbar[0.76, 0.67, 0.008, 0.19]
+    # ax3 = fig.add_axes([0.08, -0.038, 0.5, 0.02])
+    # cb2 = mpl.colorbar.ColorbarBase(ax3, cmap=cmap2, norm=norm2, 
+    #     spacing='proportional', boundaries=bounds2, format='%1i', orientation='horizontal')
 
-    cb2.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5])
-    cb2.ax.tick_params(size=0)
-    #cb2.ax.set_xticklabels(['invalid/\nnight', 'land', 'water', 'snow\ncovered land', 'sea ice', 'snow\ncovered sea ice', 'cloud', 'mixed\npixels'], fontsize=10)
-    cb2.ax.set_xticklabels(['invalid/\nnight', 'land', 'water','',
-                             'snow covered land,\nsea ice,\nsnow covered sea ice',
-                             '', '              cloud,\n              mixed pixels', ''], fontsize=10)
+    # cb2.set_ticks([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5])
+    # cb2.ax.tick_params(size=0)
+    # #cb2.ax.set_xticklabels(['invalid/\nnight', 'land', 'water', 'snow\ncovered land', 'sea ice', 'snow\ncovered sea ice', 'cloud', 'mixed\npixels'], fontsize=10)
+    # cb2.ax.set_xticklabels(['invalid/\nnight', 'land', 'water','',
+    #                          'snow covered land,\nsea ice,\nsnow covered sea ice',
+    #                          '', '              cloud,\n              mixed pixels', ''], fontsize=10)
 
     #plt.show()
     #os.chdir('..')
