@@ -45,7 +45,7 @@ data_path = 'E:\\CM_data\\'
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
 
 full_data = []
-full_df = pd.DataFrame(columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix'])
+full_df = pd.DataFrame(columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix', 'topaltitude'])
 map_data=[]
 
 coords = [(-55, 59.5), (-55,67.5), (-60,67.5), (-60,75), (-73.25,75), (-73.25,79.2),
@@ -60,7 +60,7 @@ def confuse():
     for f in file_name_list:
         st = time.time()
 
-        # if not '2007-05-20' in f: continue
+        if not '2007-05-20' in f: continue
         
         if ( f[11:19] != '333mMLay' ):
                 continue
@@ -124,6 +124,11 @@ def confuse():
         lat = lat.tolist()
         lon = lon.tolist()
         #print(lat.info()[2][0])
+
+        # Top Layer Altitude
+        topat = hdf.select('Layer_Top_Altitude')     
+        topat = topat[:, 0]
+
         # Read 'Number_Layers_Found' dataset.
         data1D = hdf.select('Number_Layers_Found')
         data = data1D[:, 0]
@@ -164,28 +169,44 @@ def confuse():
     #-----------------------------------------------------------------------------#
     #-----------------------------------------------------------------------------#
         # Create confusion maxtrix and print information of interest
-        data = data[(cor_inds[0]):(cor_inds[-1])]
-        sflag2 = sflag2[(cor_inds[0]):(cor_inds[-1])]
-        lat = lat[(cor_inds[0]):(cor_inds[-1])]
-        lon = lon[(cor_inds[0]):(cor_inds[-1])]
-        IGBP = IGBP[(cor_inds[0]):(cor_inds[-1])]
+        data = data[(cor_inds[0]):(cor_inds[-1])+1]
+        sflag2 = sflag2[(cor_inds[0]):(cor_inds[-1])+1]
+        lat = lat[(cor_inds[0]):(cor_inds[-1])+1]
+        lon = lon[(cor_inds[0]):(cor_inds[-1])+1]
+        IGBP = IGBP[(cor_inds[0]):(cor_inds[-1])+1]
+        topat = topat[(cor_inds[0]):(cor_inds[-1])+1]
 
-        
+        #Subset over IGBP
+        data = data.tolist()
+        sflag2 = sflag2.tolist()
+        topat = topat.tolist()
+
+        reminds = []
+        for index, lw in enumerate(IGBP):
+            if lw == 0:
+                reminds.append(index)
+        reminds.reverse()
+        for i in reminds:
+            data.pop(i)
+            sflag2.pop(i)
+            lat.pop(i)
+            lon.pop(i)
+            topat.pop(i)
+                
+                
         vd = ''
         print("DATA LENGTH=",len(data), len(sflag2))
         for ll in range(len(data)):
-            if data[ll] == 1 and sflag2[ll] == 1:
-                vd=('tl')
-            elif data[ll] == 1 and sflag2[ll] == 0:
-                vd=('fc')
-            elif data[ll] == 0 and sflag2[ll] == 0:
-                vd=('tc')
-            elif data[ll] == 0 and sflag2[ll] == 1:
-                vd=('fl')
-            if IGBP[ll] == 0:
-                lat[ll], lon[ll], = None, None
+            if data[ll] == 1 and sflag2[ll] == 1: vd=('tl')
+            elif data[ll] == 1 and sflag2[ll] == 0: vd=('fc')
+            elif data[ll] == 0 and sflag2[ll] == 0: vd=('tc')
+            elif data[ll] == 0 and sflag2[ll] == 1: vd=('fl')
+            # if IGBP[ll] == 0:
+            #     lat[ll], lon[ll], = None, None
+            #     continue
+            if topat[ll] == -9999: topat[ll] = None
             map_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
-                            lat[ll], lon[ll], vd])
+                            lat[ll], lon[ll], vd, topat[ll]])
 
         tc, fl, fc, tl = confusion_matrix(data, sflag2, labels=[0,1]).ravel()
         #matrix = confusion_matrix(data, sflag2)
@@ -202,7 +223,7 @@ def fdToDf():
     return full_df
 
 def mdToDf():
-    map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd',])
+    map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd', 'Top_Alt'])
     return map_df
 
 #-----------------------------------------------------------------------------#
