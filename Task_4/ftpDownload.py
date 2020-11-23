@@ -40,6 +40,8 @@ file_data = pd.DataFrame(columns=['year', 'month', 'MYD03','MYD021km', 'MLay'])
 
 monthdata = [0 for i in range(12)]
 namedata = []
+
+data_path = 'D:\\CM_data\\'
 #___________________________________________________________________________________________
 
 def ftpLogin():
@@ -84,7 +86,7 @@ def getFn(s):
 def ftpDownload(url):
     url = url.strip()
     try:
-        return urlretrieve(url, 'E:\\CM_data\\'+getFn(url)), None
+        return urlretrieve(url, 'D:\\CM_data\\'+getFn(url)), None
     except Exception as e:
         return None           
 
@@ -93,17 +95,22 @@ def batchDownload(file):
     with open('.\\Task_4\\csvs\\'+file, newline='') as f:
         reader = csv.reader(f)
         paths = list(reader)
-    paths = [j for i in paths for j in i]
 
+    file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
+    
+    paths = [j for i in paths for j in i if not 'N' in j[-6:-1]] #Remove if night
+    paths = [x for x in paths if not x[x.rfind('/')+1:len(x)] in file_name_list] #Remove if exists
+    
+    print(paths)
     f = open('.\\Task_4\\ftpcreds.txt', 'r')
     u_p = f.read()
 
-    begining = f'ftp://{u_p}@ftp.icare.univ-lille1.fr/'
-    for index, path in enumerate(paths):
-        paths[index]=begining+path
-    #ftpDownload('ftp://iraz:friedchicken@ftp.icare.univ-lille1.fr/SPACEBORNE/CALIOP/CALTRACK-333m_MYD021KM.v1.21/2007/2007_01_01/CALTRACK-333m_MYD021KM_V1-21_2007-01-01T14-20-16ZD.hdf')
-    pool = Pool(10)
-    pool.map(ftpDownload, paths)
+    # begining = f'ftp://{u_p}@ftp.icare.univ-lille1.fr/'
+    # for index, path in enumerate(paths):
+    #     paths[index]=begining+path
+    # #ftpDownload('ftp://iraz:friedchicken@ftp.icare.univ-lille1.fr/SPACEBORNE/CALIOP/CALTRACK-333m_MYD021KM.v1.21/2007/2007_01_01/CALTRACK-333m_MYD021KM_V1-21_2007-01-01T14-20-16ZD.hdf')
+    # pool = Pool(10)
+    # pool.map(ftpDownload, paths)
     et = time.time()
     print(et-st)
 
@@ -113,7 +120,7 @@ def getAvailability(ftp_path, fname, hname):
     global file_data
     global namedata
 
-    years_to_check = [str(year) for year in range(2007, 2008)] #06-14
+    years_to_check = [str(year) for year in range(2006, 2010)] #06-14
     
     # print(ftp_path+years_to_check[0])
     for year in years_to_check:
@@ -128,9 +135,9 @@ def getAvailability(ftp_path, fname, hname):
         #print(file_data)
     print(file_data)
     file_data.to_pickle('./Task_4/'+fname)
-    # with open('./Task_4/'+fname+'names.csv', 'w') as f:
-    #     for item in namedata:
-    #         f.write("%s\n" % item)
+    with open('./Task_4/csvs/'+fname+'names.csv', 'w') as f:
+        for item in namedata:
+            f.write("%s\n" % item)
     namedata=[]
 
 def convertAvaToCSV():
@@ -313,8 +320,14 @@ if __name__ == '__main__':
 
     # file_data = pd.DataFrame(columns=['year', 'month', 'MLay'])
     # getAvailability('SPACEBORNE/CALIOP/333mMLay.v4.20/', 'mlay_ava', 'MLay')
-    convertAvaToCSV()
-    
+    # convertAvaToCSV()
+
+    #___________________________________________________________________________________________
+    # Ftp download
+    batchDownload('myd03_avanames.csv')
+    #batchDownload('mlay_avanames.csv')
+    #batchDownload('myd021km_avanames.csv')
+
     # #___________________________________________________________________________________________
     # #Remove all non Greenland files -- 19366 total
     # directory = os.getcwd() + '\\Task_4\\Data\\MYD03'
@@ -352,7 +365,4 @@ if __name__ == '__main__':
     # #Remove non exist files
     # removeNonExist('.\\Task_4\\Data\\MYD03_gl\\')
 
-    #___________________________________________________________________________________________
-    # Ftp download
-    #batchDownload('mlay_avanames.csv')
-    #batchDownload('myd021km_avanames.csv')
+    

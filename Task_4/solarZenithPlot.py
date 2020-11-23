@@ -18,7 +18,7 @@ from shapely.geometry import Point, Polygon
 import matplotlib.pyplot as plt
 import numpy as np
 
-data_path = 'E:\\CM_data\\'
+data_path = 'D:\\CM_data\\'
 coords = [(-55, 59.5), (-55,67.5), (-60,67.5), (-60,75), (-73.25,75), (-73.25,79.2),
 		(-67.5,79.2), (-67.5,80.82), (-65.34,80.82), (-65.34,81.23), (-62,81.23),
 		(-62,82), (-60.25,82), (-60.25,84), (-10,84), (-10,75), (-17,75), (-17,67.5),
@@ -31,13 +31,16 @@ def plotZenith():
     datetime = []
     szalist = [[],[]]
 
-    months = ['007-12','007-01','007-02','007-03','007-04']
+    months = ['007-12','007-01','007-02','007-03','007-04','007-05',
+                '007-06','007-07','007-08','007-09','007-10','007-11','007-12']
+    #months = ['007-06-0']
 
     file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
     trim_flist = [x for x in file_name_list if '333m_MYD03' in x and any(m in x for m in months)]
 
     lbar = .10
-    print('____________________')
+    print('___________________')
+    #Outdated, sza are in csv files now. 
     for index, f in enumerate(trim_flist):
         if (index)/len(trim_flist) > lbar:
             print('██', end='')
@@ -83,26 +86,30 @@ def plotZenith():
     
     fig, ax = plt.subplots(1,1, figsize=(7,4)) 
     
-    ax.plot(datetime, szalist[1], linewidth = 1, color='blue', label='szamax')
-    ax.plot(datetime, szalist[0], linewidth = 1, color='red', label='szamin', alpha=.6)
+    ax.plot(datetime, szalist[1], linewidth = 1, color='blue', label='max')
+    ax.plot(datetime, szalist[0], linewidth = 1, color='red', label='min', alpha=.6)
 
     #
     ax.set_xticks(datetime)
-    ax.set_xticklabels([dt[0:5] for dt in datetime], rotation=90, fontsize=14)
+    ax.set_xticklabels([dt[0:5] for dt in datetime], rotation=90, fontsize=13)
+    #ax.set_yticklabels(range(0,90), fontsize=13)
+    ax.set_ylim(55,95)
+    ax.set_xlim(datetime[0],datetime[-1])
 
-    ax.set_ylim(0,90)
+    ax.set_xlabel('Date', fontsize=13)
+    ax.set_ylabel('Degrees', fontsize=13)
 
-    ax.set_xlabel('Date', fontsize=15)
-    ax.set_ylabel('Degrees', fontsize=15)
-
-    every_nth = 20
+    every_nth = 60
     for n, label in enumerate(ax.xaxis.get_ticklabels()):
         if n % every_nth != 0:
             label.set_visible(False)
-
     
+    plt.tick_params(length=0)
+    ax.legend()
+
+    ax.set_title('SZA Over Greenland 2007', fontsize=18)
     fig.tight_layout()
-    fig.savefig('./Task_4/solarZenithPlot', bbox_inches='tight')
+    fig.savefig('./Task_4/solarZenithPlot', bbox_inches='tight', dpi=400)
 
     print(f'\nAverage Loop Time: {round(sum(avgloop)/len(avgloop),3)}')
 

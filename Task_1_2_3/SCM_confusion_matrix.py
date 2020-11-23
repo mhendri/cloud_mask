@@ -51,7 +51,7 @@ name_lst = []
 # data_path = '/Users/chennan/Downloads/maps/SGLI/SGLI_CM_test_suite/hdf/'
 #data_path = '/Users/hskobe/Desktop/NASA Internship 2020/Python/test/'
 data_path = os.getcwd() + '\Task_1_2_3\\Data\\'
-#data_path = 'E:\\CM_data\\'
+#data_path = 'D:\\CM_data\\'
 # data_path = '/Users/chennan/Downloads/maps/SGLI/SGLI_CM_test_Feb2020/20200131_SGLI/hdf/'
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
 

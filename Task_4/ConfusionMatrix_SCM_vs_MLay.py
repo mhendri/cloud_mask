@@ -40,7 +40,7 @@ from scm_caltrack.classifySatelliteImage import ClassifyImage
 start_time = time.time()            
 
 # Choose directory path
-data_path = 'E:\\CM_data\\'
+data_path = 'D:\\CM_data\\'
 
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
 
@@ -55,12 +55,12 @@ coords = [(-55, 59.5), (-55,67.5), (-60,67.5), (-60,75), (-73.25,75), (-73.25,79
 poly = Polygon(coords)
 
 
-def confuse():
+def confuse(eightfivebelow):
     file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
     for f in file_name_list:
         st = time.time()
 
-        if not '2007-05-20' in f: continue
+        #if not '2007-05-20' in f: continue
         
         if ( f[11:19] != '333mMLay' ):
                 continue
@@ -129,6 +129,10 @@ def confuse():
         topat = hdf.select('Layer_Top_Altitude')     
         topat = topat[:, 0]
 
+        # Solar zenith angle
+        sza = hdf.select('Solar_Zenith_Angle')     
+        sza = sza[:, 0]
+        
         # Read 'Number_Layers_Found' dataset.
         data1D = hdf.select('Number_Layers_Found')
         data = data1D[:, 0]
@@ -175,11 +179,13 @@ def confuse():
         lon = lon[(cor_inds[0]):(cor_inds[-1])+1]
         IGBP = IGBP[(cor_inds[0]):(cor_inds[-1])+1]
         topat = topat[(cor_inds[0]):(cor_inds[-1])+1]
+        sza = sza[(cor_inds[0]):(cor_inds[-1])+1]
 
         #Subset over IGBP
         data = data.tolist()
         sflag2 = sflag2.tolist()
         topat = topat.tolist()
+        sza = sza.tolist()
 
         reminds = []
         for index, lw in enumerate(IGBP):
@@ -192,10 +198,26 @@ def confuse():
             lat.pop(i)
             lon.pop(i)
             topat.pop(i)
-                
+            sza.pop(i)
+        
+        if eightfivebelow:
+            # DESTROY SZA OVER 85
+            remsza = []
+            for index, a in enumerate(sza):
+                if a >= 85:
+                    remsza.append(index)
+            remsza.reverse()
+            for i in remsza:
+                data.pop(i)
+                sflag2.pop(i)
+                lat.pop(i)
+                lon.pop(i)
+                topat.pop(i)
+                sza.pop(i)
                 
         vd = ''
         print("DATA LENGTH=",len(data), len(sflag2))
+        if len(data) == 0: continue
         for ll in range(len(data)):
             if data[ll] == 1 and sflag2[ll] == 1: vd=('tl')
             elif data[ll] == 1 and sflag2[ll] == 0: vd=('fc')
@@ -206,7 +228,7 @@ def confuse():
             #     continue
             if topat[ll] == -9999: topat[ll] = None
             map_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
-                            lat[ll], lon[ll], vd, topat[ll]])
+                            lat[ll], lon[ll], vd, topat[ll], sza[ll]])
 
         tc, fl, fc, tl = confusion_matrix(data, sflag2, labels=[0,1]).ravel()
         #matrix = confusion_matrix(data, sflag2)
@@ -223,15 +245,22 @@ def fdToDf():
     return full_df
 
 def mdToDf():
-    map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd', 'Top_Alt'])
+    map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd', 'Top_Alt', 'SZA'])
     return map_df
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 if __name__ == "__main__":
-    confuse()
+    # confuse(False)
+    # print("--- %s seconds ---" % (time.time() - start_time))
+
+    # fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data.csv', index=False)
+    
+    # mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data.csv', index=False)
+
+    confuse(True)
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data.csv', index=False)
+    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel.csv', index=False)
     
-    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data.csv', index=False)
+    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel.csv', index=False)

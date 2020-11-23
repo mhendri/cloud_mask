@@ -131,7 +131,7 @@ def showAvaExact():
     for legobj in leg.legendHandles:
         legobj.set_linewidth(5.0)
     plt.xlim(0, len(tp))
-    plt.ylim(0, 8.7)
+    plt.ylim(0, 7)
 
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
@@ -256,8 +256,101 @@ def weeklyAvgSTD(avglen):
     plt.subplots_adjust(top=0.91)
     fig.savefig('./Task_4/confusionMatrix2plot_avg_std', bbox_inches='tight')
 
+def weeklyAvg85B(avglen):
+    tc, fc, tl, fl, totalpix, monday, time = openCSV()
+    fig = plt.figure(figsize=(12, 6))
+
+    cnt = []
+    cnt2 = 0
+    tcs, fcs, tls, fls = [],[],[],[]
+    tca, fca, tla, fla = [],[],[],[]
+    dt = []
+    for index in range(len(tc)):
+        day =  monday[index]
+        day = str(day[day.rfind('-')+1:])
+
+        if len(cnt) < avglen or day in cnt:
+            tcs.append(tc[index])
+            fcs.append(fc[index])
+            tls.append(tl[index])
+            fls.append(fl[index])
+            
+            if not day in cnt:
+                cnt.append(day)
+            cnt2+=1
+            #print(cnt)
+        else:
+            
+            tca.append(st.mean(tcs))
+            fca.append(st.mean(fcs))
+            tla.append(st.mean(tls))
+            fla.append(st.mean(fls))
+
+            temp = str(monday[index])
+            if len(temp[temp.rfind('-')+1:]) == 1:
+                temp = temp[0:temp.rfind('-')+1]+'0'+temp[temp.rfind('-')+1:].replace('0','')
+            dt.append(temp)
+
+            tcs, fcs, tls, fls = [],[],[],[]
+            #print(dt[-1], ':', std[0][-1])
+            tcs.append(tc[index])
+            fcs.append(fc[index])
+            tls.append(tl[index])
+            fls.append(fl[index])
+
+            cnt=[]
+            cnt.append(day)
+            cnt2=1
+    
+    plt.subplot(1,2,1)
+    plt.plot(dt, (tca), linewidth = 3, color='darkblue', label='TC')
+
+    plt.plot(dt, (tla), linewidth = 3, color='teal', label='TL')
+
+
+    plt.xticks(rotation=90, fontsize=14)
+    plt.yticks(fontsize=14)
+
+    plt.ylim(0, 100)
+    plt.xlim(dt[0], dt[-1])
+
+    plt.xlabel('Month-Day', fontsize=18)
+    plt.ylabel('Percent', fontsize=18)
+
+    fig.suptitle('2007 SCM vs MLay',fontsize=25)
+
+    plt.legend(prop={'size':13})
+
+    #````
+
+    plt.subplot(1,2,2)
+    plt.plot(dt, (fca), linewidth = 3, color='red', label='FC')
+    
+    plt.plot(dt, (fla), linewidth = 3, color='orange', label='FL')
+    
+    plt.xticks(rotation=90, fontsize=14)
+    plt.yticks(fontsize=14)
+
+    plt.ylim(0, 100)
+    plt.xlim(dt[0], dt[-1])
+
+    plt.xlabel('Month-Day', fontsize=18)
+    plt.ylabel('Percent', fontsize=18)
+
+    fig.suptitle('2007 SCM vs MLay',fontsize=25)
+
+    plt.legend(prop={'size':13})
+    
+
+
+    fig.tight_layout()
+    plt.subplots_adjust(top=0.91)
+    fig.savefig('./Task_4/confusionMatrix2plot_avg_std_85bel', bbox_inches='tight') 
+
 if __name__ == '__main__':
-    weeklyAvgSTD(15)
+    #weeklyAvgSTD(15)
+
+    weeklyAvg85B(15)
 
     #showAvaMonth()
 

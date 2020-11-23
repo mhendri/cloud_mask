@@ -28,7 +28,7 @@ import numpy as np
 
 # Select file directory
 #rootdir = './Task_1_2_3/Data/'
-rootdir = 'E:/CM_data/'
+rootdir = 'D:/CM_data/'
 data_path = []
 for subdir, dirs, files in os.walk(rootdir):
 	for file in files:
