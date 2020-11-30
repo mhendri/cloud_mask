@@ -147,7 +147,7 @@ ax1.set_ylim(ymax = 3)
 
 plt.yticks(np.linspace(0, 1, 2), ('Clear', 'Layered'))
 
-plt.show()
+#plt.show()
 os.chdir('..')
 pngfile = 'compare_SCMvsMLay_ClearvsLayered'
-fig.savefig(pngfile)
+fig.savefig(pngfile, bbox_inches='tight')

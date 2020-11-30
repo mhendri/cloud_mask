@@ -40,7 +40,7 @@ for f in file_name_list:
     calipso_fname = f    
     # print(f)
     nametimestamp  =  calipso_fname[-25:-4] 
-    # print(nametimestamp)
+    
     for file in listdir(data_path):
         # print(file[14:22])
         if file[-25:-4] == nametimestamp and file[14:19] == 'MYD03':
@@ -51,7 +51,7 @@ for f in file_name_list:
     calipso_path  = data_path + calipso_fname       
     mod021km_path = data_path + mod021km_fname
     mod03_path    = data_path + mod03_fname       
-    
+    #print(calipso_fname, mod021km_fname)
     ## read satellite data ##
     c1 = GetSatelliteData.read_caltrack_data(calipso_path,mod021km_path,mod03_path,channel_list)  
 

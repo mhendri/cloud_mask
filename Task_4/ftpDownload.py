@@ -41,7 +41,7 @@ file_data = pd.DataFrame(columns=['year', 'month', 'MYD03','MYD021km', 'MLay'])
 monthdata = [0 for i in range(12)]
 namedata = []
 
-data_path = 'D:\\CM_data\\'
+data_path = 'E:\\CM_data\\'
 #___________________________________________________________________________________________
 
 def ftpLogin():
@@ -86,31 +86,32 @@ def getFn(s):
 def ftpDownload(url):
     url = url.strip()
     try:
-        return urlretrieve(url, 'D:\\CM_data\\'+getFn(url)), None
+        print(url)
+        return urlretrieve(url, 'E:\\CM_new_gl\\'+getFn(url)), None
     except Exception as e:
+        print('Exception: ', url)
         return None           
 
-def batchDownload(file):
+def batchDownload(file, threads):
     st = time.time()
     with open('.\\Task_4\\csvs\\'+file, newline='') as f:
         reader = csv.reader(f)
         paths = list(reader)
 
-    file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
+    file_name_list = [f for f in listdir(data_path) if isfile(join(data_path , f))]
     
     paths = [j for i in paths for j in i if not 'N' in j[-6:-1]] #Remove if night
     paths = [x for x in paths if not x[x.rfind('/')+1:len(x)] in file_name_list] #Remove if exists
-    
-    print(paths)
+ 
     f = open('.\\Task_4\\ftpcreds.txt', 'r')
     u_p = f.read()
-
-    # begining = f'ftp://{u_p}@ftp.icare.univ-lille1.fr/'
-    # for index, path in enumerate(paths):
-    #     paths[index]=begining+path
-    # #ftpDownload('ftp://iraz:friedchicken@ftp.icare.univ-lille1.fr/SPACEBORNE/CALIOP/CALTRACK-333m_MYD021KM.v1.21/2007/2007_01_01/CALTRACK-333m_MYD021KM_V1-21_2007-01-01T14-20-16ZD.hdf')
-    # pool = Pool(10)
-    # pool.map(ftpDownload, paths)
+    #for f in paths: print(f)
+    begining = f'ftp://{u_p}@ftp.icare.univ-lille1.fr/'
+    for index, path in enumerate(paths):
+        paths[index]=begining+path
+    
+    pool = Pool(threads)
+    pool.map(ftpDownload, paths)
     et = time.time()
     print(et-st)
 
@@ -169,16 +170,17 @@ def filterMYD03(p_list):
     file_name_list = file_name_list[s_ind:e_ind]
     #print(len(file_name_list))
     for index, f in enumerate(file_name_list):
+        time2 = time.time()
         hdf = SD(directory+'\\'+f, SDC.READ)
         lat = hdf.select('Latitude')
         lon = hdf.select('Longitude')
-        
-        perc = round((((index)/(e_ind-s_ind))*100))
-        if index % 10 == 0:
-            print(f'Thread {thread}: {perc}\n')
 
         if enumLatlon(lat, lon):
             greenland_files.append(f)
+        
+        perc = round((((index)/(e_ind-s_ind))*100))
+        if index % 10 == 0:
+            print(f'Thread {thread}: {perc} | Time: {time.time()-time2}\n')
 
         lat.endaccess()
         lon.endaccess()
@@ -189,7 +191,7 @@ def enumLatlon(lat, lon):
     #print(len(lat))
     for index in range(lat.info()[2]):
         #print(index)
-        if index%10 == 0:
+        if index%14 == 0:
             if (poly.contains(Point(lon[index], lat[index]))):
                 #greenland_files.append(f)
                 return True
@@ -226,10 +228,10 @@ def checkAllExist():
         reader = csv.reader(f)
         m21 = list(reader)
     m21 = [j for i in m21 for j in i]
-    with open('.\\Task_4\\csvs\\polder_avanames.csv', newline='') as f:
-        reader = csv.reader(f)
-        pdr = list(reader)
-    pdr = [j for i in pdr for j in i]
+    # with open('.\\Task_4\\csvs\\polder_avanames.csv', newline='') as f:
+    #     reader = csv.reader(f)
+    #     pdr = list(reader)
+    # pdr = [j for i in pdr for j in i]
     with open('.\\Task_4\\csvs\\myd03_over_greenland.csv', newline='') as f:
         reader = csv.reader(f)
         md3 = list(reader)
@@ -246,9 +248,9 @@ def checkAllExist():
         if not any(date in x for x in m21):
             #print('m21',date)
             continue
-        if not any(date in x for x in pdr):
-            #print('pdr',date)
-            continue
+        # if not any(date in x for x in pdr):
+        #     #print('pdr',date)
+        #     continue
         fine_list.append(item)
 
     with open(f'./Task_4/csvs/myd03_over_greenland_final.csv', 'w') as f:
@@ -264,10 +266,10 @@ def checkAllExist():
         l=len(item)
         date = item[l-25:l]
         if any(date in x for x in fine_list):m21_f.append(item)
-    for item in pdr:
-        l=len(item)
-        date = item[l-25:l]
-        if any(date in x for x in fine_list):pdr_f.append(item)
+    # for item in pdr:
+    #     l=len(item)
+    #     date = item[l-25:l]
+    #     if any(date in x for x in fine_list):pdr_f.append(item)
     for item in md3:
         l=len(item)
         date = item[l-25:l]
@@ -279,9 +281,9 @@ def checkAllExist():
     with open(f'./Task_4/csvs/myd021km_avanames.csv', 'w') as f:
         for item in m21_f:
             f.write("%s\n" % item)
-    with open(f'./Task_4/csvs/polder_avanames.csv', 'w') as f:
-        for item in pdr_f:
-            f.write("%s\n" % item)
+    # with open(f'./Task_4/csvs/polder_avanames.csv', 'w') as f:
+    #     for item in pdr_f:
+    #         f.write("%s\n" % item)
     with open(f'./Task_4/csvs/md3_avanames.csv', 'w') as f:
         for item in md3_f:
             f.write("%s\n" % item)
@@ -297,7 +299,7 @@ def removeNonExist(directory):
     i = 0
     for f in file_name_list:
         if not f in md3:
-            os.remove('.\\Task_4\\Data\\MYD03_gl\\'+f)
+            os.remove(directory+f)
 
 if __name__ == '__main__':
     #___________________________________________________________________________________________
@@ -324,17 +326,16 @@ if __name__ == '__main__':
 
     #___________________________________________________________________________________________
     # Ftp download
-    batchDownload('myd03_avanames.csv')
-    #batchDownload('mlay_avanames.csv')
-    #batchDownload('myd021km_avanames.csv')
+    #batchDownload('myd03_avanames.csv')
 
     # #___________________________________________________________________________________________
-    # #Remove all non Greenland files -- 19366 total
-    # directory = os.getcwd() + '\\Task_4\\Data\\MYD03'
+    # #Remove all non Greenland files -- HAS TO BE IN SEP DIRECTORY 
+    # # directory = os.getcwd() + '\\Task_4\\Data\\MYD03'
+    # directory = 'E:\\CM_new\\'
 
-    # threads = 5
+    # threads = 12
     # s_ind, e_ind = [], []
-    # tlen = 10198
+    # tlen = 15254
     # for i in range(threads):
     #     s_ind.append(i*round((tlen/threads)))
     #     e_ind.append(s_ind[i]+round((tlen/threads)))
@@ -349,20 +350,25 @@ if __name__ == '__main__':
 
     # gl_list = [j for i in gl_list for j in i]
 
-    # with open(f'./Task_4/myd03_over_greenland.csv', 'w') as f:
+    # with open(f'./Task_4/csvs/myd03_over_greenland.csv', 'w') as f:
     #     for item in gl_list:
     #         f.write("%s\n" % item)
     # print(len(gl_list))
     
     # #___________________________________________________________________________________________
-    # # Move all Greenland files to seperate folder
-    # removeNonGl('.\\Task_4\\Data\\MYD03\\', '.\\Task_4\\Data\\MYD03_gl')
+    # Move all Greenland files to seperate folder
+    #removeNonGl('E:\\CM_new\\', 'E:\\CM_new_gl\\')
 
     #___________________________________________________________________________________________
-    # # Check if all 4 files exist
-    # checkAllExist()
+    # Check if all 4 files exist
+    #checkAllExist()
 
-    # #Remove non exist files
-    # removeNonExist('.\\Task_4\\Data\\MYD03_gl\\')
+    #Remove non exist files
+    #removeNonExist('E:\\CM_new_gl\\')
+
+    #_____________________________
+    # Download Remaining
+    #batchDownload('mlay_avanames.csv', 5)
+    batchDownload('myd021km_avanames.csv', 10)
 
     

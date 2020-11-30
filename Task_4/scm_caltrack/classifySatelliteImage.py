@@ -51,8 +51,8 @@ class ClassifyImage():
         for i in range(0,len(self.channel_conf)):
             channel_used.append(c1.channel_list[self.channel_conf[i]])
             # print(c1.channel_list[self.channel_conf[i]])
-        print(['classifier name: ', self.classifier_name])    
-        print(['channels used: ', channel_used])   
+        #print(['classifier name: ', self.classifier_name])    
+        #print(['channels used: ', channel_used])   
         # print(channel_used)
         
 
@@ -220,4 +220,4 @@ if __name__ == '__main__':
                         classifier_name,channel_conf)
     sflag = c4.classify_image(sflag,scaler=False)      
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+    #print("--- %s seconds ---" % (time.time() - start_time))

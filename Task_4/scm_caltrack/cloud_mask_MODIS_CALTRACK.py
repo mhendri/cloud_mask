@@ -22,7 +22,7 @@ start_time = time.time()
 data_path = os.getcwd()+'\Task_1_2_3\\Data\\'
 
 #Change working directory to scm_caltrack
-print(os.getcwd())
+#print(os.getcwd())
 os.chdir('./scm_caltrack')
 
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
@@ -77,4 +77,4 @@ for f in file_name_list:
     sflag = c4.classify_image(sflag,scaler=False)            
     
     
-print("--- %s seconds ---" % (time.time() - start_time))
+#print("--- %s seconds ---" % (time.time() - start_time))

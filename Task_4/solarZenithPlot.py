@@ -18,7 +18,7 @@ from shapely.geometry import Point, Polygon
 import matplotlib.pyplot as plt
 import numpy as np
 
-data_path = 'D:\\CM_data\\'
+data_path = 'E:\\CM_data\\'
 coords = [(-55, 59.5), (-55,67.5), (-60,67.5), (-60,75), (-73.25,75), (-73.25,79.2),
 		(-67.5,79.2), (-67.5,80.82), (-65.34,80.82), (-65.34,81.23), (-62,81.23),
 		(-62,82), (-60.25,82), (-60.25,84), (-10,84), (-10,75), (-17,75), (-17,67.5),
@@ -109,7 +109,7 @@ def plotZenith():
 
     ax.set_title('SZA Over Greenland 2007', fontsize=18)
     fig.tight_layout()
-    fig.savefig('./Task_4/solarZenithPlot', bbox_inches='tight', dpi=400)
+    fig.savefig('./Task_4/pngs/solarZenithPlot', bbox_inches='tight', dpi=400)
 
     print(f'\nAverage Loop Time: {round(sum(avgloop)/len(avgloop),3)}')
 

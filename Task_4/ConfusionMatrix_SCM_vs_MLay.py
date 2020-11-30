@@ -40,7 +40,7 @@ from scm_caltrack.classifySatelliteImage import ClassifyImage
 start_time = time.time()            
 
 # Choose directory path
-data_path = 'D:\\CM_data\\'
+data_path = 'E:\\CM_data\\'
 
 channel_list = ['R03','R04','R01', 'R02', 'R05', 'R07']
 

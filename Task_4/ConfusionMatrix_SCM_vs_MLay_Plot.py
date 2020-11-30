@@ -20,9 +20,13 @@ from matplotlib.cm import get_cmap
 from cycler import cycler
 data_path = '.\\Task_4\\'
 
+csv_upd = 'cf_matrix_full_data_85bel.csv'
+csv_old = '\\2007\\cf_matrix_full_data.csv'
+csv_old_85 = '\\2007\\cf_matrix_full_data_85bel.csv'
 
-def openCSV():
-    df = pd.read_csv(data_path+'\\csvs\\'+'cf_matrix_full_data.csv')
+def openCSV(csv):
+    #df = pd.read_csv(data_path+'\\csvs\\'+'cf_matrix_full_data_85bel.csv')
+    df = pd.read_csv(data_path+'\\csvs\\'+csv)
     
     tc = df['TC'].tolist()
     fc = df['FC'].tolist()
@@ -32,15 +36,16 @@ def openCSV():
 
     time = df['time'].tolist()
     month = df['month'].tolist()
+    year = df['year'].tolist()
     day = df['day'].tolist()
     monday = [str(a)+'-'+str(b) for a, b in zip(month, day)]
-
+    monday = [str(a)+'-'+str(b) for a, b in zip(year, monday)]
     return tc, fc, tl, fl, totalpix, monday, time
 
 def showAvaMonth():
     fig = plt.figure(figsize=(13, 6))
     
-    tp, mon = openCSV()[4], openCSV()[5]
+    tp, mon = openCSV(csv_upd)[4], openCSV(csv_upd)[5]
     mon = [x[:x.rfind('-')] for x in mon]
     
     mavg = [0,0,0,0,0,0,0,0,0,0,0,0]
@@ -56,11 +61,11 @@ def showAvaMonth():
     plt.ylabel('Pixels (thousands)', fontsize=20, fontweight='bold')
     plt.title('Pixels Over Greenland Per Month 2007',fontsize=20, fontweight='bold')
     
-    fig.savefig('./Task_4/confusionMatrix2plot_ava_month', bbox_inches='tight')
+    fig.savefig('./Task_4/pngs/confusionMatrix2plot_ava_month', bbox_inches='tight')
 
 def showAvaDay():
     fig = plt.figure(figsize=(13, 6))
-    tp, mon = openCSV()[4], openCSV()[5]
+    tp, mon = openCSV(csv_upd)[4], openCSV(csv_upd)[5]
 
     #mon = [x[x.rfind('-')+1:] for x in mon]
     #day = [0 for x in range(len(tp))]
@@ -89,11 +94,11 @@ def showAvaDay():
     plt.ylabel('Pixels x1000', fontsize=20, fontweight='bold')
     plt.title('Pixels Over Greenland Per Day 2007',fontsize=20, fontweight='bold')
     
-    fig.savefig('./Task_4/confusionMatrix2plot_ava_day', bbox_inches='tight')
+    fig.savefig('./Task_4/pngs/confusionMatrix2plot_ava_day', bbox_inches='tight')
 
 def showAvaExact():
     fig = plt.figure(figsize=(13, 7))
-    tp, time = openCSV()[4], openCSV()[6]
+    tp, time = openCSV(csv_upd)[4], openCSV(csv_upd)[6]
     
     time = [x[0:2] for x in time]
 
@@ -139,10 +144,10 @@ def showAvaExact():
     plt.ylabel('Pixels x1000', fontsize=20, fontweight='bold')
     plt.title('Pixels Over Greenland Per Orbit 2007',fontsize=20, fontweight='bold')
 
-    fig.savefig('./Task_4/confusionMatrix2plot_ava_orbit', bbox_inches='tight', dpi=400)
+    fig.savefig('./Task_4/pngs/confusionMatrix2plot_ava_orbit', bbox_inches='tight', dpi=400)
 
 def weeklyAvgSTD(avglen):
-    tc, fc, tl, fl, totalpix, monday, time = openCSV()
+    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_upd)
     fig = plt.figure(figsize=(12, 6))
 
     cnt = []
@@ -254,17 +259,29 @@ def weeklyAvgSTD(avglen):
 
     fig.tight_layout()
     plt.subplots_adjust(top=0.91)
-    fig.savefig('./Task_4/confusionMatrix2plot_avg_std', bbox_inches='tight')
+    fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_std', bbox_inches='tight')
 
 def weeklyAvg85B(avglen):
-    tc, fc, tl, fl, totalpix, monday, time = openCSV()
-    fig = plt.figure(figsize=(12, 6))
-
+    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_upd)
+    fig = plt.figure(figsize=(12, 12))
+    
+    #year to index
+    ya = {
+        '2006' : 0,
+        '2007' : 1,
+        '2008' : 2,
+        '2009' : 3,
+     }
     cnt = []
     cnt2 = 0
     tcs, fcs, tls, fls = [],[],[],[]
-    tca, fca, tla, fla = [],[],[],[]
-    dt = []
+    #        tc fc tl fl
+    avgs = [[[],[],[],[]], # 2006
+            [[],[],[],[]], # 2007
+            [[],[],[],[]], # 2008
+            [[],[],[],[]]] # 2009
+    #     06 07 08 09
+    dt = [[],[],[],[]]
     for index in range(len(tc)):
         day =  monday[index]
         day = str(day[day.rfind('-')+1:])
@@ -278,18 +295,22 @@ def weeklyAvg85B(avglen):
             if not day in cnt:
                 cnt.append(day)
             cnt2+=1
-            #print(cnt)
         else:
+            year = str(monday[index][0:monday[index].index('-')])
             
-            tca.append(st.mean(tcs))
-            fca.append(st.mean(fcs))
-            tla.append(st.mean(tls))
-            fla.append(st.mean(fls))
+            avgs[ya.get(year)][0].append(st.mean(tcs))
+            avgs[ya.get(year)][1].append(st.mean(fcs))
+            avgs[ya.get(year)][2].append(st.mean(tls))
+            avgs[ya.get(year)][3].append(st.mean(fls))
 
-            temp = str(monday[index])
+            fmt = '%m-%d'
+            temp = str(monday[index][monday[index].index('-')+1:len(monday[index])])
             if len(temp[temp.rfind('-')+1:]) == 1:
                 temp = temp[0:temp.rfind('-')+1]+'0'+temp[temp.rfind('-')+1:].replace('0','')
-            dt.append(temp)
+            temp = datetime.datetime.strptime(temp, fmt)
+            temp = temp.timetuple()
+
+            dt[ya.get(year)].append(temp.tm_yday)
 
             tcs, fcs, tls, fls = [],[],[],[]
             #print(dt[-1], ':', std[0][-1])
@@ -301,12 +322,114 @@ def weeklyAvg85B(avglen):
             cnt=[]
             cnt.append(day)
             cnt2=1
+    clist = ['darkblue','orange','red','green']
+    llbls = ['06','07','08','09']
+    tits = ['True Clear','False Clear','True Layered','False Layered']
+    for i in range(4):
+        plt.subplot(2,2,i+1)
+        for j in range(4):
+            plt.plot(dt[j], (avgs[j][i]), linewidth = 3, color=clist[j], label=llbls[j])
+            #plt.plot(dt, (tla), linewidth = 3, color='teal', label='TL')
+            plt.xticks(rotation=90, fontsize=14)
+            plt.yticks(fontsize=14)
+            plt.ylim(0, 100)
+            #plt.xlim(dt[j][0], dt[j][-1])
+            plt.title(tits[i], fontsize=20)
+            plt.xlabel('Day of Year', fontsize=18)
+            plt.ylabel('Percent', fontsize=18)
+
+            plt.legend(prop={'size':15})
+
+    fig.suptitle('06-09 SCM vs MLay',fontsize=25)
+
+    fig.tight_layout()
+    plt.subplots_adjust(top=0.91)
+    fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_std_85bel', bbox_inches='tight') 
+
+def weeklyAvgComp(avglen):
+    fig = plt.figure(figsize=(12, 6))
+
+    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_old_85)
+    cnt = []
+    cnt2 = 0
+    tcs, fcs, tls, fls = [],[],[],[]
+    tca, fca, tla, fla = [],[],[],[]
+    dt = []
+    for index in range(len(tc)):
+        day =  monday[index]
+        day = str(day[day.rfind('-')+1:])
+        if len(cnt) < avglen or day in cnt:
+            tcs.append(tc[index])
+            fcs.append(fc[index])
+            tls.append(tl[index])
+            fls.append(fl[index])
+            if not day in cnt:
+                cnt.append(day)
+            cnt2+=1
+        else:
+            tca.append(st.mean(tcs))
+            fca.append(st.mean(fcs))
+            tla.append(st.mean(tls))
+            fla.append(st.mean(fls))
+            fmt = '%m-%d'
+            temp = str(monday[index][monday[index].index('-')+1:len(monday[index])])
+            if len(temp[temp.rfind('-')+1:]) == 1:
+                temp = temp[0:temp.rfind('-')+1]+'0'+temp[temp.rfind('-')+1:].replace('0','')
+            temp = datetime.datetime.strptime(temp, fmt)
+            temp = temp.timetuple()
+            dt.append(temp.tm_yday)
+            tcs, fcs, tls, fls = [],[],[],[]
+            tcs.append(tc[index])
+            fcs.append(fc[index])
+            tls.append(tl[index])
+            fls.append(fl[index])
+            cnt=[]
+            cnt.append(day)
+            cnt2=1
     
+    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_old)
+    cnt = []
+    cnt2 = 0
+    tcs, fcs, tls, fls = [],[],[],[]
+    tca2, fca2, tla2, fla2 = [],[],[],[]
+    dt2 = []
+    for index in range(len(tc)):
+        day =  monday[index]
+        day = str(day[day.rfind('-')+1:])
+        if len(cnt) < avglen or day in cnt:
+            tcs.append(tc[index])
+            fcs.append(fc[index])
+            tls.append(tl[index])
+            fls.append(fl[index])
+            if not day in cnt:
+                cnt.append(day)
+            cnt2+=1
+        else:
+            tca2.append(st.mean(tcs))
+            fca2.append(st.mean(fcs))
+            tla2.append(st.mean(tls))
+            fla2.append(st.mean(fls))
+            fmt = '%m-%d'
+            temp = str(monday[index][monday[index].index('-')+1:len(monday[index])])
+            if len(temp[temp.rfind('-')+1:]) == 1:
+                temp = temp[0:temp.rfind('-')+1]+'0'+temp[temp.rfind('-')+1:].replace('0','')
+            temp = datetime.datetime.strptime(temp, fmt)
+            temp = temp.timetuple()
+            dt2.append(temp.tm_yday)
+            tcs, fcs, tls, fls = [],[],[],[]
+            tcs.append(tc[index])
+            fcs.append(fc[index])
+            tls.append(tl[index])
+            fls.append(fl[index])
+            cnt=[]
+            cnt.append(day)
+            cnt2=1
+
     plt.subplot(1,2,1)
     plt.plot(dt, (tca), linewidth = 3, color='darkblue', label='TC')
-
+    plt.plot(dt2, (tca2), linewidth = 3, color='darkblue', label='TC_85+', linestyle='dashed')
     plt.plot(dt, (tla), linewidth = 3, color='teal', label='TL')
-
+    plt.plot(dt2, (tla2), linewidth = 3, color='teal', label='TL_85+', linestyle='dashed')
 
     plt.xticks(rotation=90, fontsize=14)
     plt.yticks(fontsize=14)
@@ -325,9 +448,9 @@ def weeklyAvg85B(avglen):
 
     plt.subplot(1,2,2)
     plt.plot(dt, (fca), linewidth = 3, color='red', label='FC')
-    
+    plt.plot(dt2, (fca2), linewidth = 3, color='red', label='FC_85+', linestyle='dashed')
     plt.plot(dt, (fla), linewidth = 3, color='orange', label='FL')
-    
+    plt.plot(dt2, (fla2), linewidth = 3, color='orange', label='FL_85+', linestyle='dashed')
     plt.xticks(rotation=90, fontsize=14)
     plt.yticks(fontsize=14)
 
@@ -345,12 +468,14 @@ def weeklyAvg85B(avglen):
 
     fig.tight_layout()
     plt.subplots_adjust(top=0.91)
-    fig.savefig('./Task_4/confusionMatrix2plot_avg_std_85bel', bbox_inches='tight') 
+    fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_comp', bbox_inches='tight')
 
 if __name__ == '__main__':
     #weeklyAvgSTD(15)
 
-    weeklyAvg85B(15)
+    #weeklyAvg85B(20)
+
+    weeklyAvgComp(15)
 
     #showAvaMonth()
 

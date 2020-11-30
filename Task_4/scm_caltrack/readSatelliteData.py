@@ -266,6 +266,6 @@ if __name__ == '__main__':
     lat = c1.latitude
     sza = c1.sza
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+    #print("--- %s seconds ---" % (time.time() - start_time))
     
     
