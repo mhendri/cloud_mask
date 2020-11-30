@@ -321,7 +321,7 @@ def genImage(bands, enhanced, indy, fig):
     m.imshow(np.rot90((np.fliplr(rgb_projected))* 255).astype(np.uint8), origin='lower')
 
     m.drawcoastlines()
-    #plt.show()
+    plt.show()
     m.drawparallels(np.arange(-90.,120.,10.), color='k', fontsize=11,
         labels=[True,False,False,False])
     m.drawmeridians(np.arange(0.,420.,20.), color='k', fontsize=11,

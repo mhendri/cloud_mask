@@ -470,12 +470,98 @@ def weeklyAvgComp(avglen):
     plt.subplots_adjust(top=0.91)
     fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_comp', bbox_inches='tight')
 
+def hrAndSS(avglen):
+    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_old_85)
+    fig = plt.figure(figsize=(12, 6))
+
+    cnt = []
+    cnt2, datalen = 0, 0 
+    tcs, fcs, tls, fls = [],[],[],[]
+    tca, fca, tla, fla = [],[],[],[]
+    dt = []
+
+    hr, ss = [], []
+
+    for index in range(len(tc)):
+        day =  monday[index]
+        day = str(day[day.rfind('-')+1:])
+
+        if len(cnt) < avglen or day in cnt:
+            tcs.append((tc[index]/100)*totalpix[index])
+            fcs.append((fc[index]/100)*totalpix[index])
+            tls.append((tl[index]/100)*totalpix[index])
+            fls.append((fl[index]/100)*totalpix[index])
+            
+            datalen += totalpix[index]
+            if not day in cnt:
+                cnt.append(day)
+            cnt2+=1
+            #print(cnt)
+        else:
+            
+            tca.append(st.mean(tcs))
+            fca.append(st.mean(fcs))
+            tla.append(st.mean(tls))
+            fla.append(st.mean(fls))
+            
+            hrchk = ((sum(tcs) + sum(tls)) / datalen)*100
+            hr.append(hrchk)
+
+            sschk = (((sum(tcs) * sum(tls)) - (sum(fls) * sum(fcs))) / (((sum(tls) + sum(fls)) * (sum(tcs) + sum(fcs)))))*100
+            print(sschk)
+            ss.append(sschk)
+
+            if sschk < 0:
+                print(f'tc:{sum(tcs)}, fc:{sum(fcs)}, tl:{sum(tls)}, fl:{sum(fls)}')
+
+            temp = str(monday[index])
+            if len(temp[temp.rfind('-')+1:]) == 1:
+                temp = temp[0:temp.rfind('-')+1]+'0'+temp[temp.rfind('-')+1:].replace('0','')
+            dt.append(temp)
+
+            tcs, fcs, tls, fls = [],[],[],[]
+            #print(dt[-1], ':', std[0][-1])
+            tcs.append(tc[index])
+            fcs.append(fc[index])
+            tls.append(tl[index])
+            fls.append(fl[index])
+
+            cnt=[]
+            cnt.append(day)
+            cnt2=1
+            datalen=0
+
+
+    plt.plot(dt, hr, linewidth = 3, color='darkblue', label='HR')
+    plt.plot(dt, ss, linewidth = 3, color='red', label='SS')
+    #plt.plot(dt, (tla), linewidth = 3, color='teal', label='TL')
+
+    plt.xticks(rotation=90, fontsize=14)
+    plt.yticks(fontsize=14)
+
+    #plt.ylim(0, 100)
+    plt.xlim(dt[0], dt[-1])
+
+    plt.xlabel('Month-Day', fontsize=18)
+    plt.ylabel('Percent', fontsize=18)
+
+    plt.title('2007 SCM vs MLay',fontsize=25)
+
+    plt.legend(prop={'size':13})
+    
+
+    fig.tight_layout()
+
+    fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_hrss', bbox_inches='tight')
+
 if __name__ == '__main__':
     #weeklyAvgSTD(15)
 
     #weeklyAvg85B(20)
 
-    weeklyAvgComp(15)
+    #weeklyAvgComp(15)
+
+    hrAndSS(15)
 
     #showAvaMonth()
 

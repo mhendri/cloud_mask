@@ -60,7 +60,7 @@ def confuse(eightfivebelow):
     for f in file_name_list:
         st = time.time()
 
-        #if not '2007-05-20' in f: continue
+        #if not '2007-04-02' in f: continue
         
         if ( f[11:19] != '333mMLay' ):
                 continue
@@ -232,7 +232,8 @@ def confuse(eightfivebelow):
 
         tc, fl, fc, tl = confusion_matrix(data, sflag2, labels=[0,1]).ravel()
         #matrix = confusion_matrix(data, sflag2)
-        
+        #hr = (tc + tl) / len(data)
+        #ss = ((tc * tl) + (fl * fc)) / ((tc + tl) * (fl + fc))
         print(nametimestamp, nametimestamp[11:19])
         full_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
                             round((tc/len(data))*100, 3), round((fc/len(data))*100, 3), round((tl/len(data))*100, 3), 
@@ -241,7 +242,7 @@ def confuse(eightfivebelow):
         print('LOOP TIME:', (et-st))
 
 def fdToDf():
-    full_df = pd.DataFrame(full_data[:], columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix'])
+    full_df = pd.DataFrame(full_data[:], columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix', 'HR','SS'])
     return full_df
 
 def mdToDf():
@@ -258,9 +259,13 @@ if __name__ == "__main__":
     
     # mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data.csv', index=False)
 
+
+    # for data that removes 85 and up
     confuse(True)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel.csv', index=False)
     
     mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel.csv', index=False)
+
+    
