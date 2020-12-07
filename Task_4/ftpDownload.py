@@ -36,7 +36,7 @@ coords = [(-55, 59.5), (-55,67.5), (-60,67.5), (-60,75), (-73.25,75), (-73.25,79
 poly = Polygon(coords)
 
 #Dataframe for file stats
-file_data = pd.DataFrame(columns=['year', 'month', 'MYD03','MYD021km', 'MLay'])
+file_data = pd.DataFrame(columns=['year', 'month', 'MYD03','MYD021km', 'MLay', 'MYD35'])
 
 monthdata = [0 for i in range(12)]
 namedata = []
@@ -89,7 +89,8 @@ def ftpDownload(url):
         print(url)
         return urlretrieve(url, 'E:\\CM_new_gl\\'+getFn(url)), None
     except Exception as e:
-        print('Exception: ', url)
+        print(e)
+        print('URL: ', url)
         return None           
 
 def batchDownload(file, threads):
@@ -301,6 +302,98 @@ def removeNonExist(directory):
         if not f in md3:
             os.remove(directory+f)
 
+def getRequiredMYD35():
+    file_name_list = [f for f in listdir(data_path) if isfile(join(data_path, f))]
+    st = time.time()
+    file_name_list = [f for f in file_name_list if 'MYD03' in f]
+    #file_name_list = file_name_list[100:150]
+
+    with Pool(12) as p:
+        fnames = p.map(filterMYD35, file_name_list)
+    fnames = [j for i in fnames for j in i]
+    print(fnames)
+    print(len(fnames))
+    with open('.\\Task_4\\myd35.pkl', 'wb') as f:
+        pickle.dump(fnames, f)
+    print(time.time() - st)
+
+def filterMYD35(f):
+        fnames = []
+        
+        if 'MYD03' in f:
+        #if 'MYD03_V1-21_2009-06-01T07-51-10ZD.hdf' in f:
+            tnames = []
+            cinds = []
+            myd03_p = data_path + f
+            hdf = SD(myd03_p, SDC.READ)
+            lat = hdf.select('Latitude')
+            lon = hdf.select('Longitude')
+
+            ifi = hdf.select('Input_File_Index')
+            #data = hdf.select()
+            #print(hdf.attributes())
+            d = hdf.Input_Files
+            sts = [i+6 for i in range(len(d)) if d.startswith('MYD03.A', i)]
+            eds = [i-18 for i in range(len(d)) if d.startswith('.hdf', i)]
+            eds.pop(0)
+
+            for i in range(len(sts)):
+                tnames.append(d[sts[i]:eds[i]])
+
+            #for n in names: print(n)
+            #print('hello')
+            #print(lat.info()[2])
+            for index in range(lat.info()[2]):
+                if index%14 == 0:
+                    if (poly.contains(Point(lon[index], lat[index]))):
+                        if not ifi[index] in cinds and not ifi[index] < 0:
+                            cinds.append(ifi[index])
+            #print(cinds)
+            try: 
+                for c in cinds: fnames.append(tnames[c])
+                for f in fnames: print(f)
+            except Exception as e:
+                print('=======================================================================')
+                print(f,'\n')
+                for c in cinds: print(c)
+                for t in tnames: print(t)
+            
+        return fnames
+
+def myd35CrossCheck():
+    # MUST HAVE RUN getRequiredMYD35
+    with open('.\\Task_4\\myd35.pkl', 'rb') as f:\
+        ovgl = pickle.load(f)
+    with open('.\\Task_4\\csvs\\myd35_avanames.csv', newline='') as f:
+        reader = csv.reader(f)
+        myd35 = list(reader)
+    myd35 = [j for i in myd35 for j in i]
+
+    fin = []
+    chk = []
+    print('Original Length myd35: ',len(myd35))
+    print('Original Length ovgl: ',len(ovgl))
+
+    for index, s in enumerate(myd35):
+
+        s2 = s[s.index('.A')+1:s.index('.hdf')-18]
+        #print(s)
+        if s2 in ovgl:
+            if not s2 in chk:
+                chk.append(s2)
+                fin.append(s)
+        if index % 1000 == 0: print(index)
+        #break
+    fin = list(set(fin))
+
+    print('After myd35 Length: ',len(fin))
+    print('After ovgl Length: ',len(ovgl))
+
+    with open(f'./Task_4/csvs/myd35_over_greenland.csv', 'w') as f:
+        for item in fin:
+            f.write("%s\n" % item)
+
+
 if __name__ == '__main__':
     #___________________________________________________________________________________________
     # This section of removes the subfolders
@@ -369,6 +462,19 @@ if __name__ == '__main__':
     #_____________________________
     # Download Remaining
     #batchDownload('mlay_avanames.csv', 5)
-    batchDownload('myd021km_avanames.csv', 10)
+    #batchDownload('myd021km_avanames.csv', 10)
+
+    #_____________________________
+    # # Download MYD35
+    # file_data = pd.DataFrame(columns=['year', 'month', 'MYD35'])
+    # getAvailability('SPACEBORNE/MODIS/MYD35_L2.006/', 'myd35_ava', 'MYD35')
+    
+
+    #getRequiredMYD35()
+    #myd35CrossCheck()
+
+    #batchDownload('myd35_over_greenland.csv', 10)
+
+    print('uncomment something')
 
     

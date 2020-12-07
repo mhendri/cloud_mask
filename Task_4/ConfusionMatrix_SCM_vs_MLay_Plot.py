@@ -73,6 +73,8 @@ def showAvaDay():
     fmt = '%m-%d'
     juuls = []
     for md in mon:
+        if not '2007' in md: continue
+        md = str(md[md.index('-')+1:len(md)])
         dt = datetime.datetime.strptime(md, fmt)
         dt = dt.timetuple()
         juuls.append(dt.tm_yday)
@@ -98,7 +100,7 @@ def showAvaDay():
 
 def showAvaExact():
     fig = plt.figure(figsize=(13, 7))
-    tp, time = openCSV(csv_upd)[4], openCSV(csv_upd)[6]
+    tp, time= openCSV(csv_old_85)[4], openCSV(csv_old_85)[6]
     
     time = [x[0:2] for x in time]
 
@@ -130,7 +132,7 @@ def showAvaExact():
         plt.plot(bins[i][0], bins[i][1], label=i, color=colors[i-3])
 
     leg = plt.legend(handletextpad=.2, handlelength=1.1, fontsize=15, bbox_to_anchor=(.5,-.13),
-                loc='upper center', ncol=13, title='Hour', title_fontsize=18,
+                loc='upper center', ncol=13, title='Hour (UTC)', title_fontsize=18,
                 shadow=True, columnspacing=1.2)
     #plt.scatter(range(len(tp)), tp, s = 4, color='blue')
     for legobj in leg.legendHandles:
@@ -354,6 +356,7 @@ def weeklyAvgComp(avglen):
     cnt2 = 0
     tcs, fcs, tls, fls = [],[],[],[]
     tca, fca, tla, fla = [],[],[],[]
+    std =[[],[],[],[]]
     dt = []
     for index in range(len(tc)):
         day =  monday[index]
@@ -378,6 +381,15 @@ def weeklyAvgComp(avglen):
             temp = datetime.datetime.strptime(temp, fmt)
             temp = temp.timetuple()
             dt.append(temp.tm_yday)
+            temp2 = [0,0,0,0]
+            for i in range(1, cnt2+1):
+                temp2[0] += abs(tc[index-i]-tca[-1])**2.0
+                temp2[1] += abs(fc[index-i]-fca[-1])**2.0
+                temp2[2] += abs(tl[index-i]-tla[-1])**2.0
+                temp2[3] += abs(fl[index-i]-fla[-1])**2.0
+            
+            for i in range(4):
+                std[i].append(math.sqrt(temp2[i]/cnt2))
             tcs, fcs, tls, fls = [],[],[],[]
             tcs.append(tc[index])
             fcs.append(fc[index])
@@ -425,10 +437,20 @@ def weeklyAvgComp(avglen):
             cnt.append(day)
             cnt2=1
 
+    tcd = np.array(std[0])
+    fcd = np.array(std[1])
+    tld = np.array(std[2])
+    fld = np.array(std[3])
     plt.subplot(1,2,1)
     plt.plot(dt, (tca), linewidth = 3, color='darkblue', label='TC')
+    tca = np.array(tca)
+    plt.fill_between(dt, tca-tcd, tca+tcd,color='darkblue',alpha='0.1')
     plt.plot(dt2, (tca2), linewidth = 3, color='darkblue', label='TC_85+', linestyle='dashed')
+    
+
     plt.plot(dt, (tla), linewidth = 3, color='teal', label='TL')
+    fla = np.array(tla)
+    plt.fill_between(dt, tla-tld, tla+tld,color='teal',alpha='0.1')
     plt.plot(dt2, (tla2), linewidth = 3, color='teal', label='TL_85+', linestyle='dashed')
 
     plt.xticks(rotation=90, fontsize=14)
@@ -448,8 +470,13 @@ def weeklyAvgComp(avglen):
 
     plt.subplot(1,2,2)
     plt.plot(dt, (fca), linewidth = 3, color='red', label='FC')
+    fca = np.array(fca)
+    plt.fill_between(dt, fca-fcd, fca+fcd,color='red',alpha='0.1')
     plt.plot(dt2, (fca2), linewidth = 3, color='red', label='FC_85+', linestyle='dashed')
+    
     plt.plot(dt, (fla), linewidth = 3, color='orange', label='FL')
+    fla = np.array(fla)
+    plt.fill_between(dt, fla-fld, fla+fld,color='orange',alpha='0.1')
     plt.plot(dt2, (fla2), linewidth = 3, color='orange', label='FL_85+', linestyle='dashed')
     plt.xticks(rotation=90, fontsize=14)
     plt.yticks(fontsize=14)
@@ -471,16 +498,27 @@ def weeklyAvgComp(avglen):
     fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_comp', bbox_inches='tight')
 
 def hrAndSS(avglen):
-    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_old_85)
+    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_upd)
     fig = plt.figure(figsize=(12, 6))
 
     cnt = []
     cnt2, datalen = 0, 0 
     tcs, fcs, tls, fls = [],[],[],[]
     tca, fca, tla, fla = [],[],[],[]
-    dt = []
+    #     06 07 08 09
+    dt = [[],[],[],[]]
 
-    hr, ss = [], []
+    ya = {
+        '2006' : 0,
+        '2007' : 1,
+        '2008' : 2,
+        '2009' : 3,
+     }
+    #        HR  SS
+    hrss = [[[], []], #2006
+            [[], []], #2007
+            [[], []], #2008
+            [[], []]] #2009
 
     for index in range(len(tc)):
         day =  monday[index]
@@ -498,26 +536,30 @@ def hrAndSS(avglen):
             cnt2+=1
             #print(cnt)
         else:
-            
+            year = str(monday[index][0:monday[index].index('-')])
+
             tca.append(st.mean(tcs))
             fca.append(st.mean(fcs))
             tla.append(st.mean(tls))
             fla.append(st.mean(fls))
-            
+
             hrchk = ((sum(tcs) + sum(tls)) / datalen)*100
-            hr.append(hrchk)
+            hrss[ya.get(year)][0].append(hrchk)
+            
 
             sschk = (((sum(tcs) * sum(tls)) - (sum(fls) * sum(fcs))) / (((sum(tls) + sum(fls)) * (sum(tcs) + sum(fcs)))))*100
-            print(sschk)
-            ss.append(sschk)
+            hrss[ya.get(year)][1].append(sschk)
+            
+            # if sschk < 0:
+            #     print(f'tc:{sum(tcs)}, fc:{sum(fcs)}, tl:{sum(tls)}, fl:{sum(fls)}')
 
-            if sschk < 0:
-                print(f'tc:{sum(tcs)}, fc:{sum(fcs)}, tl:{sum(tls)}, fl:{sum(fls)}')
-
-            temp = str(monday[index])
+            fmt = '%m-%d'
+            temp = str(monday[index][monday[index].index('-')+1:len(monday[index])])
             if len(temp[temp.rfind('-')+1:]) == 1:
                 temp = temp[0:temp.rfind('-')+1]+'0'+temp[temp.rfind('-')+1:].replace('0','')
-            dt.append(temp)
+            temp = datetime.datetime.strptime(temp, fmt)
+            temp = temp.timetuple()
+            dt[ya.get(year)].append(temp.tm_yday)
 
             tcs, fcs, tls, fls = [],[],[],[]
             #print(dt[-1], ':', std[0][-1])
@@ -531,26 +573,35 @@ def hrAndSS(avglen):
             cnt2=1
             datalen=0
 
+    clist = ['darkblue','orange','red','green']
+    llbls = ['06','07','08','09']
 
-    plt.plot(dt, hr, linewidth = 3, color='darkblue', label='HR')
-    plt.plot(dt, ss, linewidth = 3, color='red', label='SS')
-    #plt.plot(dt, (tla), linewidth = 3, color='teal', label='TL')
-
-    plt.xticks(rotation=90, fontsize=14)
+    plt.subplot(1,2,1)
+    plt.title('Hit Rate', fontsize=20)
+    for i in range(4):
+        plt.plot(dt[i], hrss[i][0], linewidth = 3, color=clist[i], label=llbls[i])
+    plt.legend(prop={'size':15})
+    plt.xlabel('Day of Year', fontsize=18)
+    plt.ylabel('Percent', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    
+    plt.subplot(1,2,2)
+    plt.title('True Skill Score', fontsize=20)
+    for i in range(4):
+        plt.plot(dt[i], hrss[i][1], linewidth = 3, color=clist[i], label=llbls[i])
+    plt.legend(prop={'size':15}, loc='lower right')
+    plt.xlabel('Day of Year', fontsize=18)
+    plt.ylabel('Percent', fontsize=18)
+    plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
 
     #plt.ylim(0, 100)
-    plt.xlim(dt[0], dt[-1])
+    #plt.xlim(dt[0], dt[-1])
 
-    plt.xlabel('Month-Day', fontsize=18)
-    plt.ylabel('Percent', fontsize=18)
-
-    plt.title('2007 SCM vs MLay',fontsize=25)
-
-    plt.legend(prop={'size':13})
-    
-
+    plt.suptitle('06-09 HR and SS',fontsize=25)
     fig.tight_layout()
+    plt.subplots_adjust(top=.88)
 
     fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_hrss', bbox_inches='tight')
 
@@ -561,10 +612,10 @@ if __name__ == '__main__':
 
     #weeklyAvgComp(15)
 
-    hrAndSS(15)
+    #hrAndSS(15)
 
     #showAvaMonth()
 
     #showAvaDay()
 
-    #showAvaExact()
+    showAvaExact()

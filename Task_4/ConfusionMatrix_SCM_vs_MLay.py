@@ -3,9 +3,7 @@
 """
 Created on Thu Feb 13 08:44:59 2020
 
-@author: chennan
-
-Edited by Iraz Tejani
+@author: chennan, iraz
 
 This code creates a confustion matrix between the SCM and the
 CLM developed from CALIPSO.
@@ -15,10 +13,8 @@ Usage:  save this script and run
     python SCM_confusion_matrix.py
 
 Tested under: Python 3.7.6  Anaconda 4.8.3
-Last updated: 2020-10-28
+Last updated: 2020-12-04
 """
-
-
 
 import os
 from os import listdir
@@ -60,8 +56,8 @@ def confuse(eightfivebelow):
     for f in file_name_list:
         st = time.time()
 
-        #if not '2007-04-02' in f: continue
-        
+        if not '2007-08-' in f: continue
+        #if not '2006-08-0' in f and not '2007-08-0' in f and not '2008-08-0' in f and not'2009-08-0'in f: continue
         if ( f[11:19] != '333mMLay' ):
                 continue
 
@@ -80,6 +76,31 @@ def confuse(eightfivebelow):
         calipso_path  = data_path + calipso_fname   
         mod021km_path = data_path + mod021km_fname
         mod03_path    = data_path + mod03_fname       
+
+        # Read into CALIPSO file
+        hdf = SD(calipso_path, SDC.READ)
+        lat = hdf.select('Latitude')
+        lon = hdf.select('Longitude')
+        lat = lat[:, 0]
+        lon = lon[:, 0]
+        lat = lat.tolist()
+        lon = lon.tolist()
+        #Remove files with only short Greenland orbital segments
+        try: 
+            bott = ([float(f'{num:.1f}') for num in lat].index(59.5))
+            if(lat[bott+100]<lat[bott]): bott = 0
+        except Exception as e: 
+            bott = 0
+        cor_inds = []
+        for index in range(bott, len(lat)):
+            if (poly.contains(Point(lon[index], lat[index]))):
+                cor_inds.append(index)
+                if not index == (len(lat)-1) and not (poly.contains(Point(lon[index+1], lat[index+1]))):
+                    break
+        if len(cor_inds) < 10:
+            print('---------------------SKIPPED!---------------------')
+            continue
+
         try:
             ## read satellite data ##
             c1 = GetSatelliteData.read_caltrack_data(calipso_path,mod021km_path,mod03_path,channel_list)  
@@ -115,16 +136,9 @@ def confuse(eightfivebelow):
         sflag2[sflag2 == 7] = 1;    
     #-----------------------------------------------------------------------------#
     #-----------------------------------------------------------------------------#
-        # Read into CALIPSO file
-        hdf = SD(calipso_path, SDC.READ)
-        lat = hdf.select('Latitude')
-        lon = hdf.select('Longitude')
-        lat = lat[:, 0]
-        lon = lon[:, 0]
-        lat = lat.tolist()
-        lon = lon.tolist()
+        
         #print(lat.info()[2][0])
-
+        
         # Top Layer Altitude
         topat = hdf.select('Layer_Top_Altitude')     
         topat = topat[:, 0]
@@ -152,20 +166,14 @@ def confuse(eightfivebelow):
         data[data > 0] = 1;
         data[data == 0] = 0;
 
+        # Read 'Feature_Classification_Flags' for feature type
+        data2D = hdf.select('Feature_Classification_Flags')
+        feature_flag = data2D[:,:]
+	
+		# Extract feature type (bit 1-3) through bitmask
+        feature_flag = feature_flag & 7
         
-        try: 
-            bott = ([float(f'{num:.1f}') for num in lat].index(59.5))
-            if(lat[bott+100]<lat[bott]): bott = 0
-        except Exception as e: 
-            bott = 0
-        cor_inds = []
-        for index in range(bott, len(lat)):
-            if (poly.contains(Point(lon[index], lat[index]))):
-                cor_inds.append(index)
-                if not index == (len(lat)-1) and not (poly.contains(Point(lon[index+1], lat[index+1]))):
-                    break
-        if len(cor_inds) < 10:
-            continue
+        
  
         # Print out coordinates to file
         # tempdf = pd.DataFrame({'Latitude': lat, 'Longitude': lon})
@@ -180,12 +188,14 @@ def confuse(eightfivebelow):
         IGBP = IGBP[(cor_inds[0]):(cor_inds[-1])+1]
         topat = topat[(cor_inds[0]):(cor_inds[-1])+1]
         sza = sza[(cor_inds[0]):(cor_inds[-1])+1]
+        feature_flag = feature_flag[(cor_inds[0]):(cor_inds[-1])+1]
 
         #Subset over IGBP
         data = data.tolist()
         sflag2 = sflag2.tolist()
         topat = topat.tolist()
         sza = sza.tolist()
+        feature_flag =feature_flag.tolist()
 
         reminds = []
         for index, lw in enumerate(IGBP):
@@ -199,6 +209,7 @@ def confuse(eightfivebelow):
             lon.pop(i)
             topat.pop(i)
             sza.pop(i)
+            feature_flag.pop(i)
         
         if eightfivebelow:
             # DESTROY SZA OVER 85
@@ -214,39 +225,51 @@ def confuse(eightfivebelow):
                 lon.pop(i)
                 topat.pop(i)
                 sza.pop(i)
+                feature_flag.pop(i)
+        #print(feature_flag)
+
+        VFM_lst = []
+
+		#2 - Cloud
+		#3 - Aerosol
+		#4 - Stratospheric Feature
+		
+		# Assign new pixel value to column in MLay 'Feature_Classification_Flags'
+        for column in feature_flag:
+            column.reverse()
+            val = next((index for index,value in enumerate(column) if value != 1), 1)
+            VFM_lst.append(column[val])
                 
         vd = ''
         print("DATA LENGTH=",len(data), len(sflag2))
-        if len(data) == 0: continue
+        if len(data) == 0: 
+            print('---------------------SKIPPED!---------------------')
+            continue
         for ll in range(len(data)):
             if data[ll] == 1 and sflag2[ll] == 1: vd=('tl')
             elif data[ll] == 1 and sflag2[ll] == 0: vd=('fc')
             elif data[ll] == 0 and sflag2[ll] == 0: vd=('tc')
             elif data[ll] == 0 and sflag2[ll] == 1: vd=('fl')
-            # if IGBP[ll] == 0:
-            #     lat[ll], lon[ll], = None, None
-            #     continue
             if topat[ll] == -9999: topat[ll] = None
             map_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
-                            lat[ll], lon[ll], vd, topat[ll], sza[ll]])
+                            lat[ll], lon[ll], vd, topat[ll], sza[ll], VFM_lst[ll]])
 
         tc, fl, fc, tl = confusion_matrix(data, sflag2, labels=[0,1]).ravel()
-        #matrix = confusion_matrix(data, sflag2)
-        #hr = (tc + tl) / len(data)
-        #ss = ((tc * tl) + (fl * fc)) / ((tc + tl) * (fl + fc))
+        
         print(nametimestamp, nametimestamp[11:19])
         full_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
                             round((tc/len(data))*100, 3), round((fc/len(data))*100, 3), round((tl/len(data))*100, 3), 
-                            round((fl/len(data))*100, 3), len(data)])
+                            round((fl/len(data))*100, 3), len(data), f])
         et = time.time()
         print('LOOP TIME:', (et-st))
 
 def fdToDf():
-    full_df = pd.DataFrame(full_data[:], columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix', 'HR','SS'])
+    full_df = pd.DataFrame(full_data[:], columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix', 'filename'])
     return full_df
 
 def mdToDf():
-    map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd', 'Top_Alt', 'SZA'])
+    map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd', 'Top_Alt',
+                                                'SZA','Feature_Classification_Flags'])
     return map_df
 
 #-----------------------------------------------------------------------------#
@@ -264,8 +287,8 @@ if __name__ == "__main__":
     confuse(True)
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel.csv', index=False)
+    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel_test.csv', index=False)
     
-    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel.csv', index=False)
+    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel_test.csv', index=False)
 
     

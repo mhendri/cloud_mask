@@ -39,10 +39,10 @@ for f in file_name_list:
 		# Read 'Feature_Classification_Flags' for feature type
 		data2D = hdf.select('Feature_Classification_Flags')
 		feature_flag = data2D[:,:]
-		
+	
 		# Extract feature type (bit 1-3) through bitmask
 		feature_flag = feature_flag & 7
-
+		
 		# Create empty for pixel classification
 		VFM_lst = []
 
