@@ -18,12 +18,10 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 from cycler import cycler
-data_path = '.\\Task_4\\'
+data_path = 'E:\\new_csvs'
 
-csv_upd = 'cf_matrix_full_data_85bel.csv'
-csv_old = '\\2007\\cf_matrix_full_data.csv'
-csv_old_85 = '\\2007\\cf_matrix_full_data_85bel.csv'
-
+full_csv = 'cf_matrix_full_data_85bel_test2.csv'
+map_csv = 'cf_matrix_map_data_85bel_test2.csv.gz'
 def openCSV(csv):
     #df = pd.read_csv(data_path+'\\csvs\\'+'cf_matrix_full_data_85bel.csv')
     df = pd.read_csv(data_path+'\\csvs\\'+csv)
@@ -42,65 +40,9 @@ def openCSV(csv):
     monday = [str(a)+'-'+str(b) for a, b in zip(year, monday)]
     return tc, fc, tl, fl, totalpix, monday, time
 
-def showAvaMonth():
-    fig = plt.figure(figsize=(13, 6))
-    
-    tp, mon = openCSV(csv_upd)[4], openCSV(csv_upd)[5]
-    mon = [x[:x.rfind('-')] for x in mon]
-    
-    mavg = [0,0,0,0,0,0,0,0,0,0,0,0]
-    for index in range(len(tp)):
-        mavg[int(mon[index])-1] += tp[index] /1000
-    
-    plt.xticks(np.arange(12), ('Jan','Feb', 'Mar', 'Apr', 'May', 'Jun','Jul', 'Aug','Sep','Oct','Nov','Dec'))
-    plt.plot(range(12), mavg, linewidth = 2, color='blue')
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
 
-    plt.xlabel('Month', fontsize=20, fontweight='bold')
-    plt.ylabel('Pixels (thousands)', fontsize=20, fontweight='bold')
-    plt.title('Pixels Over Greenland Per Month 2007',fontsize=20, fontweight='bold')
-    
-    fig.savefig('./Task_4/pngs/confusionMatrix2plot_ava_month', bbox_inches='tight')
-
-def showAvaDay():
-    fig = plt.figure(figsize=(13, 6))
-    tp, mon = openCSV(csv_old)[4], openCSV(csv_old)[5]
-
-    #mon = [x[x.rfind('-')+1:] for x in mon]
-    #day = [0 for x in range(len(tp))]
-
-    fmt = '%m-%d'
-    juuls = []
-    for md in mon:
-        if not '2007' in md: continue
-        md = str(md[md.index('-')+1:len(md)])
-        dt = datetime.datetime.strptime(md, fmt)
-        dt = dt.timetuple()
-        juuls.append(dt.tm_yday)
-
-    flist = [0 for x in range(365)]
-
-    for index, jd in enumerate(juuls):
-        flist[jd-1] += tp[index]/1000
-    
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-
-    plt.ylim(-1,max(flist)+2)
-    plt.xlim(0,len(flist)-1)
-    #plt.xlim(240,365)
-
-    plt.plot(range(len(flist)), flist, linewidth = 2, color='blue')
-    plt.xlabel('Day of Year', fontsize=20, fontweight='bold')
-    plt.ylabel('Pixels x1000', fontsize=20, fontweight='bold')
-    plt.title('Pixels Over Greenland Per Day 2007',fontsize=20, fontweight='bold')
-    
-    fig.savefig('./Task_4/pngs/confusionMatrix2plot_ava_day', bbox_inches='tight')
-
-def showAvaExact():
     fig = plt.figure(figsize=(13, 7))
-    tp, time= openCSV(csv_old)[4], openCSV(csv_old)[6]
+    tp, time= openCSV(csv_old_85)[4], openCSV(csv_old_85)[6]
     
     time = [x[0:2] for x in time]
 
@@ -613,9 +555,4 @@ if __name__ == '__main__':
     #weeklyAvgComp(15)
 
     #hrAndSS(15)
-
-    #showAvaMonth()
-
-    showAvaDay()
-
-    #showAvaExact()
+    pass

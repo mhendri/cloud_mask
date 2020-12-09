@@ -287,8 +287,8 @@ if __name__ == "__main__":
     confuse(True)
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel_test.csv', index=False)
+    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel_test2.csv', index=False)
     
-    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel_test.csv', index=False)
+    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel_test2.csv', index=False)
 
     

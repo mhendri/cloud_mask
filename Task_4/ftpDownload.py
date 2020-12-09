@@ -330,8 +330,6 @@ def filterMYD35(f):
             lon = hdf.select('Longitude')
 
             ifi = hdf.select('Input_File_Index')
-            #data = hdf.select()
-            #print(hdf.attributes())
             d = hdf.Input_Files
             sts = [i+6 for i in range(len(d)) if d.startswith('MYD03.A', i)]
             eds = [i-18 for i in range(len(d)) if d.startswith('.hdf', i)]
