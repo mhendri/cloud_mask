@@ -1,0 +1,12 @@
+Data/
+.vscode/
+
+*.png
+*.csv
+*.xlsx
+*.txt
+Task_1_2_3/min_repro.py
+*.pkl
+Task_4/myd35_ava
+Task_4/test.py
+*.gz
