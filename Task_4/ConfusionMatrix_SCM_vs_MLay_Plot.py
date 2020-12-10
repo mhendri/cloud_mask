@@ -342,7 +342,7 @@ def weeklyAvg85B(avglen):
 
             plt.legend(prop={'size':15})
 
-    fig.suptitle('06-09 SCM vs MLay',fontsize=25)
+    fig.suptitle('2006-2009 SCM vs MLay',fontsize=25)
 
     fig.tight_layout()
     plt.subplots_adjust(top=0.91)
@@ -599,7 +599,7 @@ def hrAndSS(avglen):
     #plt.ylim(0, 100)
     #plt.xlim(dt[0], dt[-1])
 
-    plt.suptitle('06-09 HR and SS',fontsize=25)
+    plt.suptitle('2006-2009 HR and SS',fontsize=25)
     fig.tight_layout()
     plt.subplots_adjust(top=.88)
 
@@ -616,6 +616,7 @@ if __name__ == '__main__':
 
     #showAvaMonth()
 
-    showAvaDay()
+    #showAvaDay()
 
     #showAvaExact()
+    pass

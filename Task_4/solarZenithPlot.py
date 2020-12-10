@@ -94,8 +94,8 @@ def plotZenith():
     ax.set_xticklabels([dt[0:5] for dt in datetime], rotation=90, fontsize=13)
     #ax.set_yticklabels(range(0,90), fontsize=13)
     ax.set_ylim(55,95)
-    ax.set_xlim(datetime[0],datetime[-1])
-
+    #ax.set_xlim(datetime[0],datetime[-1])
+    ax.set_xlim(datetime[int(len(datetime)*.4)],datetime[int(len(datetime)*.5)])
     ax.set_xlabel('Date', fontsize=13)
     ax.set_ylabel('Degrees', fontsize=13)
 

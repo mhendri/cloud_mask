@@ -279,8 +279,10 @@ def confuse(eightfivebelow):
 
         #Import Modis CM
         cm = importCM(data, mod03_path, cor_inds)
+        myd35_fnames = cm[1]
+        cm = cm[0]
            
-        vd = ''
+        vd = -9999
         print("DATA LENGTH=",len(data), len(sflag2))
         if count == 0: 
             print('---------------------SKIPPED!---------------------')
@@ -296,14 +298,14 @@ def confuse(eightfivebelow):
         #     vd = ''
         conmat = []
         for ll in range(len(data)):
-            if data[ll] == 1 and sflag2[ll] == 1: vd=('tl')
-            elif data[ll] == 1 and sflag2[ll] == 0: vd=('fc')
-            elif data[ll] == 0 and sflag2[ll] == 0: vd=('tc')
-            elif data[ll] == 0 and sflag2[ll] == 1: vd=('fl')
+            if data[ll] == 1 and sflag2[ll] == 1: vd=(2) # tl
+            elif data[ll] == 1 and sflag2[ll] == 0: vd=(-1) # fc
+            elif data[ll] == 0 and sflag2[ll] == 0: vd=(1) # tc
+            elif data[ll] == 0 and sflag2[ll] == 1: vd=(-2) # fl
             elif data[ll] == -9999 and sflag2[ll] == -9999: vd=(-9999)
             conmat.append(vd)
                             
-            vd = ''
+            vd = -9999
         cm_nofill = [i for i in cm if not i == -9999]
         sflag2_nofill = [i for i in sflag2 if not i == -9999]
         print(nametimestamp, nametimestamp[11:19])
@@ -333,9 +335,12 @@ def confuse(eightfivebelow):
         Skill_Score = 0
         Hit_Rate = 0
 
-        createHDF(lat,lon,IGBP2,DEM_Surface_Elevation,topat,sflag2,VFM_lst,cm,conmat,Skill_Score,Hit_Rate,
-                    data2, msza, msaa, sza, saa)
+        allvars = [nametimestamp,calipso_fname,mod021km_fname,mod03_fname,myd35_fnames,lat,lon,IGBP2,
+                    DEM_Surface_Elevation,topat,sflag2,VFM_lst,cm,conmat,
+                    data2, msza, msaa, sza, saa,Skill_Score,Hit_Rate]
+        createHDF(allvars)
         print('LOOP TIME:', (et-st))
+        break
 
 
 def importCM(data, myd03_p, cor_inds):
@@ -355,11 +360,13 @@ def importCM(data, myd03_p, cor_inds):
     print(ifp[0], ifp[1][0])
     cm_results = [-9999 for i in range(len(data))]
     current_file = ''
+    files_used = []
     for index, d in enumerate(data):
         if not d == -9999:
             if not tnames[ifi[index]] in current_file:
                 current_file = myd35_dict.get(tnames[ifi[index]])
                 print(current_file)
+                files_used.append(current_file)
                 swath = Scene(reader = 'modis_l2', filenames = [myd35_path+current_file])
                 swath.load(['cloud_mask'], resolution = 1000)
                 cm = swath['cloud_mask'].values
@@ -371,7 +378,7 @@ def importCM(data, myd03_p, cor_inds):
     fillVal(ifp, cor_inds, len(ifp))
     # print(len(ifi), len(ifp))
     #print(tnames)
-    return cm_results
+    return cm_results, files_used
 
 def fillVal(lst, cor_inds, callen):
     lst_n = [-9999 for i in range(cor_inds[0])]#+[0 for i in range(len(data)-cor_inds[-1])]
@@ -399,22 +406,67 @@ def mdToDf():
     # print(map_df.memory_usage(deep=True).sum())
     return map_df
 
-def createHDF(lat,lon,IGBP2,DEM_Surface_Elevation,topat,sflag2,VFM_lst,cm,conmat,Skill_Score,Hit_Rate,
-                    data2, msza, msaa, sza, saa):
-    print(len(lat))
-    print(len(lon))
-    print(len(IGBP2))
-    print(len(DEM_Surface_Elevation))
-    print(len(topat))
-    print(len(sflag2))
-    print(len(VFM_lst))
-    print(len(cm))
-    print(len(conmat))
-    print(len(data2))
-    print(len(msaa))
-    print(len(msza))
-    print(len(sza))
-    print(len(saa))
+def createHDF(allvars):
+    varnames = {
+        0 : 'nametimestamp',
+        1 : 'calipso fname',
+        2 : 'mod21km fname',
+        3 : 'mod03 fname',
+        4 : 'myd35 fnames',
+        5 : ['Latitude'],
+        6 : ['Longitude'],
+        7 : ['IGBP_Surface_Type'],
+        8 : ['DEM_Surface_Elevation'],
+        9 : ['Layer_Top_Altitude'],
+        10 : ['SCM_classification'],
+        11 : ['Feature_Classification_Flag'],
+        12 : ['Cloud_Mask'],
+        13 : ['Confusion_Matrix'],
+        14 : ['Number_Layers_Found'],
+        15 : ['SensorZenith'],
+        16 : ['SensorAzimuth'],
+        17 : ['Solar_Zenith_Angle'],
+        18 : ['Solar_Azimuth_Angle'],
+        19 : ['Skill_Score'],
+        20 : ['Hit_Rate']
+    }
+
+    data_types = {
+        'float64' : SDC.FLOAT64,
+        'float32' : SDC.FLOAT32,
+        'int32' : SDC.INT32,
+        'int16' : SDC.INT16,
+        'int8' : SDC.INT8,
+        '<U11' : SDC.UCHAR
+    }
+
+    filename = 'CALTRACK-WOW_'+allvars[0]+'.hdf' # Create HDF file. 
+    print(filename)
+    path = 'E:\\Custom_HDFs\\'
+    hdfFile = SD(path+filename ,SDC.WRITE|SDC.CREATE) 
+    # Assign a few attributes at the file level 
+    hdfFile.File_Name = filename
+    hdfFile.Timestamp = allvars[0]
+    hdfFile.Fill_Value = -9999
+    hdfFile.Description = 'SCM, VFM, MYD35 cloud classifications coincident with the CALIOP 333m track'
+    fused = f'{allvars[1]}\n{allvars[2]}\n{allvars[3]}\n'+'\n'.join(str(s) for s in allvars[4])
+    hdfFile.Files_Used = fused 
+    
+    for i in range(5,len(allvars)-2):
+        print(i)
+        #print(lst.shape)
+        arr = np.array(allvars[i])
+        data_type = data_types.get(str(arr.dtype))
+        print(arr.dtype)
+        v1 = hdfFile.create(varnames.get(i), data_type, (arr.ndim,len(arr))) 
+        # Set some attributs on 'd1' 
+        v1.description = 'Sample descript' 
+        # d1.units = 'celsius' # Name 'd1' dimensions and assign them attributes. 
+        v1[0] = arr
+        v1.endaccess() # Close file 
+
+    hdfFile.end()
+
 
 def interSave():
     print('SAVING LENGHT', len(map_data))
