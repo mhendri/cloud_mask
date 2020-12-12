@@ -640,5 +640,8 @@ if __name__ == "__main__":
 
     
 #TODO
+#Add Pixels over Greenland
 #Fill Value not working for 2D arrays
 #Finish adding attributes
+#Stop skipping so many files
+#Scattering Angle Fill Value
