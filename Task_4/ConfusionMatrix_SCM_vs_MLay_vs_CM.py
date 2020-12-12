@@ -63,7 +63,7 @@ def confuse(eightfivebelow):
     for f in file_name_list:
         st = time.time()
 
-        if not '2006-06-13' in f: continue
+        #if not '2006-07-23' in f: continue
         #if not '2006-08-0' in f and not '2007-08-0' in f and not '2008-08-0' in f and not'2009-08-0'in f: continue
         if ( f[11:19] != '333mMLay' ):
                 continue
@@ -319,10 +319,6 @@ def confuse(eightfivebelow):
             put[i] = -9999
             scta[i] = -9999
 
-        # print(feature_flag[50000])
-        # for f in range(10):
-        #     feature_flag[f] = 6969
-        #break
         if eightfivebelow:
             # DESTROY SZA OVER 85
             remsza = []
@@ -352,7 +348,11 @@ def confuse(eightfivebelow):
         #print(feature_flag)
 
         #Import Modis CM
-        cm = importCM(data, mod03_path, cor_inds)
+        try:
+            cm = importCM(data, mod03_path, cor_inds)
+        except:
+            print('---------------------SKIPPED!---------------------')
+            continue
         myd35_fnames = cm[1]
         cm = cm[0]
            
@@ -435,7 +435,7 @@ def confuse(eightfivebelow):
                     put,sist,scta,Skill_Score,Hit_Rate]
         createHDF(allvars)
         print('LOOP TIME:', (et-st))
-        break
+        #break
 
 
 def importCM(data, myd03_p, cor_inds):
@@ -465,7 +465,7 @@ def importCM(data, myd03_p, cor_inds):
                 swath = Scene(reader = 'modis_l2', filenames = [myd35_path+current_file])
                 swath.load(['cloud_mask'], resolution = 1000)
                 cm = swath['cloud_mask'].values
-            cm_results[index] = cm[ifp[index][0]][ifp[index][1]]
+            cm_results[index] = cm[ifp[index][0]][ifp[index][1]] # pylint: disable=E1136
         #cm_results.append()
     # print(len(cm_results))
     # print(len(ifi), len(ifp))
