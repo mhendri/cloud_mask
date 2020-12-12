@@ -20,6 +20,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import time
+import datetime
 
 import numpy as np
 import pandas as pd
@@ -62,7 +63,7 @@ def confuse(eightfivebelow):
     for f in file_name_list:
         st = time.time()
 
-        #if not '2006-06-01' in f: continue
+        if not '2006-06-13' in f: continue
         #if not '2006-08-0' in f and not '2007-08-0' in f and not '2008-08-0' in f and not'2009-08-0'in f: continue
         if ( f[11:19] != '333mMLay' ):
                 continue
@@ -144,10 +145,6 @@ def confuse(eightfivebelow):
     #-----------------------------------------------------------------------------#
         
         #print(lat.info()[2][0])
-        
-        # Top Layer Altitude
-        topat = hdf.select('Layer_Top_Altitude')     
-        topat = topat[:, 0]
 
         # Solar zenith angle
         sza = hdf.select('Solar_Zenith_Angle')     
@@ -177,15 +174,62 @@ def confuse(eightfivebelow):
         data[data > 0] = 1;
         data[data == 0] = 0;
 
+        data1D = hdf.select('DEM_Surface_Elevation')
+        DEM_Surface_Elevation = data1D[:, 0]
+
+        put = hdf.select('Profile_UTC_Time')
+        put = put[:, 0]
+
+        sist = hdf.select('Snow_Ice_Surface_Type')
+        sist = sist[:, 0]
+
+        scta = hdf.select('Scattering_Angle')
+        scta = scta[:, 0]
+
+        #2D Arrays ------------------------------------------------------
         # Read 'Feature_Classification_Flags' for feature type
         data2D = hdf.select('Feature_Classification_Flags')
         feature_flag = data2D[:,:]
-	
 		# Extract feature type (bit 1-3) through bitmask
         feature_flag = feature_flag & 7
+
+        # Top Layer Altitude
+        topat = hdf.select('Layer_Top_Altitude')     
+        topat = topat[:,:]
+
+        lba = hdf.select('Layer_Base_Altitude')     
+        lba = lba[:,:]
+
+        ltp = hdf.select('Layer_Top_Pressure')     
+        ltp = ltp[:,:]
+
+        mlpr = hdf.select('Midlayer_Pressure')     
+        mlpr = mlpr[:,:]
+
+        lbp = hdf.select('Layer_Base_Pressure')     
+        lbp = lbp[:,:]
+
+        ltt = hdf.select('Layer_Top_Temperature')     
+        ltt = ltt[:,:]
+
+        lct = hdf.select('Layer_Centroid_Temperature')     
+        lct = lct[:,:]
+
+        mlt = hdf.select('Midlayer_Temperature')     
+        mlt = mlt[:,:]
+
+        lbt = hdf.select('Layer_Base_Temperature')     
+        lbt = lbt[:,:]
+
+        cads = hdf.select('CAD_Score')     
+        cads = cads[:,:]
         
-        data1D = hdf.select('DEM_Surface_Elevation')
-        DEM_Surface_Elevation = data1D[:, 0]
+        ics = hdf.select('Initial_CAD_Score')     
+        ics = ics[:,:]
+        
+        
+        #2D Arrays ------------------------------------------------------
+        
 
         m03_hdf = SD(mod03_path, SDC.READ)
 
@@ -208,24 +252,45 @@ def confuse(eightfivebelow):
         lat = fillVal(lat, cor_inds,callen)
         lon = fillVal(lon, cor_inds,callen)
         IGBP = fillVal(IGBP, cor_inds,callen)
-        topat = fillVal(topat, cor_inds,callen)
+        #topat = fillVal(topat, cor_inds,callen)
         sza = fillVal(sza, cor_inds,callen)
         saa = fillVal(saa, cor_inds,callen)
         IGBP2 = fillVal(IGBP2, cor_inds,callen)
         DEM_Surface_Elevation = fillVal(DEM_Surface_Elevation, cor_inds,callen)
         msza = fillVal(msza, cor_inds,callen)
         msaa = fillVal(msaa, cor_inds,callen)
+        put = fillVal(put, cor_inds, callen)
+
+
+        print(np.array(topat).shape)
+
 
         VFM_lst = []
-        feature_flag=feature_flag.tolist()
+        feature_flag2=feature_flag
+        feature_flag2=feature_flag2.tolist()
 		#1-Clear  #2-Cloud  #3-Aerosol  #4-Stratospheric Feature
-        for index, column in enumerate(feature_flag):
+        for index, column in enumerate(feature_flag2):
             if data[index] == -9999: 
                 VFM_lst.append(-9999)
                 continue
-            column.reverse()
-            val = next((index for index,value in enumerate(column) if value != 1), 1)
-            VFM_lst.append(column[val])
+            # Top Layer code
+            #column.reverse()
+            #val = next((index for index,value in enumerate(column) if value != 1), 1)
+            #VFM_lst.append(column[val])
+
+            #0-Clear #1-Cloud #2-Aerosol #3-Cloud+Aerosol #4-Invalid
+            if 2 in column:
+                if 3 in column: val = 3
+                elif 4 in column: val = 3
+                else: val = 1
+            elif 3 in column:
+                if 2 not in column:
+                    val = 2
+            elif 4 in column:
+                if 2 not in column: val = 2
+            elif 0 in column: val = 4
+            else: val = 0
+            VFM_lst.append(val)
             
         if len(data) == 0: 
             print('---------------------SKIPPED!---------------------')
@@ -241,9 +306,9 @@ def confuse(eightfivebelow):
             sflag2[i] = -9999
             lat[i] = -9999
             lon[i] = -9999
-            topat[i] = -9999
+            #topat[i] = -9999
             sza[i] = -9999
-            feature_flag[i] = -9999
+            #feature_flag[i] = -9999
             VFM_lst[i] = -9999
             count2 += 1
             saa[i] = -9999
@@ -251,7 +316,13 @@ def confuse(eightfivebelow):
             DEM_Surface_Elevation[i] = -9999
             msza[i] = -9999
             msaa[i] = -9999
-        
+            put[i] = -9999
+            scta[i] = -9999
+
+        # print(feature_flag[50000])
+        # for f in range(10):
+        #     feature_flag[f] = 6969
+        #break
         if eightfivebelow:
             # DESTROY SZA OVER 85
             remsza = []
@@ -264,9 +335,9 @@ def confuse(eightfivebelow):
                 sflag2[i] = -9999
                 lat[i] = -9999
                 lon[i] = -9999
-                topat[i] = -9999
+                #topat[i] = -9999
                 sza[i] = -9999
-                feature_flag[i] = -9999
+                #feature_flag[i] = -9999
                 VFM_lst[i] = -9999
                 count2+=1
                 saa[i] = -9999
@@ -274,6 +345,9 @@ def confuse(eightfivebelow):
                 DEM_Surface_Elevation[i] = -9999
                 msza[i] = -9999
                 msaa[i] = -9999
+                put[i] = -9999
+                scta[i] = -9999
+
         count = len(count)-count2
         #print(feature_flag)
 
@@ -296,48 +370,69 @@ def confuse(eightfivebelow):
         #     map_data.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
         #                     round(lat[ll],2), round(lon[ll],2), vd, round(topat[ll],2), round(sza[ll],2), VFM_lst[ll], cm[ll]])
         #     vd = ''
-        conmat = []
+        conmat_scm = []
         for ll in range(len(data)):
             if data[ll] == 1 and sflag2[ll] == 1: vd=(2) # tl
             elif data[ll] == 1 and sflag2[ll] == 0: vd=(-1) # fc
             elif data[ll] == 0 and sflag2[ll] == 0: vd=(1) # tc
             elif data[ll] == 0 and sflag2[ll] == 1: vd=(-2) # fl
             elif data[ll] == -9999 and sflag2[ll] == -9999: vd=(-9999)
-            conmat.append(vd)
+            conmat_scm.append(vd)
                             
             vd = -9999
+        data_nofill = [i for i in data if not i == -9999]
         cm_nofill = [i for i in cm if not i == -9999]
         sflag2_nofill = [i for i in sflag2 if not i == -9999]
         print(nametimestamp, nametimestamp[11:19])
-
-        cm3 = [0 if i < 3 else 1 for i in cm_nofill]
-        tc, fl, fc, tl = confusion_matrix(cm3, sflag2_nofill, labels=[0,1]).ravel()
+        
+        cm3 = [1 if i < 3 else 0 for i in cm_nofill]
+        tc, fl, fc, tl = confusion_matrix(cm3, data_nofill, labels=[0,1]).ravel()
         full_data3.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
                             round((tc/count)*100, 2), round((fc/count)*100, 2), round((tl/count)*100, 2), 
                             round((fl/count)*100, 2), count, f])
         
-        cm2 = [0 if i < 2 else 1 for i in cm_nofill]
-        tc, fl, fc, tl = confusion_matrix(cm2, sflag2_nofill, labels=[0,1]).ravel()
+        cm2 = [1 if i < 2 else 0 for i in cm_nofill]
+        tc, fl, fc, tl = confusion_matrix(cm2, data_nofill, labels=[0,1]).ravel()
         full_data2.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
                             round((tc/count)*100, 2), round((fc/count)*100, 2), round((tl/count)*100, 2), 
                             round((fl/count)*100, 2), count, f])
+
+        Skill_Score, Hit_Rate = [], []
+        ss, hr = ((tl*tc-fl*fc)/((tl+fl)*(tc+fc))), ((tl+tc)/count)
+        ss, hr = round((ss*100), 2), round((hr*100), 2)
+        Skill_Score.append(ss)
+        Hit_Rate.append(hr)
+        tc, fl, fc, tl = confusion_matrix(sflag2_nofill, data_nofill, labels=[0,1]).ravel()
+        ss, hr = ((tl*tc-fl*fc)/((tl+fl)*(tc+fc))), ((tl+tc)/count)
+        ss, hr = round((ss*100), 2), round((hr*100), 2)
+        Skill_Score.append(ss)
+        Hit_Rate.append(hr)
         
-        cm1 = [0 if i < 1 else 1 for i in cm_nofill]
-        tc, fl, fc, tl = confusion_matrix(cm1, sflag2_nofill, labels=[0,1]).ravel()
+        #Make confusion matrix array for the cloud mask as well
+        conmat_cm = []
+        for ll in range(len(data)):
+            if data[ll] == 1 and cm[ll] == 0: vd=(2) # tl
+            elif data[ll] == 1 and cm[ll] > 1: vd=(-1) # fc
+            elif data[ll] == 0 and cm[ll] > 1: vd=(1) # tc
+            elif data[ll] == 0 and cm[ll] == 0: vd=(-2) # fl
+            elif data[ll] == -9999 and cm[ll] == -9999: vd=(-9999)
+            conmat_cm.append(vd)
+        
+        cm1 = [1 if i < 1 else 0 for i in cm_nofill]
+        tc, fl, fc, tl = confusion_matrix(cm1, data_nofill, labels=[0,1]).ravel()
         full_data1.append([nametimestamp[:4], nametimestamp[5:7], nametimestamp[8:10], nametimestamp[11:19].replace('-',':'),
                             round((tc/count)*100, 2), round((fc/count)*100, 2), round((tl/count)*100, 2), 
                             round((fl/count)*100, 2), count, f])
         et = time.time()
-        print('LEN MAPDATA:', len(map_data))
-        # if len(map_data) > 60000:
-        #     interSave()
-        #     map_data.clear()
-        Skill_Score = 0
-        Hit_Rate = 0
 
+        print('==================')
+        #print('cmnofill:',cm_nofill)
+        print(cm3.count(1))
+        
         allvars = [nametimestamp,calipso_fname,mod021km_fname,mod03_fname,myd35_fnames,lat,lon,IGBP2,
-                    DEM_Surface_Elevation,topat,sflag2,VFM_lst,cm,conmat,
-                    data2, msza, msaa, sza, saa,Skill_Score,Hit_Rate]
+                    DEM_Surface_Elevation,topat,feature_flag,sflag2,VFM_lst,cm,conmat_scm,conmat_cm,
+                    data2, msza, msaa, sza, saa,lba,ltp,mlpr,lbp,ltt,lct,mlt,lbt,cads,ics,
+                    put,sist,scta,Skill_Score,Hit_Rate]
         createHDF(allvars)
         print('LOOP TIME:', (et-st))
         break
@@ -407,40 +502,58 @@ def mdToDf():
     return map_df
 
 def createHDF(allvars):
-    varnames = {
+    varinfo = {
         0 : 'nametimestamp',
         1 : 'calipso fname',
         2 : 'mod21km fname',
         3 : 'mod03 fname',
         4 : 'myd35 fnames',
-        5 : ['Latitude'],
-        6 : ['Longitude'],
-        7 : ['IGBP_Surface_Type'],
-        8 : ['DEM_Surface_Elevation'],
-        9 : ['Layer_Top_Altitude'],
-        10 : ['SCM_classification'],
-        11 : ['Feature_Classification_Flag'],
-        12 : ['Cloud_Mask'],
-        13 : ['Confusion_Matrix'],
-        14 : ['Number_Layers_Found'],
-        15 : ['SensorZenith'],
-        16 : ['SensorAzimuth'],
-        17 : ['Solar_Zenith_Angle'],
-        18 : ['Solar_Azimuth_Angle'],
-        19 : ['Skill_Score'],
-        20 : ['Hit_Rate']
+        5 : ['Latitude', {'units':'deg', 'valid_range':'-90.0...90.0'}],
+        6 : ['Longitude', {'units':'deg', 'valid_range':'-90.0...90.0'}],
+        7 : ['IGBP_Surface_Type', {'units':'no units','valid_range':'1... 18'}],
+        8 : ['DEM_Surface_Elevation', {'units':'km'}],
+        9 : ['Layer_Top_Altitude', {'units':'km','fill_value':'-9999'}],
+        10: ['Feature_Classification_Flags', {}],
+        11 : ['SCM_classification', {'valid_range':'0,1', 'description':'1:Layered\n0:clear'}],
+        12 : ['Clear_Layered_Mask', {'valid_range':'0...4','description':'4:Invalid\n3:Cloud+Aerosol\n2:Aerosol\n1:Cloud\n0:Clear'}],
+        13 : ['Cloud_Mask', {}],
+        14 : ['Confusion_Matrix_SCM', {'valid_range':'-2,-1,1,2', 'description':'2:True Layered\n1:True Clear\n-1:False Clear\n-2:False Layered'}],
+        15 : ['Confusion_Matrix_CM', {'valid_range':'-2,-1,1,2', 'description':'2:True Layered\n1:True Clear\n-1:False Clear\n-2:False Layered'}],
+        16 : ['Number_Layers_Found', {}],
+        17 : ['SensorZenith', {'units':'deg','valid_range':'0.0...180.0'}],
+        18 : ['SensorAzimuth', {'units':'deg','valid_range':'0.0...180.0'}],
+        19 : ['Solar_Zenith_Angle', {'units':'deg','valid_range':'0.0...180.0'}],
+        20 : ['Solar_Azimuth_Angle', {'units':'deg','valid_range':'0.0...180.0'}],
+        21 : ['Layer_Base_Altitude', {'units':'km'}],
+        22 : ['Layer_Top_Pressure', {}],
+        23 : ['Midlayer_Pressure', {}],
+        24 : ['Layer_Base_Pressure', {}],
+        25 : ['Layer_Top_Temperature', {}],
+        26 : ['Layer_Centroid_Temperature', {}],
+        27 : ['Midlayer_Temperature', {}],
+        28 : ['Layer_Base_Temperature', {}],
+        29 : ['CAD_Score', {'fill_value':'-127'}],
+        30 : ['Initial_CAD_Score', {'fill_value':'-127'}],
+        31 : ['Profile_UTC_Time', {'units':'no units','valid_range':'60,426.0...261,231.0'}],
+        32 : ['Snow_Ice_Surface_Type', {'units':'no units','valid_range':'0.0...255.0'}],
+        33 : ['Scattering_Angle', {'units':'deg','valid_range':'0.0...180.0'}],
+        34 : ['Skill_Score', {}],
+        35 : ['Hit_Rate', {}]
     }
 
     data_types = {
         'float64' : SDC.FLOAT64,
         'float32' : SDC.FLOAT32,
         'int32' : SDC.INT32,
+        'uint32' : SDC.UINT32,
         'int16' : SDC.INT16,
+        'uint16' : SDC.UINT16,
         'int8' : SDC.INT8,
+        'uint8' : SDC.UINT8,
         '<U11' : SDC.UCHAR
     }
 
-    filename = 'CALTRACK-WOW_'+allvars[0]+'.hdf' # Create HDF file. 
+    filename = 'CALTRACK-333m_SCM_V1-1_'+allvars[0]+'.hdf' # Create HDF file. 
     print(filename)
     path = 'E:\\Custom_HDFs\\'
     hdfFile = SD(path+filename ,SDC.WRITE|SDC.CREATE) 
@@ -451,22 +564,39 @@ def createHDF(allvars):
     hdfFile.Description = 'SCM, VFM, MYD35 cloud classifications coincident with the CALIOP 333m track'
     fused = f'{allvars[1]}\n{allvars[2]}\n{allvars[3]}\n'+'\n'.join(str(s) for s in allvars[4])
     hdfFile.Files_Used = fused 
+
+    #Parametirize this
+    print('SKILL SCORES:',allvars[34])
+    hdfFile.Skill_Scores = f'MYD35:{allvars[34][0]}\nSCM:{allvars[34][1]}'
+    hdfFile.Hit_Rates = f'MYD35:{allvars[35][0]}\nSCM:{allvars[35][1]}'
+    hdfFile.Processing_Time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     for i in range(5,len(allvars)-2):
-        print(i)
-        #print(lst.shape)
-        arr = np.array(allvars[i])
+        #Check if array is 2D
+        try:
+            allvars[i].shape
+            arr = allvars[i]
+        except:
+            arr = np.array(allvars[i])
+
+        #Get data type from data_types dictionary
         data_type = data_types.get(str(arr.dtype))
-        print(arr.dtype)
-        v1 = hdfFile.create(varnames.get(i), data_type, (arr.ndim,len(arr))) 
-        # Set some attributs on 'd1' 
-        v1.description = 'Sample descript' 
-        # d1.units = 'celsius' # Name 'd1' dimensions and assign them attributes. 
-        v1[0] = arr
+        
+        #Different x value for 2D arrays
+        x = 1
+        if arr.ndim > 1: x = arr.shape[1] 
+        v1 = hdfFile.create(varinfo.get(i)[0], data_type, (len(arr), x))
+
+        #GZIP compression
+        v1.setcompress(SDC.COMP_DEFLATE, value=1)
+        
+        # Set some attributts on 'd1' 
+        for key in varinfo.get(i)[1]: setattr(v1,key,varinfo.get(i)[1][key])
+        
+        v1[0:] = arr
         v1.endaccess() # Close file 
 
     hdfFile.end()
-
 
 def interSave():
     print('SAVING LENGHT', len(map_data))
@@ -505,7 +635,10 @@ if __name__ == "__main__":
     fd[1].to_csv('E:/new_csvs/cf_matrix_full_data_85bel_cm2.csv', index=False)
     fd[0].to_csv('E:/new_csvs/cf_matrix_full_data_85bel_cm3.csv', index=False)
     
-    interSave()
+    #interSave()
     #mdToDf().to_csv('E:/new_csvs/cf_matrix_map_data_85bel_cm.csv.gz', index=False, compression='gzip')
 
     
+#TODO
+#Fill Value not working for 2D arrays
+#Finish adding attributes

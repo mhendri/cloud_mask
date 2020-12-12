@@ -56,7 +56,7 @@ def confuse(eightfivebelow):
     for f in file_name_list:
         st = time.time()
 
-        if not '2007-08-' in f: continue
+        if not '2006-06-1' in f: continue
         #if not '2006-08-0' in f and not '2007-08-0' in f and not '2008-08-0' in f and not'2009-08-0'in f: continue
         if ( f[11:19] != '333mMLay' ):
                 continue
