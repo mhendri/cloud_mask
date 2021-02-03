@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 data_path = '.\\Task_4\\'
 
 def openCSV(vd, x, y):
-    df = pd.read_csv(data_path+'\\csvs\\'+'cf_matrix_map_data_85bel.csv')
+    df = pd.read_csv(data_path+'\\csvs\\'+'cf_matrix_map_data_85bel_6-9.csv')
     
     df = df.drop(['year', 'month','day','time','Longitude'],axis=1)
     
@@ -42,7 +42,7 @@ def sza_ta_falsePlot(vd, x, y):
     fig, ax = plt.subplots()
     
     hb2 = ax.hexbin(xf, yf, gridsize=150, cmap='inferno', alpha=0)
-    hb = ax.hexbin(xf, yf, gridsize=150, cmap='inferno')#, vmax=0.5*hb2.get_array().max())
+    hb = ax.hexbin(xf, yf, gridsize=150, cmap='inferno', vmax=0.5*hb2.get_array().max())
     ax.set(xlim=(min(xf), max(xf)), ylim=(min(yf), max(yf)))
     #ax.set_title("False-Clear Frequency", fontsize=18)
     
@@ -52,16 +52,16 @@ def sza_ta_falsePlot(vd, x, y):
     cb = fig.colorbar(hb, orientation='horizontal', ax=ax)
     cb.set_ticks(np.linspace(hb.get_array().min(), hb.get_array().max(), 5))
     cb.set_ticklabels(np.linspace(0, 1, 5))
-    cb.set_label(f'{labels[vd]} Instances', fontsize=13)
+    cb.set_label(f'{labels[vd]} Frequency', fontsize=13)
     fig.tight_layout()
     
     fig.savefig(f'./Task_4/pngs/frequencyPlot_{vd}_{x}_{y}', bbox_inches='tight', dpi=400)
 
 if __name__ == '__main__':
-    sza_ta_falsePlot('fc', 'SZA', 'Top_Alt')
+    #sza_ta_falsePlot('fc', 'SZA', 'Top_Alt')
 
-    # sza_ta_falsePlot('tl', 'SZA', 'Top_Alt')
+    #sza_ta_falsePlot('tl', 'SZA', 'Top_Alt')
 
-    # sza_ta_falsePlot('tc', 'SZA', 'Latitude')
+    sza_ta_falsePlot('tc', 'SZA', 'Latitude')
 
-    # sza_ta_falsePlot('fl', 'SZA', 'Latitude')
+    #sza_ta_falsePlot('fl', 'SZA', 'Latitude')

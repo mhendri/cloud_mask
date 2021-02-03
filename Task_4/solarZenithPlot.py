@@ -31,9 +31,9 @@ def plotZenith():
     datetime = []
     szalist = [[],[]]
 
-    months = ['007-12','007-01','007-02','007-03','007-04','007-05',
-                '007-06','007-07','007-08','007-09','007-10','007-11','007-12']
-    #months = ['007-06-0']
+    #months = ['007-12','007-01','007-02','007-03','007-04','007-05',
+    #            '007-06','007-07','007-08','007-09','007-10','007-11','007-12']
+    months = ['007-06-']
 
     file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
     trim_flist = [x for x in file_name_list if '333m_MYD03' in x and any(m in x for m in months)]
@@ -74,6 +74,7 @@ def plotZenith():
             continue
         
         sza = sza[(cor_inds[0]):(cor_inds[-1])+1]
+        if min(sza) < 0: continue
         #print(sza)
         szalist[0].append(min(sza))
         szalist[1].append(max(sza))
@@ -93,9 +94,9 @@ def plotZenith():
     ax.set_xticks(datetime)
     ax.set_xticklabels([dt[0:5] for dt in datetime], rotation=90, fontsize=13)
     #ax.set_yticklabels(range(0,90), fontsize=13)
-    ax.set_ylim(55,95)
-    #ax.set_xlim(datetime[0],datetime[-1])
-    ax.set_xlim(datetime[int(len(datetime)*.4)],datetime[int(len(datetime)*.5)])
+    ax.set_ylim(35,95)
+    ax.set_xlim(datetime[0],datetime[-1])
+    #ax.set_xlim(datetime[int(len(datetime)*.4)],datetime[int(len(datetime)*.5)])
     ax.set_xlabel('Date', fontsize=13)
     ax.set_ylabel('Degrees', fontsize=13)
 

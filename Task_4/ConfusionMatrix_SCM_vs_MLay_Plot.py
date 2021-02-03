@@ -20,9 +20,10 @@ from matplotlib.cm import get_cmap
 from cycler import cycler
 data_path = '.\\Task_4\\'
 
-csv_upd = 'cf_matrix_full_data_85bel.csv'
-csv_old = '\\2007\\cf_matrix_full_data.csv'
-csv_old_85 = '\\2007\\cf_matrix_full_data_85bel.csv'
+csv_upd = 'cf_matrix_full_data_85bel_2007.csv'
+csv_full = 'cf_matrix_full_data_85bel_6-9.csv'
+csv_old = '\\cf_matrix_full_data_85abov_2007.csv'   #This is data above 85
+csv_old_85 = '\\cf_matrix_full_data_85bel_2007.csv' #This is data 85 and below
 
 def openCSV(csv):
     #df = pd.read_csv(data_path+'\\csvs\\'+'cf_matrix_full_data_85bel.csv')
@@ -218,6 +219,7 @@ def weeklyAvgSTD(avglen):
     tla = np.array(tla)
     plt.fill_between(dt, tla-tld, tla+tld,color='teal',alpha='0.1')
 
+    year = dt[0][:4]
 
     plt.xticks(rotation=90, fontsize=14)
     plt.yticks(fontsize=14)
@@ -225,10 +227,10 @@ def weeklyAvgSTD(avglen):
     plt.ylim(0, 100)
     plt.xlim(dt[0], dt[-1])
 
-    plt.xlabel('Month-Day', fontsize=18)
+    plt.xlabel('Date', fontsize=18)
     plt.ylabel('Percent', fontsize=18)
 
-    fig.suptitle('2007 SCM vs MLay',fontsize=25)
+    fig.suptitle(f'{year} SCM vs MLay',fontsize=25)
 
     plt.legend(prop={'size':13})
 
@@ -250,10 +252,10 @@ def weeklyAvgSTD(avglen):
     plt.ylim(0, 100)
     plt.xlim(dt[0], dt[-1])
 
-    plt.xlabel('Month-Day', fontsize=18)
+    plt.xlabel('Date', fontsize=18)
     plt.ylabel('Percent', fontsize=18)
 
-    fig.suptitle('2007 SCM vs MLay',fontsize=25)
+    fig.suptitle(f'{year} SCM vs MLay',fontsize=25)
 
     plt.legend(prop={'size':13})
     
@@ -261,10 +263,10 @@ def weeklyAvgSTD(avglen):
 
     fig.tight_layout()
     plt.subplots_adjust(top=0.91)
-    fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_std', bbox_inches='tight')
-
+    fig.savefig(f'./Task_4/pngs/confusionMatrix2plot_avg_std_{year}', bbox_inches='tight')
+    
 def weeklyAvg85B(avglen):
-    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_upd)
+    tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_full)
     fig = plt.figure(figsize=(12, 12))
     
     #year to index
@@ -350,8 +352,9 @@ def weeklyAvg85B(avglen):
 
 def weeklyAvgComp(avglen):
     fig = plt.figure(figsize=(12, 6))
-
+    
     tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_old_85)
+    year = monday[0][:4]
     cnt = []
     cnt2 = 0
     tcs, fcs, tls, fls = [],[],[],[]
@@ -446,7 +449,7 @@ def weeklyAvgComp(avglen):
     tca = np.array(tca)
     plt.fill_between(dt, tca-tcd, tca+tcd,color='darkblue',alpha='0.1')
     plt.plot(dt2, (tca2), linewidth = 3, color='darkblue', label='TC_85+', linestyle='dashed')
-    
+
 
     plt.plot(dt, (tla), linewidth = 3, color='teal', label='TL')
     fla = np.array(tla)
@@ -459,7 +462,7 @@ def weeklyAvgComp(avglen):
     plt.ylim(0, 100)
     plt.xlim(dt[0], dt[-1])
 
-    plt.xlabel('Month-Day', fontsize=18)
+    plt.xlabel('Day of Year', fontsize=18)
     plt.ylabel('Percent', fontsize=18)
 
     fig.suptitle('2007 SCM vs MLay',fontsize=25)
@@ -484,10 +487,10 @@ def weeklyAvgComp(avglen):
     plt.ylim(0, 100)
     plt.xlim(dt[0], dt[-1])
 
-    plt.xlabel('Month-Day', fontsize=18)
+    plt.xlabel('Day of Year', fontsize=18)
     plt.ylabel('Percent', fontsize=18)
 
-    fig.suptitle('2007 SCM vs MLay',fontsize=25)
+    fig.suptitle(f'{year} SCM vs MLay',fontsize=25)
 
     plt.legend(prop={'size':13})
     
@@ -495,7 +498,7 @@ def weeklyAvgComp(avglen):
 
     fig.tight_layout()
     plt.subplots_adjust(top=0.91)
-    fig.savefig('./Task_4/pngs/confusionMatrix2plot_avg_comp', bbox_inches='tight')
+    fig.savefig(f'./Task_4/pngs/confusionMatrix2plot_avg_comp_{year}', bbox_inches='tight')
 
 def hrAndSS(avglen):
     tc, fc, tl, fl, totalpix, monday, time = openCSV(csv_upd)
@@ -616,7 +619,7 @@ if __name__ == '__main__':
 
     #showAvaMonth()
 
-    #showAvaDay()
+    showAvaDay()
 
     #showAvaExact()
     pass

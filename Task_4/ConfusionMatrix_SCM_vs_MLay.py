@@ -56,7 +56,7 @@ def confuse(eightfivebelow):
     for f in file_name_list:
         st = time.time()
 
-        if not '2006-06-1' in f: continue
+        #if not '1001' in f: continue
         #if not '2006-08-0' in f and not '2007-08-0' in f and not '2008-08-0' in f and not'2009-08-0'in f: continue
         if ( f[11:19] != '333mMLay' ):
                 continue
@@ -131,9 +131,9 @@ def confuse(eightfivebelow):
             continue
 
         # Focus on only layered pixels (= 6 and 7)
-        sflag2[sflag2 < 6] = 0;
-        sflag2[sflag2 == 6] = 1;
-        sflag2[sflag2 == 7] = 1;    
+        sflag2[sflag2 < 6] = 0
+        sflag2[sflag2 == 6] = 1
+        sflag2[sflag2 == 7] = 1   
     #-----------------------------------------------------------------------------#
     #-----------------------------------------------------------------------------#
         
@@ -156,15 +156,15 @@ def confuse(eightfivebelow):
         IGBP = IGBP_Type[:, 0]
 
         # Focus on land (≠ 17) data only.
-        IGBP[IGBP < 17] = 1;
-        IGBP[IGBP > 17] = 1;
-        IGBP[IGBP == 17] = 0;
+        IGBP[IGBP < 17] = 1
+        IGBP[IGBP > 17] = 1
+        IGBP[IGBP == 17] = 0
 
         IGBP = IGBP.tolist()
 
         # Focus only on layered pixels (> 0)
-        data[data > 0] = 1;
-        data[data == 0] = 0;
+        data[data > 0] = 1
+        data[data == 0] = 0
 
         # Read 'Feature_Classification_Flags' for feature type
         data2D = hdf.select('Feature_Classification_Flags')
@@ -270,6 +270,11 @@ def fdToDf():
 def mdToDf():
     map_df = pd.DataFrame(map_data[:], columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd', 'Top_Alt',
                                                 'SZA','Feature_Classification_Flags'])
+
+    map_df[['Feature_Classification_Flags','year', 'month','day']] = map_df[['Feature_Classification_Flags','year', 'month','day']].apply(pd.to_numeric, downcast='integer')
+    map_df[['Latitude', 'Longitude','Top_Alt','SZA']] = map_df[['Latitude', 'Longitude','Top_Alt','SZA']].apply(pd.to_numeric, downcast='float')
+    map_df[['Vd', 'time']] = map_df[['Vd','time']].astype('category')
+
     return map_df
 
 #-----------------------------------------------------------------------------#
@@ -287,8 +292,9 @@ if __name__ == "__main__":
     confuse(True)
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel_test2.csv', index=False)
+    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel_6-9.csv', index=False)
     
-    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel_test2.csv', index=False)
+    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel_6-9.csv', index=False)
+
 
     

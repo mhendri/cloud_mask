@@ -437,7 +437,6 @@ def confuse(eightfivebelow):
         print('LOOP TIME:', (et-st))
         #break
 
-
 def importCM(data, myd03_p, cor_inds):
     tnames = []
     m03_hdf = SD(myd03_p, SDC.READ)
