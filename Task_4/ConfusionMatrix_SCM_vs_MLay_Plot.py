@@ -92,7 +92,38 @@ def showAvaDay():
     plt.xlim(0,len(flist)-1)
     #plt.xlim(240,365)
 
-    plt.plot(range(len(flist)), flist, linewidth = 2, color='blue')
+    plt.plot(range(len(flist)), flist, linewidth = 2, color='grey', label='85_above', alpha=0.7)
+
+    tp, mon = openCSV(csv_old_85)[4], openCSV(csv_old_85)[5]
+
+    #mon = [x[x.rfind('-')+1:] for x in mon]
+    #day = [0 for x in range(len(tp))]
+
+    fmt = '%m-%d'
+    juuls = []
+    for md in mon:
+        if not '2007' in md: continue
+        md = str(md[md.index('-')+1:len(md)])
+        dt = datetime.datetime.strptime(md, fmt)
+        dt = dt.timetuple()
+        juuls.append(dt.tm_yday)
+
+    flist = [0 for x in range(365)]
+
+    for index, jd in enumerate(juuls):
+        flist[jd-1] += tp[index]/1000
+    
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+
+    plt.ylim(-1,max(flist)+2)
+    plt.xlim(0,len(flist)-1)
+    #plt.xlim(240,365)
+
+    plt.plot(range(len(flist)), flist, linewidth = 2, color='red', label='85_below')
+
+    plt.legend(loc='best', fontsize=20)
+
     plt.xlabel('Day of Year', fontsize=20, fontweight='bold')
     plt.ylabel('Pixels x1000', fontsize=20, fontweight='bold')
     plt.title('Pixels Over Greenland Per Day 2007',fontsize=20, fontweight='bold')
