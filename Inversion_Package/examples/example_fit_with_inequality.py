@@ -19,6 +19,7 @@ from lmfit.lineshapes import gaussian, lorentzian
 def residual(pars, x, data):
     model = (gaussian(x, pars['amp_g'], pars['cen_g'], pars['wid_g']) +
              lorentzian(x, pars['amp_l'], pars['cen_l'], pars['wid_l']))
+             
     return model - data
 
 
@@ -58,7 +59,7 @@ report_fit(out.params)
 plt.plot(x, data, 'bo')
 plt.plot(x, best_fit, 'r--', label='best fit')
 plt.legend(loc='best')
-#plt.show()
+plt.show()
 
 plt.savefig('./Inversion_Package/pngs/example_fit_with_inequality', bbox_inches='tight', dpi=400)
 
