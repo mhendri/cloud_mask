@@ -29,9 +29,11 @@ For each item In colFiles
 Next
 
 'Wscript.Echo Mid(strFoundName, 1, 4)
-charIndex = InStr(strFoundName, ".")
-intFoundName = CInt(Mid(strFoundName, 5, charIndex-5)) + intAdd
-strModifiedName = Mid(strFoundName,1,4) + CStr(intFoundName) + ".txt"
+'charIndex = InStr(strFoundName, ".")
+'Wscript.Echo Mid(strFoundName, 5)
+intFoundName = CInt(Mid(strFoundName, 5)) + intAdd
+
+strModifiedName = Mid(strFoundName,1,4) + CStr(intFoundName) '+ ".txt"
 
 
 'Wscript.Echo charIndex
