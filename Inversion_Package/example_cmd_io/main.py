@@ -14,7 +14,7 @@ from random import randint
 
 os.chdir('./Inversion_Package/example_cmd_io/') #Change this to your dir
 
-for i in range(10): #Run the vbs script 10 times
-    add = randint(-8,10) #This is the number to add to the filename
+for i in range(100): #Run the vbs script 10 times
+    add = randint(-10,10) #This is the number to add to the filename
     print(f'Count:{i}, Add:{add}')
     call(f'cscript modify_fn.vbs {add}')

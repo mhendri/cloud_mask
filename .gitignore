@@ -1,8 +1,6 @@
 Data/
 .vscode/
 
-*.png
-*.csv
 *.xlsx
 *.txt
 Task_1_2_3/min_repro.py
@@ -12,3 +10,5 @@ Task_4/test.py
 *.gz
 Inversion_Package/RSP1-P3_L1B-RSPGEOL1B-GeolocatedRadiances_20190803T155922Z_V003-20210122T201239Z.h5
 Inversion_Package/example_cmd_io.zip
+rt_code/
+*.csv
