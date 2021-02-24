@@ -1,11 +1,12 @@
-#!C:\msys64\usr\bin\bash.exe
-
-#add exclamationC:\msys64\msys2
-
-#cd "/c/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/"
-
+#!/bin/bash
 
 #dir
-cd "rt_code/rt_code/"
-dir
-./vec_generate_obs.exe info/vecgen_aer_ocean.info 0 1
+sleep 1
+cd
+sleep 1
+cd "C:\Users\Iraz\Documents\Docs\Programs\Cloud_mask\Inversion_Package\rt_code\rt_code" # This will be whatever directory your rt_code is in
+echo 'oy' # this just prints to check if working
+sleep 2
+time ./vec_generate_obs.exe info/vecgen_aer_ocean.info 0 1
+sleep 10
+echo 'yo'

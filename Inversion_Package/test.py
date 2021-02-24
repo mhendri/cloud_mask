@@ -103,6 +103,11 @@ import pyautogui
 # proc_stdout = process.communicate()[0].decode()
 # print(proc_stdout)
 
-os.system('bash shell.sh')
+#os.system('bash shell.sh')
+#os.system('rt_code\\rt_code\\vec_generate_obs.exe')
 
-#process = subprocess.Popen('bash shell.sh', shell=True,stdout=subprocess.PIPE,stdin=subprocess.PIPE)
+#process = subprocess.Popen('/rt_code/rt_code/vec_generate_obs.exe info/vecgen_aer_ocean.info 0 1', shell=True,stdout=subprocess.PIPE,stdin=subprocess.PIPE)
+#proc_stdout = process.communicate()[0].decode()
+#print(proc_stdout)
+
+os.system(r'C:\\msys64\\msys2 bash shell.sh')
