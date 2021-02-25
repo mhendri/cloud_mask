@@ -8,7 +8,7 @@ from pathlib import Path
 
 def createSrf(filename, srfFileName, alam = 2.264380, f0 = 0.0, f1 = 1.10,f2 = 0.0,f3 = 0.03422,f4 = 0.00389,f5 = 1.3386,
               f6 = 0.0,f7 = 0.0143,f8 = 1.0):
-    filePath = Path("C:/Users/gmyers4/Downloads/rt_code_new/rt_code/rt_code/info/")
+    filePath = Path("C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/info/")
     totalName = filePath  / (filename + ".txt")
     f = open(totalName, "w")
     f.write(srfFileName+'\n')
@@ -56,7 +56,7 @@ def createInfo(MCAP=75,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=25,N3BY3=7, QSTO
             If an error is encountered, the error message will be saved to the .info file, otherwise the file is generated
             based on the input values
     """
-    f = open(r"C:\Users\gmyers4\Downloads\rt_code_new\rt_code\rt_code\info\standard.info", "w")
+    f = open(r"C:\Users\Iraz\Documents\Docs\Programs\Cloud_mask\Inversion_Package\rt_code\rt_code\info\standard.info", "w")
     errorValue = errorCatching(MCAP, NCAP, NCAP2, NTAU, NTAU2, MTOT, N3BY3, QSTOP, QSTOP2, nPhi, nGauss, ERRBNDR,
                                ERRBNDP, NPERS, NTYPE,
                                NLAM, NLAYER, NGAS, IPRT, IREMV, A, B, R1, R2, NSD, mu0, phi, ALAM, ALBEDO, SRFFILELIST,
@@ -150,7 +150,6 @@ def errorCatching(MCAP=90,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=45,N3BY3=7, Q
                 Checks if there are any logical errors in the argument list for the input file
                 Keyword arguments:
                 Same arguments of create info function
-
                 Output:
                 None if no error is found, string detailing error if error is present
         """
@@ -246,12 +245,12 @@ def errorCatching(MCAP=90,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=45,N3BY3=7, Q
             return "Incorrect number of reflective indices provided."
         if (len(REFRACFILELIST) != NTYPE*NLAM):
             return "Incorrect number of reflective indices filenames provided. (check REREFRACFILELIST)"
-        if (len(DELP) != NLAYER):
+        if not (len(DELP) >= NLAYER):
             return "Incorrect number of pressure layers. (check DELP and NLAYER)"
         if (len(NZITEMS) != NTYPE):
             return "Incorrect number of aerosols provided. (check NZITEMS and NTYPE)"
         for i in range(NTYPE):
-            if (len(NZITEMS[i]) != NLAYER):
+            if not (len(NZITEMS[i]) >= NLAYER):
                 return "Incorrect number of layers provided for at least one aerosol. (check NZITEMS and NLAYER)"
         if NGAS>0:
             if len(TAUABS) != NLAM:
