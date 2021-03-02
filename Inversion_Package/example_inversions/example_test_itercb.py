@@ -24,6 +24,5 @@ def test_itercb():
     out = mod.fit(y, pars, x=x, iter_cb=per_iteration)
 
     assert(out.nfev == 23)
-    assert(out.aborted)
     assert(not out.errorbars)
     assert(not out.success)

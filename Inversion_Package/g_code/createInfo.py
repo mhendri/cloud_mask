@@ -5,23 +5,58 @@ passed arguments to the createInfo function.
 
 import numpy as np
 from pathlib import Path
+def createAllInput(MCAP=75,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=25,N3BY3=7, QSTOP= 1.000E-20,QSTOP2= 1.000E-20,
+               nPhi = 256, nGauss = 24,ERRBNDR = 2.000E-8, ERRBNDP = 1.000E-8,NPERS = 2,NTYPE = 0, NLAM = 1, NLAYER = 1
+               ,NGAS = 0,IPRT = 1, IREMV = 1,A=[],B=[],R1=0.0,R2 = 10.0,NSD =3,mu0 = 0.01,phi = 0.00,ALAM = [0.555],
+               ALBEDO =[-1.30], SRFFILELIST=["ocn.a00u70c100l0555"],RSPFILELIST=["ocnTest55555555"],NR=[],NI=[],REFRACFILELIST=[],
+               DELP=[1013.0],NZITEMS=[], TAUABS = [],f0Arr=[], f1Arr= [], f2Arr=[], f3Arr = [], f4Arr =[], f5Arr = [],
+                   f6Arr=[], f7Arr=[], f8Arr=[], ISURFArr=[], NTHETA = 24, NEXTR = 1, IGAUSS = 2):
+
+    createInfo(MCAP, NCAP, NCAP2, NTAU, NTAU2, MTOT, N3BY3, QSTOP, QSTOP2, nPhi, nGauss, ERRBNDR, ERRBNDP, NPERS, NTYPE,
+               NLAM, NLAYER, NGAS, IPRT, IREMV, A, B, R1, R2, NSD, mu0, phi, ALAM, ALBEDO, SRFFILELIST, RSPFILELIST, NR,
+               NI, REFRACFILELIST, DELP, NZITEMS, TAUABS)
+
+    srfErrorVal = errorCatchingSRF(f0Arr , f1Arr , f2Arr , f3Arr  , f4Arr  , f5Arr  ,
+                   f6Arr , f7Arr , f8Arr , ISURFArr)
+    if srfErrorVal is not None:
+        filePath = Path("C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/info/")
+        totalName = filePath / (RSPFILELIST[0] + ".txt")
+        f = open(totalName, "w")
+        f.write(srfErrorVal)
+        f.close()
+        return
+
+    for i in range(len(f0Arr)):
+        createSrf(RSPFILELIST[i], SRFFILELIST[i], ALAM[i], f0Arr[i], f1Arr[i], f2Arr[i], f3Arr[i], f4Arr[i], f5Arr[i],
+                  f6Arr[i], f7Arr[i], f8Arr[i], MCAP, N3BY3, NTHETA, NEXTR, nPhi, ISURFArr[i], IGAUSS)
+    return
 
 def createSrf(filename, srfFileName, alam = 2.264380, f0 = 0.0, f1 = 1.10,f2 = 0.0,f3 = 0.03422,f4 = 0.00389,f5 = 1.3386,
-              f6 = 0.0,f7 = 0.0143,f8 = 1.0):
+              f6 = 0.0,f7 = 0.0143,f8 = 1.0, MCAP = 25, N3BY3 = 7, NTHETA = 24, NEXTR = 1, NPHI = 256, ISURF = 4, IGAUSS = 2):
     filePath = Path("C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/info/")
     totalName = filePath  / (filename + ".txt")
     f = open(totalName, "w")
     f.write(srfFileName+'\n')
-    mod = "{:.%7f}"
-    f.write(" 25=MCAP    7=N3BY3  24=NTHETA  1=NEXTR 256=NPHI    4=ISURF   2=IGAUSS \n")
+    numMCAP = 3 - len(str(MCAP))
+    numN3BY3 = 3 - len(str(N3BY3))
+    numNTHETA = 3 - len(str(NTHETA))
+    numNEXTR = 3 - len(str(NEXTR))
+    numNPHI = 3 - len(str(NPHI))
+    numISURF = 3 - len(str(ISURF))
+    numIGAUSS = 3 - len(str(IGAUSS))
+    f.write(" "*numMCAP + str(MCAP) + "=MCAP  " + " "*numN3BY3+str(N3BY3) + "=N3BY3 "+ " "*numNTHETA + str(NTHETA)
+            + "=NTHETA" +" "*numNEXTR + str(NEXTR) + "=NEXTR " +" "*numNPHI + str(NPHI) + "=NPHI  " + " "*numISURF +
+             str(ISURF) +"=ISURF " + " "*numIGAUSS + str(IGAUSS) + "=IGAUSS \n")
     f.write("1.0       0.866000  1.0\n")
     f.write("  ALAM= " + format(alam, '.6f') + "    F0= " + format(f0, '.6f') + "    F1= " + format(f1,'.6f') + "    F2= " + format(f2,'.6f')+"\n")
-    f.write("    F3= " + format(f3, '.6f') + "    F4= " + format(f4,'.6f') + "    F5= " + format(f5,'.6f')+ "    F6= " + format(f5,'.6f') +"\n")
+    f.write("    F3= " + format(f3, '.6f') + "    F4= " + format(f4,'.6f') + "    F5= " + format(f5,'.6f')+ "    F6= " + format(f6,'.6f') +"\n")
     f.write("    F7= " + format(f7,'.6f') + "    F8= " + format(f8, '.6f') + "\n")
-    f.write("\n")
-    f.write("F1,F2,F3,F4\n")
-    f.write("CHL,SCDM,BP440,ACDM440\n")
-    f.write("0.03422\n")
+    if (alam == 0.41027):
+        f.write("\n")
+        f.write("F1,F2,F3,F4\n")
+        f.write("CHL,SCDM,BP440,ACDM440\n")
+        f.write("0.03422\n")
+
     f.close()
     return
 
@@ -33,10 +68,8 @@ def createInfo(MCAP=75,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=25,N3BY3=7, QSTO
     """
             Create a '.info' file for use in the FORTRAN doubling code
             Keyword arguments: (all outlined in the README)
-
             MCAP, NCAP, NCAP2, NTAU, NTAU2, MTOT, N3BY3, QSTOP, QSTOP2, nPhi, nGauss, ERRBNDR, ERRBNDP,
             NPERS, NTYPE, NLAM, NLAYER, NGAS, IPRT, R1, R2, NSD, mu0, phi: All defined explicitly in README
-
             A: List of A parameters for distribution defined by NSD (list of floats)
             B: List of B parameters for distribution defined by NSD (list of floats)
             ALAM: List of wavelengths used (list of floats)
@@ -49,7 +82,6 @@ def createInfo(MCAP=75,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=25,N3BY3=7, QSTO
             DELP: List of pressures, one for each layer. Should add up to 1013.0 (list of floats)
             NZITEMS: List of lists of area densities of aerosols in each layer, one list for each aerosol type (list of lists of floats)
             TAUABS: List of lists of absorption depths in each layer, one for each wavelength (list of lists of floats)
-
             Output:
             Nothing is returned.
             ".info" file is saved in the designated directory upon execution of function
@@ -57,7 +89,7 @@ def createInfo(MCAP=75,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=25,N3BY3=7, QSTO
             based on the input values
     """
     f = open(r"C:\Users\Iraz\Documents\Docs\Programs\Cloud_mask\Inversion_Package\rt_code\rt_code\info\standard.info", "w")
-    errorValue = errorCatching(MCAP, NCAP, NCAP2, NTAU, NTAU2, MTOT, N3BY3, QSTOP, QSTOP2, nPhi, nGauss, ERRBNDR,
+    errorValue = errorCatchingInfo(MCAP, NCAP, NCAP2, NTAU, NTAU2, MTOT, N3BY3, QSTOP, QSTOP2, nPhi, nGauss, ERRBNDR,
                                ERRBNDP, NPERS, NTYPE,
                                NLAM, NLAYER, NGAS, IPRT, IREMV, A, B, R1, R2, NSD, mu0, phi, ALAM, ALBEDO, SRFFILELIST,
                                RSPFILELIST,
@@ -141,7 +173,7 @@ def createInfo(MCAP=75,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=25,N3BY3=7, QSTO
 
     f.close()
 
-def errorCatching(MCAP=90,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=45,N3BY3=7, QSTOP= 1.000E-20,QSTOP2= 1.000E-20,
+def errorCatchingInfo(MCAP=90,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=45,N3BY3=7, QSTOP= 1.000E-20,QSTOP2= 1.000E-20,
                nPhi = 256, nGauss = 24,ERRBNDR = 2.000E-8, ERRBNDP = 1.000E-8,NPERS = 2,NTYPE = 0, NLAM = 1, NLAYER = 1
                ,NGAS = 0,IPRT = 1, IREMV = 1,A=[],B=[],R1=0.0,R2 = 10.0,NSD =3,mu0 = 0.5,phi = 0.7893456,ALAM = [0.555],
                ALBEDO =[-1.30], SRFFILELIST=["ocn.ocnTest"],RSPFILELIST=["testFile"],NR=[],NI=[],REFRACFILELIST=[],
@@ -262,3 +294,12 @@ def errorCatching(MCAP=90,NCAP = 18,NCAP2=18,NTAU=24,NTAU2=24,MTOT=45,N3BY3=7, Q
             return "Invalid pressure layers defined (should sum to 1013.0)."
 
         return
+
+def errorCatchingSRF(f0Arr=[], f1Arr= [], f2Arr=[], f3Arr = [], f4Arr =[], f5Arr = [], f6Arr=[], f7Arr=[], f8Arr=[], ISURFArr=[]):
+    ###     CHECKING LENGTH CONDITION
+    length = len(f0Arr)
+    if any(len(lst) != length for lst in [f1Arr, f2Arr, f3Arr, f4Arr, f5Arr, f6Arr, f7Arr, f8Arr]):
+        return "At least one of the fn lists is of incorrect length (all should be of the same length)"
+    if (len(ISURFArr) != len(f0Arr)):
+        return "Length of ISURFArr is incorrect (should match the length of the fn lists)."
+    return

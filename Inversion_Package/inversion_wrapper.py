@@ -10,14 +10,36 @@ import os
 sys.path.insert(0, 'C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/g_code/')
 
 import numpy as np
+import matplotlib.pyplot as plt
+import pickle
+import time
+
+from waiting import wait
 from lmfit import Minimizer, Parameters
 
-from g_code.createInfo import createInfo, createSrf
+from g_code.createInfo import createInfo, createSrf, createAllInput
+from g_code.wavelengthData import wavelengthData
 
 os.chdir('./Inversion_Package/')
 
+#List of all wavelengths
+wl_list = ['410', '470', '555', '670', '864', '1589', '2264']
+#Directory for rt_code
+rt_dir = './rt_code/rt_code/'
 
-def get_residual():
+
+#Check if firstInv2264.rsp has been updated
+last_update_time = os.path.getmtime(f'{rt_dir}firstInv2264.rsp')
+def is2264Update():
+    if last_update_time != os.path.getmtime(f'{rt_dir}firstInv2264.rsp'):
+        return True
+    #print(last_update_time, os.path.getmtime(f'{rt_dir}firstInv2264.rsp'))
+    return False
+
+
+#Creates surface and info files
+def createFiles(params):
+    print('---Creating Surface/Info Files---')
     #Set Variables
     #######################################################################################################
     #List of wavelengths corresponds to list from .info file - Alam=0.55...
@@ -43,25 +65,131 @@ def get_residual():
     #List of pressure layers
     delp = [50.0 ,500.0, 138.0 ,265.0 , 60.0  , 0.0  , 0.0,0.0]
     #Amount of aerosol for each aerosol type
-    nz = [[ 1.00E-02, 0.00E-01,  0.00E-01,  0.00E-01,  0.00E-02,  0.00E-15,  0.00E-15,  0.00E-15], 
-            [3.500E-02, 0.00E-01,  0.00E-01,  0.00E-01,  0.00E-02,  0.00E-15,  0.00E-15,  0.00E-15]]
+    # nz = [[ 1.00E-02, 0.00E-01,  0.00E-01,  0.00E-01,  0.00E-02,  0.00E-15,  0.00E-15,  0.00E-15],  # ACTUAL NZ
+    #         [3.500E-02, 0.00E-01,  0.00E-01,  0.00E-01,  0.00E-02,  0.00E-15,  0.00E-15,  0.00E-15]] 
+    nz = [[params['NZ0'].value, 0.00E-01,  0.00E-01,  0.00E-01,  0.00E-02,  0.00E-15,  0.00E-15,  0.00E-15], # FREE NZ
+        [params['NZ1'].value, 0.00E-01,  0.00E-01,  0.00E-01,  0.00E-02,  0.00E-15,  0.00E-15,  0.00E-15]] 
 
-    #Create Files
-    #######################################################################################################
-    #creates surface files
-    createSrf(filename = "firstInv555", srfFileName="oceanl555test", alam=0.55496) # TODO include f7 here
-    createSrf(filename = "firstInv410", srfFileName="oceanl410test", alam=0.41027)
-    createSrf(filename = "firstInv470", srfFileName="oceanl470test", alam=0.46913)
-    createSrf(filename = "firstInv670", srfFileName="oceanl670test", alam=0.67001)
-    createSrf(filename = "firstInv864", srfFileName="oceanl864test", alam=0.86351)
-    createSrf(filename = "firstInv1589", srfFileName="oceanl1589test", alam=1.58886)
-    createSrf(filename = "firstInv2264", srfFileName="oceanl2264test", alam=2.26438)
+    f0A = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    f1A = [1.1,1.1,1.1,1.1,1.1,1.1,1.1]
+    f2A = [0.025,0.0,0.025,0.025,0.025,0.025,0.025]
+    f3A = [2.0,0.03422,2.0,2.0,2.0,2.0,2.0]
+    f4A = [1.0,0.00389,1.0,1.0,1.0,1.0,1.0]
+    f5A = [1.34, 1.3386, 1.3362, 1.331, 1.330, 1.3182, 1.2875]
+    f6A = [0.00, 0.0, 0.0, 0.0, 0.0, 0.000104, 0.000419]
+    f7A = [params['F7'].value,0.0143,0.0143,0.0143,0.0143,0.0143,0.0143] #TODO set free #Wind Speed
+    f8A = [1.0,1.0,1.0,1.0,1.0,1.0,1.0]
+    isurf = [1,4,1,1,1,1,1]
 
-    #Creates .info file
-    createInfo(NLAM=7, ALBEDO=alb, ALAM=lam, SRFFILELIST=srf, RSPFILELIST=rsp, NTYPE=2, NLAYER=5, R1 = 0.000000,
-                        R2=10.00000, NSD = 3,  A=a, B=b, NR=nr, NI=ni, NZITEMS= nz, REFRACFILELIST=refrac, DELP=delp)
+    createAllInput(NLAM=7, ALBEDO=alb, ALAM=lam, SRFFILELIST=srf, RSPFILELIST=rsp, NTYPE=2, NLAYER=5, R1 = 0.000000,
+                           R2=10.00000, NSD = 3,  A=a, B=b, NR=nr, NI=ni, NZITEMS= nz, REFRACFILELIST=refrac, DELP=delp, f0Arr= f0A,
+                              f1Arr=f1A, f2Arr=f2A, f3Arr= f3A, f4Arr= f4A, f5Arr=f5A, f6Arr= f6A, f7Arr=f7A, f8Arr=f8A, ISURFArr=isurf)
 
-    print('bash')
-    os.system(r'C:\\msys64\\msys2 bash shell.sh')
+    print('---Creating Surface Files---')
+    createSurfaceFiles()
+    print('---Running Bash---')
+    os.system(r'C:\\msys64\\msys2 bash shell.sh 0 1')
+    print('---Waiting for Bash---')
+    wait(lambda: is2264Update())
+    print('Done Waiting\n')
+
+def isSurfaceFilesDone():
+    times = {}
+    for wl in wl_list:
+        times[wl] = os.path.getmtime(f'{rt_dir}oceanl{wl}test')
+    time.sleep(1)
+    for key in times:
+        print(times[key], os.path.getmtime(f'{rt_dir}oceanl{key}test'))
+        if times[key] != os.path.getmtime(f'{rt_dir}oceanl{key}test'):
+            return False
+    return True
+    
+#Creates all the surface files simulataneously 
+def createSurfaceFiles():
+    for wl in wl_list:
+        os.system(f'C:\\msys64\\msys2 bash shell.sh {wl} 0')
+    print('---Waiting for Surface---')
+    wait(lambda: isSurfaceFilesDone())
+    print('Done Waiting\n')
+
+
+
+
+#Returns a dictionary with wavelength objects
+def readFiles():    
+
+    #Wavelength Datas
+    wds = {}
+
+    #w = wavelengthData(f'{rt_dir}firstInv2264.rsp')
+    
+    print('Reading .rsp files...')
+    for wl in wl_list:
+        wds[wl] = wavelengthData(f'{rt_dir}firstInv{wl}.rsp')
+    #for key in wd_list: print(key)
+    #print(wds['410'].THETAV)
+
+    #plt.plot(wds['410'].THETAV, wds['410'].RV11, color = "#7e00db", label="410",linewidth = 0.5)
+    #plt.show()
+
+
+    ##### Test plotting pickle with dictionary data
+    # nwls = importPickles()
+    # plt.plot(wds['410'].THETAV, nwls['410rv11'], color = "#7e00db", label="410",linewidth = 0.5)
+    # plt.show()
+
+    return wds
+
+
+def calcResidual(wds, nwls):
+    print('---Calculating Residual---')
+    return nwls['410rv11'] - wds['410'].RV11
+
+
+def getResidual(params):
+    createFiles(params)
+    wds = readFiles()
+    nwls = importPickles()
+
+    resid = calcResidual(wds, nwls)
+    print('Average Residual: ',sum(resid)/len(resid))
+    #return resid
+    #print(resid)
+
+
+def importPickles():
+    #list of noisy wavelengths from Gabe
+    nwls = {}
+
+    for wl in wl_list:
+        with open(f'./data/noisy_radiances/{wl}/firstInv{wl}rv11.pkl', 'rb') as f: data = pickle.load(f)
+        nwls[f'{wl}rv11'] = data
+        with open(f'./data/noisy_radiances/{wl}/firstInv{wl}rv21.pkl', 'rb') as f: data = pickle.load(f)
+        nwls[f'{wl}rv21'] = data
+        with open(f'./data/noisy_radiances/{wl}/firstInv{wl}rv31.pkl', 'rb') as f: data = pickle.load(f)
+        nwls[f'{wl}rv31'] = data
+
+    #for key in nwls: print(key)
+    print('---Reading pickles---')
+    return nwls
 
 def invert():
+    
+    params = Parameters()
+    params.add('F7', value=0.0) #Solution : .0143
+    params.add('NZ0', value=0.0) #Solutions : 1.00E-02
+    params.add('NZ1', value=0.0) #Solution : 3.500E-02
+
+
+    mini = Minimizer(getResidual, params, fcn_args=())
+    result = mini.leastsq()
+
+    print(result.params)
+
+
+
+#importPickles()
+#invert()
+#readFiles()
+#print(calcResidual(readFiles(), importPickles()))
+invert()

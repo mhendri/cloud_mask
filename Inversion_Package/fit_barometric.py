@@ -50,10 +50,8 @@ def get_residual(params, x, data=None):
     h = [h*1000 for h in x]
     #h = np.array(h)
 
-    
     #model = Pb * (((Tb + Lb * (h - hb))/(Tb))**((-g*M) / (R*Lb))) / 100
     #print(model)
-    
     model=[]
     for i in range(len(h)):
         pressure = Pb * (((Tb + Lb * (h[i] - hb))/(Tb))**((-g*M) / (R*Lb))) / 100
@@ -65,20 +63,13 @@ def get_residual(params, x, data=None):
         #print(model)
         #plt.show()
 
-    
     plt.plot(heights, model)
     plt.show()
     plt.plot(heights, data-model)
     plt.show()
-    
-    #print(data[0], sum(model))
 
     return data-model
 
-
-# print(std[:5])
-# print(mean[:5])
-# print(len(mean))
 
 std_p1 = [mean[i]+std[i] for i in range(len(mean))]
 std_n1 = [mean[i]-std[i] for i in range(len(mean))]

@@ -2,6 +2,9 @@ import os
 import pickle
 import math
 
+import sys
+sys.path.insert(0, 'C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/g_code/')
+
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -110,4 +113,30 @@ import pyautogui
 #proc_stdout = process.communicate()[0].decode()
 #print(proc_stdout)
 
-os.system(r'C:\\msys64\\msys2 bash shell.sh')
+os.system(r'C:\\msys64\\msys2 bash shell.sh 1589 0')
+
+for i in range(100):
+    #if i % 100000 == 0: 
+    print(os.path.getmtime(f'./rt_code/rt_code/oceanl1589test'))
+
+
+
+# ###############################################################################
+# g_code Test
+# from g_code.wavelengthData import wavelengthData
+
+# fi = wavelengthData('./rt_code/rt_code/firstInv2264.rsp')
+
+# print(fi.THETAV)
+
+
+
+# ###############################################################################
+# open pickled noisy
+# with open('./data/noisy_radiances/410/firstInv410rv11.pkl', 'rb') as f: #load in meanArr
+#     list = pickle.load(f)
+
+# print(list[1])
+
+#C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/info/
+#C:\Users\Iraz\Documents\Docs\Programs\Cloud_mask\Inversion_Package\rt_code\rt_code\info\standard.info
