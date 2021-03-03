@@ -33,13 +33,12 @@ last_update_time = os.path.getmtime(f'{rt_dir}firstInv2264.rsp')
 def is2264Update():
     if last_update_time != os.path.getmtime(f'{rt_dir}firstInv2264.rsp'):
         return True
-    #print(last_update_time, os.path.getmtime(f'{rt_dir}firstInv2264.rsp'))
     return False
 
 
 #Creates surface and info files
 def createFiles(params):
-    print('---Creating Surface/Info Files---')
+    print(f"---Creating All Inputs--- : {time.strftime(r'%X')}")
     #Set Variables
     #######################################################################################################
     #List of wavelengths corresponds to list from .info file - Alam=0.55...
@@ -77,7 +76,8 @@ def createFiles(params):
     f4A = [1.0,0.00389,1.0,1.0,1.0,1.0,1.0]
     f5A = [1.34, 1.3386, 1.3362, 1.331, 1.330, 1.3182, 1.2875]
     f6A = [0.00, 0.0, 0.0, 0.0, 0.0, 0.000104, 0.000419]
-    f7A = [params['F7'].value,0.0143,0.0143,0.0143,0.0143,0.0143,0.0143] #TODO set free #Wind Speed
+    # f7A = [0.0143,0.0143,0.0143,0.0143,0.0143,0.0143,0.0143] #Actual
+    f7A = [params['F7'].value,0.0143,0.0143,0.0143,0.0143,0.0143,0.0143] #TODO make all free
     f8A = [1.0,1.0,1.0,1.0,1.0,1.0,1.0]
     isurf = [1,4,1,1,1,1,1]
 
@@ -85,13 +85,19 @@ def createFiles(params):
                            R2=10.00000, NSD = 3,  A=a, B=b, NR=nr, NI=ni, NZITEMS= nz, REFRACFILELIST=refrac, DELP=delp, f0Arr= f0A,
                               f1Arr=f1A, f2Arr=f2A, f3Arr= f3A, f4Arr= f4A, f5Arr=f5A, f6Arr= f6A, f7Arr=f7A, f8Arr=f8A, ISURFArr=isurf)
 
-    print('---Creating Surface Files---')
+    print(f'\nParameter Update\n________________\nF7 = {params["F7"].value}\nNZ0 = {params["NZ0"].value}\nNZ1 = {params["NZ1"].value}\n')
+
+    print(f'---Creating Surface Files--- : {time.strftime("%X")}')
     createSurfaceFiles()
-    print('---Running Bash---')
-    os.system(r'C:\\msys64\\msys2 bash shell.sh 0 1')
-    print('---Waiting for Bash---')
-    wait(lambda: is2264Update())
-    print('Done Waiting\n')
+    time.sleep(1)
+    print(f'---Running RTC--- : {time.strftime(r"%X")}')
+    print(f'+++Command Sent: shell.sh 0 1')
+    log_dir = f'{os.getcwd()}\Logs\\'
+    os.system(f'C:\\msys64\\msys2 bash shell.sh 0 1 {log_dir}{time.strftime(r"%X").replace(":","_")}.txt')
+    print(f'---Waiting for RTC--- : {time.strftime(r"%X")}')
+    #wait(lambda: is2264Update())
+    time.sleep(40)
+    print(f'---Done Waiting--- : {time.strftime(r"%X")}\n')
 
 def isSurfaceFilesDone():
     times = {}
@@ -99,61 +105,73 @@ def isSurfaceFilesDone():
         times[wl] = os.path.getmtime(f'{rt_dir}oceanl{wl}test')
     time.sleep(1)
     for key in times:
-        print(times[key], os.path.getmtime(f'{rt_dir}oceanl{key}test'))
+        #print(times[key], os.path.getmtime(f'{rt_dir}oceanl{key}test'))
         if times[key] != os.path.getmtime(f'{rt_dir}oceanl{key}test'):
             return False
+    print(times[key], os.path.getmtime(f'{rt_dir}oceanl{wl}test'))
     return True
     
 #Creates all the surface files simulataneously 
 def createSurfaceFiles():
     for wl in wl_list:
+        print(f'+++Command Sent: shell.sh {wl} 0')
         os.system(f'C:\\msys64\\msys2 bash shell.sh {wl} 0')
-    print('---Waiting for Surface---')
+    print(f'---Waiting for Surface--- : {time.strftime(r"%X")}')
     wait(lambda: isSurfaceFilesDone())
-    print('Done Waiting\n')
-
-
+    print(f'---Done Waiting--- : {time.strftime(r"%X")}\n')
 
 
 #Returns a dictionary with wavelength objects
 def readFiles():    
-
     #Wavelength Datas
     wds = {}
-
     #w = wavelengthData(f'{rt_dir}firstInv2264.rsp')
     
-    print('Reading .rsp files...')
+    print(f'---Reading .rsp files--- : {time.strftime(r"%X")}')
     for wl in wl_list:
         wds[wl] = wavelengthData(f'{rt_dir}firstInv{wl}.rsp')
     #for key in wd_list: print(key)
     #print(wds['410'].THETAV)
 
-    #plt.plot(wds['410'].THETAV, wds['410'].RV11, color = "#7e00db", label="410",linewidth = 0.5)
+    # # WRITE RV11 to pkl
+    # with open('actualnum.pkl', 'wb') as f:
+    #     pickle.dump(wds['555'].RV11, f)
+
+    # with open('crazynum.pkl', 'rb') as f: crazynum= pickle.load(f)
+    # print(crazynum[0], wds['555'].RV11[0])
+
+    plt.plot(wds['555'].THETAV, wds['555'].RV11, color = "#7e00db", label="410",linewidth = 0.5)
     #plt.show()
 
 
     ##### Test plotting pickle with dictionary data
-    # nwls = importPickles()
-    # plt.plot(wds['410'].THETAV, nwls['410rv11'], color = "#7e00db", label="410",linewidth = 0.5)
-    # plt.show()
+    nwls = importPickles()
+    plt.plot(wds['555'].THETAV, nwls['555rv11'], color = "green", label="410",linewidth = 0.5)
+    #plt.show()
 
     return wds
 
 
 def calcResidual(wds, nwls):
-    print('---Calculating Residual---')
-    return nwls['410rv11'] - wds['410'].RV11
+    print(f'---Calculating Residual--- : {time.strftime(r"%X")}')
+    # print(sum(wds['555'].RV11 - nwls['555rv11']))
+    # return wds['555'].RV11 - nwls['555rv11'] #Noisy wavelength residual
+    with open('crazynum.pkl', 'rb') as f: actualnum = pickle.load(f)
+    print(f'current:{wds["555"].RV11}')
+    print(f'actualnum:{actualnum}')
+    print(wds['555'].RV11 - actualnum)
+    return wds['555'].RV11 - actualnum
 
 
 def getResidual(params):
+    print('\n\n===================================New Run')
     createFiles(params)
     wds = readFiles()
     nwls = importPickles()
 
     resid = calcResidual(wds, nwls)
     print('Average Residual: ',sum(resid)/len(resid))
-    #return resid
+    return resid
     #print(resid)
 
 
@@ -170,15 +188,16 @@ def importPickles():
         nwls[f'{wl}rv31'] = data
 
     #for key in nwls: print(key)
-    print('---Reading pickles---')
+    print(f'---Reading pickles--- : {time.strftime(r"%X")}')
     return nwls
+
 
 def invert():
     
     params = Parameters()
-    params.add('F7', value=0.0) #Solution : .0143
-    params.add('NZ0', value=0.0) #Solutions : 1.00E-02
-    params.add('NZ1', value=0.0) #Solution : 3.500E-02
+    params.add('F7', value=0.000000, min=0, max=0.02) #Solution : .0143
+    params.add('NZ0', value=0.000000, min=0, max=0.1) #Solutions : 1.00E-02
+    params.add('NZ1', value=0.000000, min=0, max=0.1) #Solution : 3.500E-02
 
 
     mini = Minimizer(getResidual, params, fcn_args=())

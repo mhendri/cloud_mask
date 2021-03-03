@@ -49,11 +49,16 @@ fi
 if [ $2 = '1' ]
 then
     echo "Running vec_generate_obs.exe info/standard.info"
-    time ./vec_generate_obs.exe info/standard.info 0 1
+    sleep 1
+    if [ -n "$3" ]
+    then
+        time ./vec_generate_obs.exe info/standard.info 0 1 | tee $3
+    else
+        time ./vec_generate_obs.exe info/standard.info 0 1
+    fi
 fi
 
 echo "Complete"
-sleep 1
 
 
 

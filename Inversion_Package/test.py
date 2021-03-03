@@ -1,8 +1,11 @@
 import os
 import pickle
 import math
-
+import time
 import sys
+import subprocess
+import pyautogui
+
 sys.path.insert(0, 'C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/g_code/')
 
 import numpy as np
@@ -11,6 +14,21 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 os.chdir('./Inversion_Package/')
+
+
+###
+# ###############################################################################
+# Random
+
+# print(time.strftime(r'%X'))
+
+
+
+
+
+
+
+
 # ###############################################################################
 # Barometric Test
 
@@ -61,8 +79,9 @@ os.chdir('./Inversion_Package/')
 
 # get_residual()
 
-
-
+print('hello')
+time.sleep(3)
+print('hello')
 
 
 
@@ -81,8 +100,6 @@ os.chdir('./Inversion_Package/')
 #this guy 
 #C:\msys64\msys2_shell.cmd -mingw64 -c "/c/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/vec_generate_obs.exe info/vecgen_aer_ocean.info 0 1"
 
-import subprocess
-import pyautogui
 
 #userCmd = 'C:\msys64\msys2_shell.cmd -mingw64 -defterm "/c/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/vec_generate_obs.exe info/vecgen_aer_ocean.info 0 1'
 # userCmd = 'C:\msys64\msys2 -mingw64 -defterm "/c/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/vec_generate_obs.exe info/vecgen_aer_ocean.info 0 1'
@@ -113,11 +130,14 @@ import pyautogui
 #proc_stdout = process.communicate()[0].decode()
 #print(proc_stdout)
 
-os.system(r'C:\\msys64\\msys2 bash shell.sh 1589 0')
+# print(f'\n\n{os.getcwd()}')
 
-for i in range(100):
-    #if i % 100000 == 0: 
-    print(os.path.getmtime(f'./rt_code/rt_code/oceanl1589test'))
+# log_dir = f'{os.getcwd()}\Logs\\'
+# os.system(f'C:\\msys64\\msys2 bash shell.sh 0 1 {log_dir}sample.txt')
+
+# for i in range(100):
+#     #if i % 100000 == 0: 
+#     print(os.path.getmtime(f'./rt_code/rt_code/oceanl1589test'))
 
 
 
