@@ -80,4 +80,8 @@ a000u.rsp >>> read by python script
 python read script >>> inversion code 
 
 inversion code >>> info file
+
+misc:::
+./vec_generate_obs.exe info/standard.info 0 1
+./vec_generate_obs.exe info/vecgen_aer_ocean.info 0 1
 '''

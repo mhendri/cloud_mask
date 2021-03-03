@@ -130,6 +130,7 @@ def readFiles():
     print(f'---Reading .rsp files--- : {time.strftime(r"%X")}')
     for wl in wl_list:
         wds[wl] = wavelengthData(f'{rt_dir}firstInv{wl}.rsp')
+        print(f'---Reading: {rt_dir}firstInv{wl}.rsp')
     #for key in wd_list: print(key)
     #print(wds['410'].THETAV)
 
@@ -139,16 +140,26 @@ def readFiles():
 
     # with open('crazynum.pkl', 'rb') as f: crazynum= pickle.load(f)
     # print(crazynum[0], wds['555'].RV11[0])
+    vao4 = wavelengthData(f'{rt_dir}a00u500cc110410.rsp')
+    vao5 = wavelengthData(f'{rt_dir}a00u500cc110555.rsp')
+    vao2 = wavelengthData(f'{rt_dir}a00u500cc1102260.rsp')
+    plt.plot(vao4.THETAV, vao4.RV11, color = 'green', linewidth = 0.2)
+    plt.plot(vao5.THETAV, vao5.RV11, color = 'purple', linewidth = 0.2)
+    plt.plot(vao2.THETAV, vao2.RV11, color = 'black', linewidth = 0.2)
+    plt.show()
 
-    plt.plot(wds['555'].THETAV, wds['555'].RV11, color = "#7e00db", label="410",linewidth = 0.5)
+    plt.plot(wds['555'].THETAV, wds['555'].RV11, color = "red", label="410",linewidth = 0.2)
     #plt.show()
 
 
-    ##### Test plotting pickle with dictionary data
-    nwls = importPickles()
-    plt.plot(wds['555'].THETAV, nwls['555rv11'], color = "green", label="410",linewidth = 0.5)
-    #plt.show()
+    # ##### Test plotting pickle with dictionary data
+    # nwls = importPickles()
+    # plt.plot(wds['555'].THETAV, nwls['555rv11'], color = "green", label="410",linewidth = 0.5)
+    # #plt.show()
 
+    with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
+    plt.plot(wds['555'].THETAV, actualnum, color = "green", label="410",linewidth = 0.2)
+    plt.show()
     return wds
 
 
@@ -156,9 +167,9 @@ def calcResidual(wds, nwls):
     print(f'---Calculating Residual--- : {time.strftime(r"%X")}')
     # print(sum(wds['555'].RV11 - nwls['555rv11']))
     # return wds['555'].RV11 - nwls['555rv11'] #Noisy wavelength residual
-    with open('crazynum.pkl', 'rb') as f: actualnum = pickle.load(f)
-    print(f'current:{wds["555"].RV11}')
-    print(f'actualnum:{actualnum}')
+    with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
+    print(f'current:{wds["555"].RV11[0]}')
+    print(f'actualnum:{actualnum[0]}')
     print(wds['555'].RV11 - actualnum)
     return wds['555'].RV11 - actualnum
 
@@ -195,9 +206,9 @@ def importPickles():
 def invert():
     
     params = Parameters()
-    params.add('F7', value=0.000000, min=0, max=0.02) #Solution : .0143
-    params.add('NZ0', value=0.000000, min=0, max=0.1) #Solutions : 1.00E-02
-    params.add('NZ1', value=0.000000, min=0, max=0.1) #Solution : 3.500E-02
+    params.add('F7', value=0.02, min=0, max=0.04) #Solution : .0143 #TODO Max to 15m/s wind speed
+    params.add('NZ0', value=1E-2, min=0, max=0.1) #Solutions : 1.00E-02
+    params.add('NZ1', value=1E-2, min=0, max=0.1) #Solution : 3.500E-02
 
 
     mini = Minimizer(getResidual, params, fcn_args=())
@@ -212,3 +223,4 @@ def invert():
 #readFiles()
 #print(calcResidual(readFiles(), importPickles()))
 invert()
+plt.show()
