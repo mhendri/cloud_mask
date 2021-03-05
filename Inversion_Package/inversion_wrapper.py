@@ -84,7 +84,7 @@ def createFiles(params):
     createAllInput(NLAM=7, ALBEDO=alb, ALAM=lam, SRFFILELIST=srf, RSPFILELIST=rsp, NTYPE=2, NLAYER=5, R1 = 0.000000,
                            R2=10.00000, NSD = 3,  A=a, B=b, NR=nr, NI=ni, NZITEMS= nz, REFRACFILELIST=refrac, DELP=delp, f0Arr= f0A,
                               f1Arr=f1A, f2Arr=f2A, f3Arr= f3A, f4Arr= f4A, f5Arr=f5A, f6Arr= f6A, f7Arr=f7A, f8Arr=f8A, ISURFArr=isurf)
-
+    time.sleep(1)
     print(f'\nParameter Update\n________________\nF7 = {params["F7"].value}\nNZ0 = {params["NZ0"].value}\nNZ1 = {params["NZ1"].value}\n')
 
     print(f'---Creating Surface Files--- : {time.strftime("%X")}')
@@ -103,12 +103,12 @@ def isSurfaceFilesDone():
     times = {}
     for wl in wl_list:
         times[wl] = os.path.getmtime(f'{rt_dir}oceanl{wl}test')
-    time.sleep(1)
+    time.sleep(2)
     for key in times:
         #print(times[key], os.path.getmtime(f'{rt_dir}oceanl{key}test'))
         if times[key] != os.path.getmtime(f'{rt_dir}oceanl{key}test'):
             return False
-    print(times[key], os.path.getmtime(f'{rt_dir}oceanl{wl}test'))
+    #print(times[key], os.path.getmtime(f'{rt_dir}oceanl{wl}test'))
     return True
     
 #Creates all the surface files simulataneously 
@@ -140,13 +140,15 @@ def readFiles():
 
     # with open('crazynum.pkl', 'rb') as f: crazynum= pickle.load(f)
     # print(crazynum[0], wds['555'].RV11[0])
-    vao4 = wavelengthData(f'{rt_dir}a00u500cc110410.rsp')
-    vao5 = wavelengthData(f'{rt_dir}a00u500cc110555.rsp')
-    vao2 = wavelengthData(f'{rt_dir}a00u500cc1102260.rsp')
-    plt.plot(vao4.THETAV, vao4.RV11, color = 'green', linewidth = 0.2)
-    plt.plot(vao5.THETAV, vao5.RV11, color = 'purple', linewidth = 0.2)
-    plt.plot(vao2.THETAV, vao2.RV11, color = 'black', linewidth = 0.2)
-    plt.show()
+
+    ### Plots vecgen_aer_ocean.rsp stuff 
+    # vao4 = wavelengthData(f'{rt_dir}a00u500cc110410.rsp')
+    # vao5 = wavelengthData(f'{rt_dir}a00u500cc110555.rsp')
+    # vao2 = wavelengthData(f'{rt_dir}a00u500cc1102260.rsp')
+    # plt.plot(vao4.THETAV, vao4.RV11, color = 'green', linewidth = 0.2)
+    # plt.plot(vao5.THETAV, vao5.RV11, color = 'purple', linewidth = 0.2)
+    # plt.plot(vao2.THETAV, vao2.RV11, color = 'black', linewidth = 0.2)
+    # plt.show()
 
     plt.plot(wds['555'].THETAV, wds['555'].RV11, color = "red", label="410",linewidth = 0.2)
     #plt.show()
@@ -159,7 +161,7 @@ def readFiles():
 
     with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
     plt.plot(wds['555'].THETAV, actualnum, color = "green", label="410",linewidth = 0.2)
-    plt.show()
+    #plt.show()
     return wds
 
 
@@ -170,8 +172,8 @@ def calcResidual(wds, nwls):
     with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
     print(f'current:{wds["555"].RV11[0]}')
     print(f'actualnum:{actualnum[0]}')
-    print(wds['555'].RV11 - actualnum)
-    return wds['555'].RV11 - actualnum
+    #print(actualnum - wds['555'].RV11)
+    return actualnum - wds['555'].RV11
 
 
 def getResidual(params):
@@ -206,7 +208,7 @@ def importPickles():
 def invert():
     
     params = Parameters()
-    params.add('F7', value=0.02, min=0, max=0.04) #Solution : .0143 #TODO Max to 15m/s wind speed
+    params.add('F7', value=0.0133, min=0, max=0.04, brute_step=0.01) #Solution : .0143 #TODO Max to 15m/s wind speed
     params.add('NZ0', value=1E-2, min=0, max=0.1) #Solutions : 1.00E-02
     params.add('NZ1', value=1E-2, min=0, max=0.1) #Solution : 3.500E-02
 
