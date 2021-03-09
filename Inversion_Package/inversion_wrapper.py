@@ -172,8 +172,8 @@ def calcResidual(wds, nwls):
     with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
     print(f'current:{wds["555"].RV11[0]}')
     print(f'actualnum:{actualnum[0]}')
-    #print(actualnum - wds['555'].RV11)
-    return actualnum - wds['555'].RV11
+    #print(wds['555'].RV11 - actualnum)
+    return wds['555'].RV11 - actualnum
 
 
 def getResidual(params):
@@ -208,7 +208,11 @@ def importPickles():
 def invert():
     
     params = Parameters()
-    params.add('F7', value=0.0133, min=0, max=0.04, brute_step=0.01) #Solution : .0143 #TODO Max to 15m/s wind speed
+    # params.add('F7', value=0.0133, min=0, max=0.04) #Solution : .0143 #TODO Max to 15m/s wind speed
+    # params.add('NZ0', value=1E-2, min=0, max=0.1) #Solutions : 1.00E-02
+    # params.add('NZ1', value=1E-2, min=0, max=0.1) #Solution : 3.500E-02
+
+    params.add('F7', value=0.0133, min=0, max=0.04) #Solution : .0143 #TODO Max to 15m/s wind speed
     params.add('NZ0', value=1E-2, min=0, max=0.1) #Solutions : 1.00E-02
     params.add('NZ1', value=1E-2, min=0, max=0.1) #Solution : 3.500E-02
 
@@ -217,6 +221,7 @@ def invert():
     result = mini.leastsq()
 
     print(result.params)
+    print(result.message)
 
 
 

@@ -30,7 +30,7 @@ with open('data/Lbtropical.pkl', 'rb') as f:
     Lbtrop = pickle.load(f)
 
 
-print(Lbtrop[0])
+print(Lbtrop[0]/1000)
 
 ###############################################################################
 #Residual Function
@@ -86,7 +86,7 @@ data = (mean + np.random.normal(0, std[0], 50))
 
 
 params = Parameters()
-params.add('Lb', value=-1) #Temperature Lapse Rate
+params.add('Lb', value=1, min=-10, max=10) #Temperature Lapse Rate
 #params.add('h', value=0.0) #Height at which 
 
 #Tropics
@@ -98,11 +98,12 @@ np.random.seed(0)
 ptrop = (ptrop + np.random.normal(0,5,50))
 
 plt.plot(heights,ptrop)
-plt.show()
+#plt.show()
 
-mini = Minimizer(get_residual, params, fcn_args=(heights, ptrop))
-result = mini.leastsq()
+mini = Minimizer(get_residual, params,method='brute', fcn_args=(heights, ptrop))
+result = mini.brute()
 print(result.params)
+
 
 fit = get_residual(result.params, heights, ptrop)
 

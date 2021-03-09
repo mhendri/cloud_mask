@@ -5,6 +5,7 @@ import time
 import sys
 import subprocess
 import pyautogui
+import lmfit
 
 sys.path.insert(0, 'C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/g_code/')
 
@@ -21,8 +22,6 @@ os.chdir('./Inversion_Package/')
 # Random
 
 # print(time.strftime(r'%X'))
-
-
 
 
 
@@ -79,9 +78,9 @@ os.chdir('./Inversion_Package/')
 
 # get_residual()
 
-print('hello')
-time.sleep(3)
-print('hello')
+# print('hello')
+# time.sleep(3)
+# print('hello')
 
 
 
