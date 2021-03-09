@@ -95,7 +95,7 @@ def createFiles(params):
     log_dir = f'{os.getcwd()}\Logs\\'
     os.system(f'C:\\msys64\\msys2 bash shell.sh 0 1 {log_dir}{time.strftime(r"%X").replace(":","_")}.txt')
     print(f'---Waiting for RTC--- : {time.strftime(r"%X")}')
-    #wait(lambda: is2264Update())
+    #wait(lambda: is2264Update()) #TODO FIX
     time.sleep(40)
     print(f'---Done Waiting--- : {time.strftime(r"%X")}\n')
 
@@ -208,10 +208,6 @@ def importPickles():
 def invert():
     
     params = Parameters()
-    # params.add('F7', value=0.0133, min=0, max=0.04) #Solution : .0143 #TODO Max to 15m/s wind speed
-    # params.add('NZ0', value=1E-2, min=0, max=0.1) #Solutions : 1.00E-02
-    # params.add('NZ1', value=1E-2, min=0, max=0.1) #Solution : 3.500E-02
-
     params.add('F7', value=0.0133, min=0, max=0.04) #Solution : .0143 #TODO Max to 15m/s wind speed
     params.add('NZ0', value=1E-2, min=0, max=0.1) #Solutions : 1.00E-02
     params.add('NZ1', value=1E-2, min=0, max=0.1) #Solution : 3.500E-02
