@@ -68,7 +68,8 @@ INSTRUCTIONS:
 shell.sh 410 1
 
 The first paramter is the wavelength for generating surface files
-The third parameter is for running vec_generate_obs
+The second parameter is for running vec_generate_obs
+The third is the directory you want to log in - optional
 
 
 info file >>> vec_generate_obs.exe
