@@ -7,7 +7,7 @@ Fitting multiple (simulated) Gaussian data sets simultaneously.
 All minimizers require the residual array to be one-dimensional. Therefore, in
 the ``objective`` we need to ```flatten``` the array before returning it.
 
-TODO: this should be using the Model interface / built-in models!
+: this should be using the Model interface / built-in models!
 
 """
 import matplotlib.pyplot as plt
