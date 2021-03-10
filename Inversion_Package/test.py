@@ -22,6 +22,11 @@ os.chdir('./Inversion_Package/')
 # Random
 
 # print(time.strftime(r'%X'))
+start_time = time.time()
+
+time.sleep(20)
+
+print(f"--- {round((time.time() - start_time)/60,2)} minutes ---")
 
 
 

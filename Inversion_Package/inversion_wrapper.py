@@ -20,12 +20,23 @@ from lmfit import Minimizer, Parameters
 from g_code.createInfo import createInfo, createSrf, createAllInput
 from g_code.wavelengthData import wavelengthData
 
-os.chdir('./Inversion_Package/')
 
+#Housekeeping
+#---------------------------------------------------------------------------------------------------------------#
+#Start counting total runtime
+start_time = time.time()
+#Changes dir to the inversion_package directory if you're working from my full repo
+os.chdir('./Inversion_Package/')
 #List of all wavelengths
 wl_list = ['410', '470', '555', '670', '864', '1589', '2264']
-#Directory for rt_code
+#Directory for rt_code which contains things such as vec_generate_obs.exe
 rt_dir = './rt_code/rt_code/'
+#---------------------------------------------------------------------------------------------------------------#
+
+
+#Returns the current time 
+def getTime():
+    return time.strftime(r'%X')
 
 
 #Check if firstInv2264.rsp has been updated
@@ -90,14 +101,14 @@ def createFiles(params):
     print(f'---Creating Surface Files--- : {time.strftime("%X")}')
     createSurfaceFiles()
     time.sleep(1)
-    print(f'---Running RTC--- : {time.strftime(r"%X")}')
+    print(f'---Running RTC--- : {getTime()}')
     print(f'+++Command Sent: shell.sh 0 1')
     log_dir = f'{os.getcwd()}\Logs\\'
-    os.system(f'C:\\msys64\\msys2 bash shell.sh 0 1 {log_dir}{time.strftime(r"%X").replace(":","_")}.txt')
-    print(f'---Waiting for RTC--- : {time.strftime(r"%X")}')
+    os.system(f'C:\\msys64\\msys2 bash shell.sh 0 1 {log_dir}{getTime().replace(":","_")}.txt')
+    print(f'---Waiting for RTC--- : {getTime()}')
     #wait(lambda: is2264Update()) #TODO FIX
     time.sleep(40)
-    print(f'---Done Waiting--- : {time.strftime(r"%X")}\n')
+    print(f'---Done Waiting--- : {getTime()}\n')
 
 def isSurfaceFilesDone():
     times = {}
@@ -116,9 +127,9 @@ def createSurfaceFiles():
     for wl in wl_list:
         print(f'+++Command Sent: shell.sh {wl} 0')
         os.system(f'C:\\msys64\\msys2 bash shell.sh {wl} 0')
-    print(f'---Waiting for Surface--- : {time.strftime(r"%X")}')
+    print(f'---Waiting for Surface--- : {getTime()}')
     wait(lambda: isSurfaceFilesDone())
-    print(f'---Done Waiting--- : {time.strftime(r"%X")}\n')
+    print(f'---Done Waiting--- : {getTime()}\n')
 
 
 #Returns a dictionary with wavelength objects
@@ -127,7 +138,7 @@ def readFiles():
     wds = {}
     #w = wavelengthData(f'{rt_dir}firstInv2264.rsp')
     
-    print(f'---Reading .rsp files--- : {time.strftime(r"%X")}')
+    print(f'---Reading .rsp files--- : {getTime()}')
     for wl in wl_list:
         wds[wl] = wavelengthData(f'{rt_dir}firstInv{wl}.rsp')
         print(f'---Reading: {rt_dir}firstInv{wl}.rsp')
@@ -166,7 +177,7 @@ def readFiles():
 
 
 def calcResidual(wds, nwls):
-    print(f'---Calculating Residual--- : {time.strftime(r"%X")}')
+    print(f'---Calculating Residual--- : {getTime()}')
     # print(sum(wds['555'].RV11 - nwls['555rv11']))
     # return wds['555'].RV11 - nwls['555rv11'] #Noisy wavelength residual
     with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
@@ -189,9 +200,10 @@ def getResidual(params):
 
 
 def importPickles():
-    #list of noisy wavelengths from Gabe
+    #Dictionary of noisy wavelengths from Gabe
     nwls = {}
 
+    #Goes through the wavelengths and reads in all the noisy wavelength files for all
     for wl in wl_list:
         with open(f'./data/noisy_radiances/{wl}/firstInv{wl}rv11.pkl', 'rb') as f: data = pickle.load(f)
         nwls[f'{wl}rv11'] = data
@@ -200,30 +212,40 @@ def importPickles():
         with open(f'./data/noisy_radiances/{wl}/firstInv{wl}rv31.pkl', 'rb') as f: data = pickle.load(f)
         nwls[f'{wl}rv31'] = data
 
-    #for key in nwls: print(key)
-    print(f'---Reading pickles--- : {time.strftime(r"%X")}')
+    print(f'---Reading pickles--- : {getTime()}')
     return nwls
 
 
+#Main inversion method. Handles pretty much everything.
 def invert():
-    
     params = Parameters()
-    params.add('F7', value=0.0133, min=0, max=0.04) #Solution : .0143 #TODO Max to 15m/s wind speed
-    params.add('NZ0', value=1E-2, min=0, max=0.1) #Solutions : 1.00E-02
-    params.add('NZ1', value=1E-2, min=0, max=0.1) #Solution : 3.500E-02
+    # Important parameters of parameters:
+    # min, max - float
+    # value - float
+    # vary - Boolean. If True then it is free paramter meaning LMFit will change it. defaults to True
+    params.add('F7', value=0.0133, min=0, max=0.04) #Solution : .0143 
+    params.add('NZ0', value=0.02, min=0, max=0.1) #Solutions : 1.00E-02
+    params.add('NZ1', value=0.02, min=0, max=0.1) #Solution : 3.500E-02
 
 
-    mini = Minimizer(getResidual, params, fcn_args=())
+    # You need to pass a residual function as well as parameters here. 
+    # fcn_args=() allows you to pass parameters to your residual function.
+    # epsfcn= allows you to change the step size 
+    mini = Minimizer(getResidual, params, fcn_args=(), epsfcn=0.0001)
     result = mini.leastsq()
 
+    #Print out the results of the fit
+    print('__________________________________________')
     print(result.params)
-    print(result.message)
+    print('Lmfit Message: ', result.message)
 
 
 
-#importPickles()
-#invert()
-#readFiles()
-#print(calcResidual(readFiles(), importPickles()))
-invert()
-plt.show()
+#---------------------------------------------------------------------------------------------------------------#
+if __name__ == '__main__':
+    
+    invert()
+
+    #plt.show()
+    print(f"Total Runtime: {round((time.time() - start_time)/60,2)} minutes")
+
