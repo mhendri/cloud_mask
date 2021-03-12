@@ -74,7 +74,7 @@ The third is the directory you want to log in - optional
 
 info file >>> vec_generate_obs.exe
 
-vec_generate_obs.exe >>> a000u...{wavelenght}.rsp contains all radiances and other vars listed in section 6 readme
+vec_generate_obs.exe >>> a000u...{wavelength}.rsp contains all radiances and other vars listed in section 6 readme
 
 a000u.rsp >>> read by python script
 

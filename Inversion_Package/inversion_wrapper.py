@@ -89,8 +89,8 @@ def createFiles(params):
     f4A = [1.0,0.00389,1.0,1.0,1.0,1.0,1.0]
     f5A = [1.34, 1.3386, 1.3362, 1.331, 1.330, 1.3182, 1.2875]
     f6A = [0.00, 0.0, 0.0, 0.0, 0.0, 0.000104, 0.000419]
-    # f7A = [0.0143,0.0143,0.0143,0.0143,0.0143,0.0143,0.0143] #Actual
-    f7A = [params['F7'].value,0.0143,0.0143,0.0143,0.0143,0.0143,0.0143] #TODO make all free
+    # f7A = [0.0143,0.0143,0.0143,0.0143,0.0143,0.0143,0.0143] #Old F7 List
+    f7A = [params['F7'].value for x in range(7)]
     f8A = [1.0,1.0,1.0,1.0,1.0,1.0,1.0]
     isurf = [1,4,1,1,1,1,1]
 
@@ -128,6 +128,7 @@ def isSurfaceFilesDone():
             return False
     return True
     
+
 # Creates all the surface files simulataneously don't need to read this
 def createSurfaceFiles():
     for wl in wl_list:
@@ -173,17 +174,17 @@ def readFiles():
 
 
 
-    plt.plot(wds['555'].THETAV, wds['555'].RV11, color = "red", label="410",linewidth = 0.2)
+    #plt.plot(wds['555'].THETAV, wds['555'].RV11, color = "red", label="410",linewidth = 0.2)
     #plt.show()
 
 
     # ##### Test plotting pickle with dictionary data
-    # nwls = importPickles()
-    # plt.plot(wds['555'].THETAV, nwls['555rv11'], color = "green", label="410",linewidth = 0.5)
-    # #plt.show()
+    nwls = importPickles()
+    #plt.plot(wds['555'].THETAV, nwls['555rv11'], color = "green", label="410",linewidth = 0.5)
+    #plt.show()
 
-    with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
-    plt.plot(wds['555'].THETAV, actualnum, color = "green", label="410",linewidth = 0.2)
+    #with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
+    #plt.plot(wds['555'].THETAV, actualnum, color = "green", label="410",linewidth = 0.2)
     #plt.show()
     #######################################################################################################
     return wds
@@ -195,15 +196,41 @@ def calcResidual(wds, nwls):
     print(f'---Calculating Residual--- : {getTime()}')
     #TODO FIX THIS PART
     # print(sum(wds['555'].RV11 - nwls['555rv11']))
-    # return wds['555'].RV11 - nwls['555rv11'] #Noisy wavelength residual
+    thtv = [x for x in range(1050)]
+    residuals = []
+    models = []
+
+    for wl in wl_list:
+        residuals.append(wds[wl].RV11 - nwls[f'{wl}rv11'])
+
+        # residuals.append(wds[wl].RV21 - nwls[f'{wl}rv21'])
+        # residuals.append(wds[wl].RV31 - nwls[f'{wl}rv31'])
+
+        # thtv.append(wds[wl].THETAV)
+        # thtv.append(wds[wl].THETAV)
+        models.append(wds[wl].RV11)
+        # models.append(wds[wl].RV21)
+        # models.append(wds[wl].RV31)
+    thtv = np.array(thtv)
+    residuals = np.array(residuals).flatten()
+    models = np.array(models).flatten()
+
+    
+    #plt.plot(thtv, models)
+    #plt.show()
+
+    # plt.plot(thtv, residuals)
+    # plt.show()
+    return np.array(residuals) # List of all residuals
     
     # Reads in the pickle of the correct data that was produced by putting in the right answers 
     # for the variables and then generating the .rsp files. 
-    with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
-    print(f'current:{wds["555"].RV11[0]}')
-    print(f'actualnum:{actualnum[0]}')
+    #######################################################################################################
+    # with open('actualnum.pkl', 'rb') as f: actualnum = pickle.load(f)
+    # print(f'current:{wds["555"].RV11[0]}')
+    # print(f'actualnum:{actualnum[0]}')
 
-    return wds['555'].RV11 - actualnum
+    # return wds['555'].RV11 - actualnum
 
 
 # This is the residual function which you give to the minimzer object. 

@@ -22,13 +22,21 @@ os.chdir('./Inversion_Package/')
 # Random
 
 # print(time.strftime(r'%X'))
-start_time = time.time()
+# start_time = time.time()
 
-time.sleep(20)
+# time.sleep(20)
 
-print(f"--- {round((time.time() - start_time)/60,2)} minutes ---")
+# print(f"--- {round((time.time() - start_time)/60,2)} minutes ---")
 
 
+# lt = [6 for x in range(7)]
+# print(lt)
+
+test = np.array([[1,2,3],[4,5,6]])
+test = test+1
+print(test)
+
+#print(np.array(test).flatten())#.flatten())
 
 
 
@@ -160,7 +168,8 @@ print(f"--- {round((time.time() - start_time)/60,2)} minutes ---")
 # with open('./data/noisy_radiances/410/firstInv410rv11.pkl', 'rb') as f: #load in meanArr
 #     list = pickle.load(f)
 
-# print(list[1])
+# plt.plot()
+# # print(list[1])
 
 #C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/info/
 #C:\Users\Iraz\Documents\Docs\Programs\Cloud_mask\Inversion_Package\rt_code\rt_code\info\standard.info
