@@ -6,6 +6,7 @@ import sys
 import subprocess
 import pyautogui
 import lmfit
+import F2PY
 
 sys.path.insert(0, 'C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/g_code/')
 
