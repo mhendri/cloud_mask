@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from lmfit import Minimizer, Parameters
+from lmfit import Minimizer, Parameters, report_fit
 
 os.chdir('./Inversion_Package/')
 
@@ -100,10 +100,12 @@ ptrop = (ptrop + np.random.normal(0,5,50))
 plt.plot(heights,ptrop)
 #plt.show()
 
-mini = Minimizer(get_residual, params,method='brute', fcn_args=(heights, ptrop))
-result = mini.brute()
+mini = Minimizer(get_residual, params, fcn_args=(heights, ptrop))
+result = mini.leastsq()
 print(result.params)
-
+#print('\n\n\n',result.__dict__)
+report_fit(result)
+params.pretty_print()
 
 fit = get_residual(result.params, heights, ptrop)
 
