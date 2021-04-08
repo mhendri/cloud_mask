@@ -51,13 +51,16 @@ coords = [(-55, 59.5), (-55,67.5), (-60,67.5), (-60,75), (-73.25,75), (-73.25,79
 poly = Polygon(coords)
 
 
-def confuse(eightfivebelow):
+def confuse(eightfivebelow,st_year,ed_year):
     file_name_list = [f for f in listdir(data_path ) if isfile(join(data_path , f))]
     for f in file_name_list:
         st = time.time()
 
         #if not '1001' in f: continue
         #if not '2006-08-0' in f and not '2007-08-0' in f and not '2008-08-0' in f and not'2009-08-0'in f: continue
+        if not any(str(s) in f for s in [*range(st_year, ed_year+1)]): #skips if it is not in year
+            continue
+
         if ( f[11:19] != '333mMLay' ):
                 continue
 
@@ -95,8 +98,8 @@ def confuse(eightfivebelow):
         for index in range(bott, len(lat)):
             if (poly.contains(Point(lon[index], lat[index]))):
                 cor_inds.append(index)
-                if not index == (len(lat)-1) and not (poly.contains(Point(lon[index+1], lat[index+1]))):
-                    break
+                # if not index == (len(lat)-1) and not (poly.contains(Point(lon[index+1], lat[index+1]))):
+                #     break
         if len(cor_inds) < 10:
             print('---------------------SKIPPED!---------------------')
             continue
@@ -277,24 +280,29 @@ def mdToDf():
 
     return map_df
 
+
+def generateCSV(remove_sza_85plus='True', st_year=None, ed_year=None):
+    confuse(remove_sza_85plus,st_year,ed_year)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+    fdToDf().to_csv(f'./Task_4/csvs/cf_matrix_full_data_85bel_{st_year}-{ed_year}.csv', index=False)
+    
+    mdToDf().to_csv(f'./Task_4/csvs/cf_matrix_map_data_85bel_{st_year}-{ed_year}.csv', index=False)
+
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
 if __name__ == "__main__":
-    # confuse(False)
-    # print("--- %s seconds ---" % (time.time() - start_time))
 
-    # fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data.csv', index=False)
+    #Produce for individual years 2006-2009
+    #generateCSV(st_year=2006,ed_year=2006)
+    generateCSV(st_year=2007,ed_year=2007)
+    generateCSV(st_year=2008,ed_year=2008)
+    generateCSV(st_year=2009,ed_year=2009)
+
+    #Produce for all years 2006-2009
+    #generateCSV(st_year=2006,ed_year=2009)
+
     
-    # mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data.csv', index=False)
-
-
-    # for data that removes 85 and up
-    confuse(True)
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    fdToDf().to_csv('./Task_4/csvs/cf_matrix_full_data_85bel_6-9.csv', index=False)
-    
-    mdToDf().to_csv('./Task_4/csvs/cf_matrix_map_data_85bel_6-9.csv', index=False)
 
 
     

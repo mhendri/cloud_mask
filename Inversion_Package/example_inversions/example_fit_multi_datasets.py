@@ -26,6 +26,7 @@ def gauss_dataset(params, i, x):
     amp = params['amp_%i' % (i+1)]
     cen = params['cen_%i' % (i+1)]
     sig = params['sig_%i' % (i+1)]
+    
     return gauss(x, amp, cen, sig)
 
 
@@ -39,6 +40,7 @@ def objective(params, x, data):
         resid[i, :] = data[i, :] - gauss_dataset(params, i, x)
 
     # now flatten this to a 1D array, as minimize() needs
+    print(params['sig_%i' % (i+1)].value)
     return resid.flatten()
 
 

@@ -105,7 +105,7 @@ result = mini.leastsq()
 print(result.params)
 #print('\n\n\n',result.__dict__)
 report_fit(result)
-params.pretty_print()
+
 
 fit = get_residual(result.params, heights, ptrop)
 

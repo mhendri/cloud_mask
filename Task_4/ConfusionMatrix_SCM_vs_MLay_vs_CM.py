@@ -102,8 +102,8 @@ def confuse(eightfivebelow):
         for index in range(bott, len(lat)):
             if (poly.contains(Point(lon[index], lat[index]))):
                 cor_inds.append(index)
-                if not index == (len(lat)-1) and not (poly.contains(Point(lon[index+1], lat[index+1]))):
-                    break
+                # if not index == (len(lat)-1) and not (poly.contains(Point(lon[index+1], lat[index+1]))):
+                #     break
         if len(cor_inds) < 10:
             print('---------------------SKIPPED!---------------------')
             continue

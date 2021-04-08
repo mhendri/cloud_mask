@@ -92,7 +92,7 @@ def showAvaDay():
     plt.xlim(0,len(flist)-1)
     #plt.xlim(240,365)
 
-    plt.plot(range(len(flist)), flist, linewidth = 2, color='grey', label='85_above', alpha=0.7)
+    plt.plot(range(len(flist)), flist, linewidth = 2, color='grey', label='SZA > 85', alpha=0.7)
 
     tp, mon = openCSV(csv_old_85)[4], openCSV(csv_old_85)[5]
 
@@ -120,7 +120,7 @@ def showAvaDay():
     plt.xlim(0,len(flist)-1)
     #plt.xlim(240,365)
 
-    plt.plot(range(len(flist)), flist, linewidth = 2, color='red', label='85_below')
+    plt.plot(range(len(flist)), flist, linewidth = 2, color='red', label='SZA <= 85')
 
     plt.legend(loc='best', fontsize=20)
 

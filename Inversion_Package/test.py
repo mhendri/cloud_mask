@@ -33,9 +33,9 @@ os.chdir('./Inversion_Package/')
 # lt = [6 for x in range(7)]
 # print(lt)
 
-test = np.array([[1,2,3],[4,5,6]])
-test = test+1
-print(test)
+# test = np.array([[1,2,3],[4,5,6]])
+# test = test+1
+# print(test)
 
 #print(np.array(test).flatten())#.flatten())
 
@@ -95,6 +95,7 @@ print(test)
 # print('hello')
 # time.sleep(3)
 # print('hello')
+
 
 
 
@@ -174,3 +175,11 @@ print(test)
 
 #C:/Users/Iraz/Documents/Docs/Programs/Cloud_mask/Inversion_Package/rt_code/rt_code/info/
 #C:\Users\Iraz\Documents\Docs\Programs\Cloud_mask\Inversion_Package\rt_code\rt_code\info\standard.info
+
+
+# ###############################################################################
+# vec_generate_obs time test
+# st = time.time()
+# os.system(f'C:\\msys64\\msys2 bash shell.sh 0 1')
+
+# print(time.time() - st)
