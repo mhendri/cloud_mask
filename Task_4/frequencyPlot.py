@@ -12,6 +12,11 @@ import pandas as pd
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation 
+
+from mpl_toolkits.basemap import Basemap,cm
+from netCDF4 import Dataset as NetCDFFile
+
 
 data_path = '.\\Task_4\\'
 
@@ -22,19 +27,19 @@ def openCSV(x, y, vd='all', year=None, month=None):
     vddf = df
     if vd != 'all':
         vddf = df[df.Vd == vd]
-        print('---VD HERE:', vddf)
+        #print('---VD HERE:', vddf)
     if year:
         vddf = vddf[vddf.year == year]
-        print('---YR HERE:', vddf)
+        #print('---YR HERE:', vddf)
     if month:
         vddf = vddf[vddf.month == month]
-        print('---MT HERE:', vddf)
+        #print('---MT HERE:', vddf)
    
     xdf = vddf[x].tolist()
     ydf = vddf[y].tolist()
     return xdf, ydf
 
-def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False):
+def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False, num_bins=1000):
     xf, yf = openCSV(x, y, vd, year, month)
 
     labels = {
@@ -51,41 +56,68 @@ def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False):
     
     fig, ax = plt.subplots()
     
-    fig.set_figheight(10)
-    fig.set_figwidth(8)
+    #Dimensions for not map
+    fig.set_figheight(5)
+    fig.set_figwidth(10)
 
+    #Dimensions for map
+    # fig.set_figheight(10) 
+    # fig.set_figwidth(12)
 
-    hb2 = ax.hexbin(xf, yf, gridsize=2000, cmap='inferno', alpha=0)
-    hb = ax.hexbin(xf, yf, gridsize=2000, cmap='inferno', vmax=0.5*hb2.get_array().max())
-    
-    if gbox: ax.set(xlim=(-11, -74), ylim=(60, 84))
+    ax.patch.set_facecolor('black')
+
+    if x == 'Longitude' and y == 'Latitude':
+        m = Basemap(projection='cyl', resolution='l', fix_aspect=False,
+                llcrnrlat=59.833, urcrnrlat=81.868,
+                llcrnrlon=-72.99, urcrnrlon=-13)
+        m.drawcoastlines(linewidth=0.2, color='white')
+    #m.drawparallels(np.arange(50,90,10), labels=[True,False,False,True])
+    #m.drawmeridians(np.arange(-80,0,10), labels=[True,False,False,True])
+
+    hb2 = ax.hexbin(xf, yf, gridsize=num_bins, cmap='inferno', alpha=0)
+    if vd == 'all': hb = ax.hexbin(xf, yf, gridsize=1000, cmap='inferno', mincnt=0.001, vmin=-2, vmax=0.5*31)#hb2.get_array().max())
+    else: hb = ax.hexbin(xf, yf, gridsize=num_bins, cmap='plasma', mincnt=0.001, vmin=-2, vmax=hb2.get_array().max())
+    #else: hb = ax.hexbin(xf, yf, gridsize=num_bins, cmap='plasma', mincnt=0.001, vmin=-2, vmax=0.5*hb2.get_array().max())
+
+    if gbox: ax.set(xlim=(-72.99, -13), ylim=(59.833, 81.868))
     else: ax.set(xlim=(min(xf), max(xf)), ylim=(min(yf), max(yf)))
-    #ax.set_title("False-Clear Frequency", fontsize=18)
+    if not month: ax.set_title(f"{labels[vd]} {year}", fontsize=18)
+    if not month and not year: ax.set_title(f"{labels[vd]}", fontsize=18)
+    else: ax.set_title(f"{labels[vd]} {year}-{month}", fontsize=18)
     
     #norm = plt.Normalize(0, hb.get_array().max())
     ax.set_ylabel(labels[y], fontsize=13)
     ax.set_xlabel(labels[x], fontsize=13)
-    cb = fig.colorbar(hb, orientation='horizontal', ax=ax, extend='both')
-    cb.set_ticks(np.linspace(hb.get_array().min(), hb.get_array().max(), 5))
-    #cb.set_ticklabels(np.linspace(0, 1, 5))
-    cb.set_ticklabels(np.linspace(0, hb.get_array().max(), 5))
-    cb.set_label(f'{labels[vd]} Frequency', fontsize=13)
-    fig.tight_layout()
+    cb = fig.colorbar(hb, orientation='vertical', ax=ax, pad=0.05)#,extend='both')
     
-    #fig.savefig(f'./Task_4/pngs/frequencyPlot_{vd}_{x}_{y}test', bbox_inches='tight', dpi=400)
-    fig.savefig(f'./Task_4/pngs/freqplettesting', bbox_inches='tight', dpi=800)
+    if vd == 'all': cb.set_ticks(np.linspace(0, 31, 5))
+    else: cb.set_ticks(np.linspace(hb.get_array().min(), hb.get_array().max(), 5))
+    cb.set_ticklabels(np.linspace(0, 1, 2))
+    #cb.set_ticklabels(np.linspace(0, hb.get_array().max(), 5))
+    cb.set_label(f'{labels[vd]} Frequency', fontsize=13)
+    #fig.tight_layout()
+     
+    fig.savefig(f'./Task_4/pngs/freqplots/frequencyPlot-{year}-{month}_{vd}_{x}_{y}', bbox_inches='tight', dpi=400)
+    #fig.savefig(f'./Task_4/pngs/freqplots/freqplettesting', bbox_inches='tight', dpi=400)
+
+
+
+
+
 
 if __name__ == '__main__':
-    # sza_ta_falsePlot('fc', 'SZA', 'Top_Alt')
+    sza_ta_falsePlot('SZA', 'Top_Alt', vd='fc',  num_bins=200)
+    sza_ta_falsePlot('SZA', 'Top_Alt', vd='tl',  num_bins=200)
+    sza_ta_falsePlot('SZA', 'Latitude', vd='tc',  num_bins=200)
+    sza_ta_falsePlot('SZA', 'Latitude', vd='fl',  num_bins=200)
 
-    # sza_ta_falsePlot('tl', 'SZA', 'Top_Alt')
+    #sza_ta_falsePlot('Longitude', 'Latitude', vd='all', year=2007, month=6, gbox=True, num_bins=1000)
 
-    # sza_ta_falsePlot('tc', 'SZA', 'Latitude')
-
-    # sza_ta_falsePlot('fl', 'SZA', 'Latitude')
-
-    sza_ta_falsePlot('Longitude', 'Latitude', vd='all', year=None, month=None, gbox=None)
-
+    # for i in range(1,13):
+    #     sza_ta_falsePlot('Longitude', 'Latitude', vd='all', year=2007, month=i, gbox=True, num_bins=1000)
+    
+    #anim = animation.FuncAnimation(fig, sza_ta_falsePlot, fargs={'Longitude', 'Latitude', vd='all', year=2007, month}) 
 
 
-#TODO add elevation data
+
+#TODO add elevation data??

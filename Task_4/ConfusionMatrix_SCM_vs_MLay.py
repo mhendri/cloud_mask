@@ -56,7 +56,7 @@ def confuse(eightfivebelow,st_year,ed_year):
     for f in file_name_list:
         st = time.time()
 
-        #if not '1001' in f: continue
+        #if not '08-01' in f: continue
         #if not '2006-08-0' in f and not '2007-08-0' in f and not '2008-08-0' in f and not'2009-08-0'in f: continue
         if not any(str(s) in f for s in [*range(st_year, ed_year+1)]): #skips if it is not in year
             continue
@@ -268,6 +268,7 @@ def confuse(eightfivebelow,st_year,ed_year):
 
 def fdToDf():
     full_df = pd.DataFrame(full_data[:], columns=['year', 'month', 'day', 'time', 'TC', 'FC', 'TL', 'FL', 'totalpix', 'filename'])
+    
     return full_df
 
 def mdToDf():
@@ -277,7 +278,7 @@ def mdToDf():
     map_df[['Feature_Classification_Flags','year', 'month','day']] = map_df[['Feature_Classification_Flags','year', 'month','day']].apply(pd.to_numeric, downcast='integer')
     map_df[['Latitude', 'Longitude','Top_Alt','SZA']] = map_df[['Latitude', 'Longitude','Top_Alt','SZA']].apply(pd.to_numeric, downcast='float')
     map_df[['Vd', 'time']] = map_df[['Vd','time']].astype('category')
-
+    
     return map_df
 
 
@@ -286,8 +287,10 @@ def generateCSV(remove_sza_85plus='True', st_year=None, ed_year=None):
 
     print("--- %s seconds ---" % (time.time() - start_time))
     fdToDf().to_csv(f'./Task_4/csvs/cf_matrix_full_data_85bel_{st_year}-{ed_year}.csv', index=False)
-    
     mdToDf().to_csv(f'./Task_4/csvs/cf_matrix_map_data_85bel_{st_year}-{ed_year}.csv', index=False)
+
+    full_data = []
+    map_data = []
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
@@ -300,7 +303,7 @@ if __name__ == "__main__":
     generateCSV(st_year=2009,ed_year=2009)
 
     #Produce for all years 2006-2009
-    #generateCSV(st_year=2006,ed_year=2009)
+    # generateCSV(st_year=2006,ed_year=2009)
 
     
 
