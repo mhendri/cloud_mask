@@ -91,10 +91,10 @@ def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False, num_bins
     cb = fig.colorbar(hb, orientation='vertical', ax=ax, pad=0.05)#,extend='both')
     
     if vd == 'all': cb.set_ticks(np.linspace(0, 31, 5))
-    else: cb.set_ticks(np.linspace(hb.get_array().min(), hb.get_array().max(), 5))
-    cb.set_ticklabels(np.linspace(0, 1, 2))
-    #cb.set_ticklabels(np.linspace(0, hb.get_array().max(), 5))
-    cb.set_label(f'{labels[vd]} Frequency', fontsize=13)
+    else: cb.set_ticks(np.around(np.linspace(hb.get_array().min(), hb.get_array().max(), 5)))
+    #cb.set_ticklabels(np.linspace(0, 1, 2))
+    cb.set_ticklabels(np.linspace(0, hb.get_array().max(), 5, dtype=int))
+    cb.set_label(f'{labels[vd]} Pixels', fontsize=13)
     #fig.tight_layout()
      
     fig.savefig(f'./Task_4/pngs/freqplots/frequencyPlot-{year}-{month}_{vd}_{x}_{y}', bbox_inches='tight', dpi=400)
