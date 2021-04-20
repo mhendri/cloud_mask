@@ -9,7 +9,7 @@ Usage: save this script and run
 
 The HDF file must be in your current working directory
 
-Tested under: Python 3.7.6, Anaconda 4.8.3
+Tested under: Python 3.8.7, Anaconda 4.8.3
 Last Updated: 2020-08-13
 '''
 

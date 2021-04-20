@@ -16,7 +16,7 @@ Usage:  save this script and run
     python MODIS_orbit_features_enhanced.py
     For different band combinations, simply change the list bands_used right underneath the imports. 
 The HDF files must either be in your current working directory.
-Tested under: Python 3.7.6  Anaconda 4.8.3
+Tested under: Python 3.8.7  Anaconda 4.8.3
 Last updated: 2020-09-03
 '''
 #-----------------------------------------------------------------------------#

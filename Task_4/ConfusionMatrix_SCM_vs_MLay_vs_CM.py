@@ -8,12 +8,10 @@ Created on Thu Feb 13 08:44:59 2020
 This code creates a confustion matrix between the SCM and the
 CLM developed from CALIPSO.
 
-Usage:  save this script and run
+This is similar to ConfusionMatrix_SCM_vs_MLay.py however
+this version includes MODIS cloud mask results.
 
-    python SCM_confusion_matrix.py
-
-Tested under: Python 3.7.6  Anaconda 4.8.3
-Last updated: 2020-12-04
+Tested under: Python 3.8.7  Anaconda 4.8.3
 """
 
 import os

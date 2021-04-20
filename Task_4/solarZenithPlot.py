@@ -1,10 +1,9 @@
 '''
-Created by Iraz Tejani
+Created by: Iraz Tejani
 
 This script plots solar zenith angles!
 
-Tested under: Python 3.7.6  Anaconda 4.8.5
-Last updated: 2020-11-13
+Tested under: Python 3.8.7  Anaconda 4.8.5
 '''
 
 import os

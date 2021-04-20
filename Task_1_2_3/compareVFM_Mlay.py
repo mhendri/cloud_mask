@@ -1,5 +1,5 @@
 """
-Edited by Iraz Tejani
+Created by Iraz Tejani
 
 All this does is compare the VFM output to the MLay output.
 
@@ -7,8 +7,7 @@ Usage: just run it in your code editor
 
 The HDF file must be in the data directory.
 
-Tested under: Python 3.7.6  Anaconda 4.8.5
-Last updated: 2020-10-19
+Tested under: Python 3.8.7  Anaconda 4.8.5
 """
 import os
 import numpy as np

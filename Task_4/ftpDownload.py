@@ -1,12 +1,15 @@
 '''
-Created by Iraz Tejani
+Created by: Iraz Tejani
 
 This script downloads all the data we need from 
 ftp://ftp.icare.univ-lille1.fr/SPACEBORNE/CALIOP/
 
-Tested under: Python 3.7.6  Anaconda 4.8.5
-Last updated: 2020-10-22
+If you really need to run this, contact me and I will show you
+how to.
+
+Tested under: Python 3.8.7  Anaconda 4.8.5
 '''
+
 
 import os
 from os import listdir
@@ -46,7 +49,7 @@ data_path = 'E:\\CM_data\\'
 
 def ftpLogin():
     #FTP Login
-    ftp = FTP('ftp.icare.univ-lille1.fr', 'iraz', 'friedchicken')
+    ftp = FTP('ftp.icare.univ-lille1.fr', 'username', 'password') # PUT YOUR USERNAME AND PASSWORD HERE 
     return ftp
 
 def ftpWalk(ftp, dir):
@@ -473,6 +476,6 @@ if __name__ == '__main__':
 
     #batchDownload('myd35_over_greenland.csv', 10)
 
-    print('uncomment something')
+    pass
 
     

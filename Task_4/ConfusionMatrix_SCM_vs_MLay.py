@@ -8,12 +8,10 @@ Created on Thu Feb 13 08:44:59 2020
 This code creates a confustion matrix between the SCM and the
 CLM developed from CALIPSO.
 
-Usage:  save this script and run
+To run this, go down to the main method and then simply call 
+confuse with whatever years you want. It will output csvs.
 
-    python SCM_confusion_matrix.py
-
-Tested under: Python 3.7.6  Anaconda 4.8.3
-Last updated: 2020-12-04
+Tested under: Python 3.8.7  Anaconda 4.8.3
 """
 
 import os

@@ -1,11 +1,16 @@
 '''
-Created by Iraz Tejani
+Created by: Iraz Tejani
 
-This script makes a figure using output from
-confusionMatrix2.py
+This script makes multiple figures using output from
+confusionMatrix_SCM_vs_MLay.py
 
-Tested under: Python 3.7.6  Anaconda 4.8.5
-Last updated: 2020-10-22
+Make sure the paths to the csv files are correct. If you need
+them and don't want to process then contact me and I will provide.
+
+Usage: Go down to the main method and then just uncomment whatever
+method you want the figure for. 
+
+Tested under: Python 3.8.7  Anaconda 4.8.5
 '''
 import statistics as st
 import math

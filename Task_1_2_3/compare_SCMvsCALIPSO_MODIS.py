@@ -1,5 +1,5 @@
 '''
-Created by Hannah Skobe
+Created by: Iraz Tejani, Hannah Skobe
 
 This code illustrates how to access CALIPSO and MODIS files
 to compare the SCM and 'Number_Layers_Found' field in the 
@@ -11,8 +11,7 @@ Usage:  save this script and run
 
 The HDF file must be in your current working directory in a folder named 'Data'.
 
-Tested under: Python 3.7.6  Anaconda 4.8.3
-Last updated: 2020-08-14
+Tested under: Python 3.8.7  Anaconda 4.8.3
 '''
 
 import os

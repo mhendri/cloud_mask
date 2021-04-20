@@ -1,11 +1,10 @@
 '''
-Created by Iraz Tejani
+Created by: Iraz Tejani
 
 This script makes a figure using output from
-confusionMatrix2.py
+confusionMatrix_SCM_vs_MLay.py
 
-Tested under: Python 3.7.6  Anaconda 4.8.5
-Last updated: 2020-10-22
+Tested under: Python 3.8.7  Anaconda 4.8.5
 '''
 import numpy as np
 import pandas as pd

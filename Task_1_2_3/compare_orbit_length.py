@@ -11,7 +11,7 @@ Usage:  save this script and run
 
 The HDF files must either be in your current working directory.
 
-Tested under: Python 3.7.6  Anaconda 4.8.3
+Tested under: Python 3.8.7  Anaconda 4.8.3
 Last updated: 2020-08-14
 '''
 

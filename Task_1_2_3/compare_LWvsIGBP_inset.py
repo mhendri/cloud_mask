@@ -12,7 +12,7 @@ To generate zoomed in image, comment out bottom insert section then simply zoom
 using the plot tool shown after running the script. 
 
 The HDF file must be in your current working directory in a folder named 'Data'.
-Tested under: Python 3.7.6  Anaconda 4.8.3
+Tested under: Python 3.8.7  Anaconda 4.8.3
 Last updated: 2020-08-19
 """
 
