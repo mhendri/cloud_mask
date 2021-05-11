@@ -54,14 +54,13 @@ def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False, num_bins
     }
     
     fig, ax = plt.subplots()
-    
-    #Dimensions for not map
-    fig.set_figheight(5)
-    fig.set_figwidth(10)
 
-    #Dimensions for map
-    # fig.set_figheight(10) 
-    # fig.set_figwidth(12)
+    if x == 'Longitude' and y == 'Latitude':
+        fig.set_figheight(10) 
+        fig.set_figwidth(12)
+    else:
+        fig.set_figheight(5)
+        fig.set_figwidth(10)
 
     ax.patch.set_facecolor('black')
 
@@ -75,8 +74,8 @@ def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False, num_bins
 
     hb2 = ax.hexbin(xf, yf, gridsize=num_bins, cmap='inferno', alpha=0)
     if vd == 'all': hb = ax.hexbin(xf, yf, gridsize=1000, cmap='inferno', mincnt=0.001, vmin=-2, vmax=0.5*31)#hb2.get_array().max())
-    else: hb = ax.hexbin(xf, yf, gridsize=num_bins, cmap='plasma', mincnt=0.001, vmin=-2, vmax=hb2.get_array().max())
-    #else: hb = ax.hexbin(xf, yf, gridsize=num_bins, cmap='plasma', mincnt=0.001, vmin=-2, vmax=0.5*hb2.get_array().max())
+    #else: hb = ax.hexbin(xf, yf, gridsize=num_bins, cmap='inferno', mincnt=0.001, vmin=-2, vmax=hb2.get_array().max())
+    else: hb = ax.hexbin(xf, yf, gridsize=num_bins, cmap='inferno', mincnt=0.001, vmin=-2, vmax=0.5*hb2.get_array().max())
 
     if gbox: ax.set(xlim=(-72.99, -13), ylim=(59.833, 81.868))
     else: ax.set(xlim=(min(xf), max(xf)), ylim=(min(yf), max(yf)))
@@ -91,7 +90,7 @@ def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False, num_bins
     
     if vd == 'all': cb.set_ticks(np.linspace(0, 31, 5))
     else: cb.set_ticks(np.around(np.linspace(hb.get_array().min(), hb.get_array().max(), 5)))
-    #cb.set_ticklabels(np.linspace(0, 1, 2))
+    # cb.set_ticklabels(np.linspace(0, 1, 2))
     cb.set_ticklabels(np.linspace(0, hb.get_array().max(), 5, dtype=int))
     cb.set_label(f'{labels[vd]} Pixels', fontsize=13)
     #fig.tight_layout()
@@ -105,12 +104,15 @@ def sza_ta_falsePlot(x, y, vd='all', year=None, month=None, gbox=False, num_bins
 
 
 if __name__ == '__main__':
-    sza_ta_falsePlot('SZA', 'Top_Alt', vd='fc',  num_bins=200)
-    sza_ta_falsePlot('SZA', 'Top_Alt', vd='tl',  num_bins=200)
-    sza_ta_falsePlot('SZA', 'Latitude', vd='tc',  num_bins=200)
-    sza_ta_falsePlot('SZA', 'Latitude', vd='fl',  num_bins=200)
+    # sza_ta_falsePlot('SZA', 'Top_Alt', vd='fc',  num_bins=200)
+    # sza_ta_falsePlot('SZA', 'Top_Alt', vd='tl',  num_bins=200)
+    # sza_ta_falsePlot('SZA', 'Latitude', vd='tc',  num_bins=200)
+    # sza_ta_falsePlot('SZA', 'Latitude', vd='fl',  num_bins=200)
 
-    #sza_ta_falsePlot('Longitude', 'Latitude', vd='all', year=2007, month=6, gbox=True, num_bins=1000)
+    sza_ta_falsePlot('Longitude', 'Latitude', vd='tl', year=2007, month=None, gbox=True, num_bins=50)
+    sza_ta_falsePlot('Longitude', 'Latitude', vd='tc', year=2007, month=None, gbox=True, num_bins=50)
+    sza_ta_falsePlot('Longitude', 'Latitude', vd='fl', year=2007, month=None, gbox=True, num_bins=50)
+    sza_ta_falsePlot('Longitude', 'Latitude', vd='fc', year=2007, month=None, gbox=True, num_bins=50)
 
     # for i in range(1,13):
     #     sza_ta_falsePlot('Longitude', 'Latitude', vd='all', year=2007, month=i, gbox=True, num_bins=1000)
