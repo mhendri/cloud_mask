@@ -83,10 +83,12 @@ def getGreenlandCoords(HDF_PATH):
     hdf = SD(HDF_PATH, SDC.READ)
     lat = hdf.select('Latitude')[:, :]
     lon = hdf.select('Longitude')[:, :]
-    stop = int(round(np.max(np.where(np.around(lon)==-74)[1])+5.1, -1))
 
-    lat = lat[:stop, 0:stop]
-    lon = lon[:stop, 0:stop]
+    where = np.where(np.around(lon)==-74)[1]
+    if where.size>0:
+        stop = int(round(np.max(where)+5.1, -1))
+        lat = lat[:stop, 0:stop]
+        lon = lon[:stop, 0:stop]
 
     ######### Testing stuff
     #####################################################
