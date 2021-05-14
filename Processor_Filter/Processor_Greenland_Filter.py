@@ -2,7 +2,8 @@
 Created by: Iraz Tejani
 
 This script will take an input HDF file and then return a list of 
-coordinates from it which fall over Greenland
+coordinates from it which fall over Greenland as well as indexes 
+if you want.
 
 USAGE: import this file and then call the method
        getGreenlandCoords(HDF_PATH). This will return
@@ -41,8 +42,8 @@ poly = Polygon(coords)
 def multi_subset(zipped):
     lat = zipped[0]
     lon = zipped[1]
-    idf = random.randint(10000) #To identify the same plots. I know this is garbage
-    rgb = np.random.rand(3,) #Get a random color
+    # idf = random.randint(10000) #To identify the same plots. I know this is garbage
+    # rgb = np.random.rand(3,) #Get a random color
 
     corx = []
     cory = []
@@ -117,7 +118,7 @@ def getGreenlandCoords(HDF_PATH):
         cor_inds = p.map(multi_subset, zipped)
 
     # print(len(cor_inds[0][0]))
-    # print(f'Parrallel Enumeration Done - {time.time()-st}')
+    print(f'Filter Enumeration Done - {round(time.time()-st,2)} seconds')
 
     corx = []
     cory = []
@@ -138,4 +139,45 @@ def getGreenlandCoords(HDF_PATH):
 
     return corx, cory
 
+
+def multi_subset_index(zipped):
+    lat = zipped[0]
+    lon = zipped[1]
+
+    cor_inds = []
+    lastvar = -1
+
+    for index, x in np.ndenumerate(lon):
+        if -74 < x <= -10 and 59 < lat[index[0]][index[1]] <= 84 and (poly.contains(Point(x, lat[index[0]][index[1]]))):
+            cor_inds.append(index)
+
+    return cor_inds
+
+def getGreenlandIndex(HDF_PATH):
+    st = time.time()
+    hdf = SD(HDF_PATH, SDC.READ)
+    lat = hdf.select('Latitude')[:, :]
+    lon = hdf.select('Longitude')[:, :]
+
+    # where = np.where(np.around(lon)==-74)[1]
+    # if where.size>0:
+    #     stop = int(round(np.max(where)+5.1, -1))
+    #     lat = lat[:stop, 0:stop]
+    #     lon = lon[:stop, 0:stop]
+
+    latsplit = np.hsplit(lat, 9)
+    lonsplit = np.hsplit(lon, 9)
+    zipped = list(zip(latsplit,lonsplit))
+ 
+    threads = 8
+    with Pool(threads) as p:
+        cor_inds = p.map(multi_subset_index, zipped)
+
+    print(f'Filter Enumeration Done - {round(time.time()-st,2)} seconds')
+
+    cor_inds = [i for s in cor_inds for i in s]
     
+    return cor_inds
+
+if __name__ == '__main__':
+    freeze_support()
