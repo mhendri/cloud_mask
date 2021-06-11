@@ -607,12 +607,12 @@ def interSave():
     df = pd.read_csv(csv_path+'cf_matrix_map_data_85bel_cm.csv.gz', compression='gzip')
     df = df.append(map_df, ignore_index=True)
 
-    df.to_csv('E:/new_csvs/cf_matrix_map_data_85bel_cm.csv.gz', index=False, compression='gzip')
+    df.to_csv(f'{csv_path}cf_matrix_map_data_85bel_cm.csv.gz', index=False, compression='gzip')
 
 def emptyDf():
     map_df = pd.DataFrame(columns=['year', 'month', 'day', 'time', 'Latitude', 'Longitude', 'Vd', 'Top_Alt',
                                                 'SZA','Feature_Classification_Flags', 'Modis_CM'])
-    map_df.to_csv('E:/new_csvs/cf_matrix_map_data_85bel_cm.csv.gz', index=False, compression='gzip')
+    map_df.to_csv(f'{csv_path}cf_matrix_map_data_85bel_cm.csv.gz', index=False, compression='gzip')
 
 def fnameDict():
     myd35_fnames = [f for f in listdir(myd35_path) if isfile(join(myd35_path, f))]
@@ -628,9 +628,9 @@ if __name__ == "__main__":
 
     fd = fdToDf()
 
-    fd[2].to_csv('E:/new_csvs/cf_matrix_full_data_85bel_cm1.csv', index=False)
-    fd[1].to_csv('E:/new_csvs/cf_matrix_full_data_85bel_cm2.csv', index=False)
-    fd[0].to_csv('E:/new_csvs/cf_matrix_full_data_85bel_cm3.csv', index=False)
+    fd[2].to_csv(f'{csv_path}cf_matrix_full_data_85bel_cm1.csv', index=False)
+    fd[1].to_csv(f'{csv_path}cf_matrix_full_data_85bel_cm2.csv', index=False)
+    fd[0].to_csv(f'{csv_path}cf_matrix_full_data_85bel_cm3.csv', index=False)
     
     #interSave()
     #mdToDf().to_csv('E:/new_csvs/cf_matrix_map_data_85bel_cm.csv.gz', index=False, compression='gzip')
